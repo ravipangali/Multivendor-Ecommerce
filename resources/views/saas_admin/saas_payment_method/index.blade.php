@@ -107,7 +107,7 @@
                                         @else
                                             <form action="{{ route('admin.payment-methods.set-default', $paymentMethod->id) }}" method="POST" class="d-inline">
                                                 @csrf
-                                                <button type="submit" class="btn btn-sm btn-outline-primary" title="Set as default">
+                                                <button type="submit" class="btn btn-sm btn-primary" title="Set as default">
                                                     <i data-feather="circle" style="width: 14px; height: 14px;"></i>
                                                 </button>
                                             </form>
@@ -206,5 +206,4 @@
         color: #6f42c1 !important;
     }
 </style>
-@endsection
 @endsection

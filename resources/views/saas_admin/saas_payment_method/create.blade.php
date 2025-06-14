@@ -406,4 +406,3 @@
     }
 </style>
 @endsection
-@endsection

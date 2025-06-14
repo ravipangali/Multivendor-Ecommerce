@@ -15,6 +15,17 @@ class SaasProductReview extends Model
         'seller_id',
         'rating',
         'review',
+        'seller_response',
+        'is_reported',
+        'report_reason',
+        'is_approved',
+        'images',
+    ];
+
+    protected $casts = [
+        'is_reported' => 'boolean',
+        'is_approved' => 'boolean',
+        'images' => 'array',
     ];
 
     /**
@@ -39,5 +50,43 @@ class SaasProductReview extends Model
     public function seller()
     {
         return $this->belongsTo(User::class, 'seller_id');
+    }
+
+    /**
+     * Scope a query to only include approved reviews.
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('is_approved', true);
+    }
+
+    /**
+     * Scope a query to only include reported reviews.
+     */
+    public function scopeReported($query)
+    {
+        return $query->where('is_reported', true);
+    }
+
+    /**
+     * Check if the review has images.
+     */
+    public function hasImages()
+    {
+        return !empty($this->images);
+    }
+
+    /**
+     * Get the review images URLs.
+     */
+    public function getImageUrls()
+    {
+        if (!$this->hasImages()) {
+            return [];
+        }
+
+        return array_map(function ($image) {
+            return asset('storage/' . $image);
+        }, $this->images);
     }
 }

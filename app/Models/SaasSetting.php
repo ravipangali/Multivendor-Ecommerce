@@ -2,120 +2,87 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 
 class SaasSetting extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'key',
-        'value',
-        'group',
-        'display_name',
-        'type',
-        'validation',
-        'description',
-        'is_public',
-        'sort_order',
+        // Site Settings
+        'site_name',
+        'site_logo',
+        'site_favicon',
+        'site_description',
+        'site_keywords',
+        'site_footer',
+        'site_email',
+        'site_phone',
+        'site_address',
+
+        // Social Media Links
+        'site_facebook',
+        'site_twitter',
+        'site_instagram',
+        'site_linkedin',
+        'site_youtube',
+
+        // Currency Settings
+        'site_currency_symbol',
+        'site_currency_code',
+
+        // Mail Settings
+        'mail_host',
+        'mail_port',
+        'mail_username',
+        'mail_password',
+        'mail_encryption',
+        'mail_from_address',
+        'mail_from_name',
+
+        // Payment Gateway Settings
+        'minimum_withdrawal_amount',
+        'gateway_transaction_fee',
+        'esewa_merchant_id',
+        'esewa_secret_key',
+        'khalti_public_key',
+        'khalti_secret_key',
+        'withdrawal_policy',
+
+        // Shipping Settings
+        'shipping_enable_free',
+        'shipping_free_min_amount',
+        'shipping_flat_rate_enable',
+        'shipping_flat_rate_cost',
+        'shipping_enable_local_pickup',
+        'shipping_local_pickup_cost',
+        'shipping_allow_seller_config',
+        'shipping_seller_free_enable',
+        'shipping_seller_flat_rate_enable',
+        'shipping_seller_zone_based_enable',
+        'shipping_policy_info',
+
+        // Tax Settings
+        'tax_enable',
+        'tax_rate',
+        'tax_shipping',
+        'tax_inclusive_pricing',
+
+        // Additional Shipping Settings
+        'shipping_weight_rate',
+        'shipping_min_weight',
+        'shipping_max_weight',
+        'shipping_zone_based_enable',
+        'shipping_local_rate',
+        'shipping_regional_rate',
+        'shipping_remote_rate',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
-        'is_public' => 'boolean',
-        'sort_order' => 'integer',
+        'minimum_withdrawal_amount' => 'decimal:2',
+        'gateway_transaction_fee' => 'decimal:2',
     ];
-
-    /**
-     * Cache key prefix for settings
-     */
-    const CACHE_KEY = 'saas_settings';
-
-    /**
-     * Custom save method to clear cache when a setting is modified
-     */
-    public function save(array $options = [])
-    {
-        // Clear cache for this setting
-        $this->clearCache();
-
-        return parent::save($options);
-    }
-
-    /**
-     * Get a setting value by key
-     */
-    public static function getValue(string $key, $default = null)
-    {
-        $cacheKey = self::getCacheKey($key);
-
-        return Cache::remember($cacheKey, 86400, function () use ($key, $default) {
-            $setting = self::where('key', $key)->first();
-            return $setting ? $setting->value : $default;
-        });
-    }
-
-    /**
-     * Set a setting value by key
-     */
-    public static function setValue(string $key, $value, string $group = 'general')
-    {
-        $setting = self::firstOrNew([
-            'key' => $key,
-        ]);
-
-        $setting->value = $value;
-
-        if (!$setting->exists) {
-            $setting->group = $group;
-        }
-
-        $setting->save();
-
-        return $setting;
-    }
-
-    /**
-     * Get settings by group
-     */
-    public static function getByGroup(string $group)
-    {
-        $cacheKey = self::getCacheKey("group_{$group}");
-
-        return Cache::remember($cacheKey, 86400, function () use ($group) {
-            return self::where('group', $group)->orderBy('sort_order')->get();
-        });
-    }
-
-    /**
-     * Clear setting cache
-     */
-    public function clearCache()
-    {
-        // Clear specific key cache
-        Cache::forget(self::getCacheKey($this->key));
-
-        // Clear group cache
-        Cache::forget(self::getCacheKey("group_{$this->group}"));
-
-        // Clear all settings cache
-        Cache::forget(self::getCacheKey('all'));
-    }
-
-    /**
-     * Clear all settings cache
-     */
-    public static function clearAllCache()
-    {
-        Cache::flush();
-    }
-
-    /**
-     * Get cache key for a setting
-     */
-    protected static function getCacheKey(string $key)
-    {
-        return self::CACHE_KEY . "_{$key}";
-    }
 }

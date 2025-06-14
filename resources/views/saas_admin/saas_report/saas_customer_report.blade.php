@@ -157,7 +157,7 @@
                                     <small class="text-muted">Joined {{ $customer->created_at->format('M d, Y') }}</small>
                                 </div>
                                 <div class="ms-auto">
-                                    <a href="{{ route('admin.customers.show', $customer->id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                    <a href="{{ route('admin.customers.show', $customer->id) }}" class="btn btn-sm btn-primary">View</a>
                                 </div>
                             </div>
                         </div>

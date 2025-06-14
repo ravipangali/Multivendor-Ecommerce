@@ -7,6 +7,8 @@ use App\Models\SaasOrder;
 use App\Models\SaasOrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class SaasOrderController extends Controller
 {
@@ -122,6 +124,9 @@ class SaasOrderController extends Controller
             return redirect()->back();
         }
 
+        // Load necessary relationships for email notifications
+        $order->load(['customer', 'seller', 'items.product', 'items.productVariation']);
+
         // Record the previous status for notification purposes
         $previousStatus = $order->order_status;
 
@@ -133,8 +138,29 @@ class SaasOrderController extends Controller
             SaasOrderItem::where('order_id', $order->id)
                 ->update(['status' => $request->order_status]);
 
-            // Here you would normally send a notification to the customer
-            // Notification::send($order->customer, new OrderStatusChanged($order));
+            try {
+                // Send email to customer
+                Mail::to($order->customer->email)->send(
+                    new \App\Mail\SaasOrderStatusChanged($order, $previousStatus, 'customer')
+                );
+
+                // Send email to seller (optional - since seller is making the change)
+                // Mail::to($order->seller->email)->send(
+                //     new \App\Mail\SaasOrderStatusChanged($order, $previousStatus, 'seller')
+                // );
+            } catch (\Exception $e) {
+                // Log email error but don't fail the status update
+                Log::error('Failed to send order status change emails: ' . $e->getMessage());
+            }
+
+            // Log the status change
+            Log::info('Seller changed order status', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'previous_status' => $previousStatus,
+                'new_status' => $request->order_status,
+                'seller_id' => Auth::id(),
+            ]);
         }
 
         toast('Order status updated successfully', 'success');

@@ -131,6 +131,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @section('scripts')
 <script>
@@ -161,5 +162,4 @@
         typeSelect.addEventListener('change', toggleFields);
     });
 </script>
-@endsection
 @endsection

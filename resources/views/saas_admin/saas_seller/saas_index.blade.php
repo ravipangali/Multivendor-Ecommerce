@@ -39,7 +39,7 @@
                             <button type="submit" class="btn btn-primary">Filter</button>
                         </div>
                         <div class="col-md-3 text-end">
-                            <a href="{{ route('admin.sellers.index') }}" class="btn btn-outline-secondary">Clear</a>
+                            <a href="{{ route('admin.sellers.index') }}" class="btn btn-secondary">Clear</a>
                         </div>
                     </form>
                 </div>

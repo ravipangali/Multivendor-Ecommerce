@@ -4,356 +4,337 @@
 
 @section('styles')
 <style>
-    .settings-card {
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-    }
-    .settings-card:hover {
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
     .settings-nav {
-        position: sticky;
-        top: 1rem;
+        background: #fff;
         border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
+        margin-bottom: 2rem;
     }
-    .settings-nav .list-group-item {
-        border-left: 0;
-        border-right: 0;
-        padding: 1rem 1.25rem;
+    .settings-nav .nav-link {
+        color: #6c757d;
+        border: none;
+        padding: 1rem 1.5rem;
+        border-radius: 0;
+        transition: all 0.3s ease;
         display: flex;
         align-items: center;
+        gap: 0.5rem;
     }
-    .settings-nav .list-group-item.active {
-        background-color: #3b7ddd;
-        border-color: #3b7ddd;
+    .settings-nav .nav-link:first-child {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
     }
-    .settings-nav .list-group-item i {
-        margin-right: 10px;
+    .settings-nav .nav-link:last-child {
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
     }
-    .preview-image {
-        width: 120px;
-        height: 120px;
-        object-fit: contain;
-        border-radius: 5px;
-        border: 1px solid #dee2e6;
-        padding: 5px;
-        background-color: #f8f9fa;
-    }
-    .image-preview-container {
-        position: relative;
-        margin-bottom: 15px;
-    }
-    .image-preview-container .remove-image {
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        background: #dc3545;
+    .settings-nav .nav-link.active {
+        background: linear-gradient(135deg, #4c8bef 0%, #024dc4 100%);
         color: white;
-        border-radius: 50%;
-        width: 25px;
-        height: 25px;
+    }
+    .settings-nav .nav-link:hover:not(.active) {
+        background: #f8f9fa;
+        color: #495057;
+    }
+    .settings-card {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
+        border: none;
+        overflow: hidden;
+    }
+    .settings-card .card-header {
+        background: linear-gradient(135deg, #4c8bef 0%, #024dc4 100%);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+    }
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
+    }
+    .form-section h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-weight: 600;
         display: flex;
         align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        gap: 0.5rem;
     }
-    .dropzone {
-        border: 2px dashed #dee2e6;
-        border-radius: 5px;
-        padding: 20px;
-        text-align: center;
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #e0e6ed;
+        padding: 0.75rem 1rem;
         transition: all 0.3s ease;
     }
-    .dropzone:hover {
-        border-color: #3b7ddd;
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     }
-    .custom-switch .custom-control-label::before {
-        height: 1.5rem;
-        width: 2.75rem;
-        border-radius: 0.75rem;
+    .btn-primary {
+        background: linear-gradient(135deg, #4c8bef 0%, #024dc4 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
-    .custom-switch .custom-control-label::after {
-        height: calc(1.5rem - 4px);
-        width: calc(1.5rem - 4px);
-        border-radius: 0.75rem;
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
-    .form-section-title {
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #dee2e6;
-        color: #3b7ddd;
+    .image-preview {
+        max-height: 60px;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 5px;
+        background: white;
     }
-    .form-section-title:first-of-type {
-        margin-top: 0;
+    .input-group-text {
+        background: #f8f9fa;
+        border: 1px solid #e0e6ed;
+        color: #6c757d;
     }
 </style>
 @endsection
 
 @section('content')
 <div class="col-12">
-    <div class="row">
-        <!-- Settings navigation -->
-        <div class="col-md-3 mb-4">
-            <div class="settings-nav">
-                <div class="list-group list-group-flush">
-                    <a href="{{ route('admin.settings.general') }}" class="list-group-item list-group-item-action active">
-                        <i data-feather="settings" class="feather-sm"></i> General
-                    </a>
-                    <a href="{{ route('admin.settings.email') }}" class="list-group-item list-group-item-action">
-                        <i data-feather="mail" class="feather-sm"></i> Email
-                    </a>
-                    <a href="{{ route('admin.settings.payment') }}" class="list-group-item list-group-item-action">
-                        <i data-feather="credit-card" class="feather-sm"></i> Payment
-                    </a>
-                    <a href="{{ route('admin.settings.shipping') }}" class="list-group-item list-group-item-action">
-                        <i data-feather="truck" class="feather-sm"></i> Shipping
-                    </a>
-                </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">General Settings</h5>
+                <a href="{{ route('admin.settings.index') }}" class="btn btn-secondary">
+                    <i class="align-middle" data-feather="arrow-left"></i> Back to Settings
+                </a>
             </div>
         </div>
+        <div class="card-body">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-        <!-- Settings content -->
-        <div class="col-md-9">
-            <div class="card settings-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">General Settings</h5>
-                    <button type="button" class="btn btn-sm btn-outline-primary" id="resetForm">
-                        <i data-feather="refresh-cw" class="feather-sm"></i> Reset
+            <form action="{{ route('admin.settings.general') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                <!-- Site Information -->
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="align-middle" data-feather="globe"></i> Site Information
+                    </h6>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_name" class="form-label">Site Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="site_name" name="site_name"
+                                    value="{{ old('site_name', $settings->site_name) }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_email" class="form-label">Site Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="site_email" name="site_email"
+                                    value="{{ old('site_email', $settings->site_email) }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_phone" class="form-label">Site Phone</label>
+                                <input type="text" class="form-control" id="site_phone" name="site_phone"
+                                    value="{{ old('site_phone', $settings->site_phone) }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_address" class="form-label">Site Address</label>
+                                <input type="text" class="form-control" id="site_address" name="site_address"
+                                    value="{{ old('site_address', $settings->site_address) }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="site_description" class="form-label">Site Description</label>
+                        <textarea class="form-control" id="site_description" name="site_description" rows="3">{{ old('site_description', $settings->site_description) }}</textarea>
+                        <small class="text-muted">This will be used as meta description for SEO</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="site_keywords" class="form-label">Site Keywords</label>
+                        <input type="text" class="form-control" id="site_keywords" name="site_keywords"
+                            value="{{ old('site_keywords', $settings->site_keywords) }}"
+                            placeholder="keyword1, keyword2, keyword3">
+                        <small class="text-muted">Comma-separated keywords for SEO</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="site_footer" class="form-label">Footer Text</label>
+                        <textarea class="form-control" id="site_footer" name="site_footer" rows="2">{{ old('site_footer', $settings->site_footer) }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Site Branding -->
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="align-middle" data-feather="image"></i> Site Branding
+                    </h6>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_logo" class="form-label">Site Logo</label>
+                                <input type="file" class="form-control" id="site_logo" name="site_logo" accept="image/*">
+                                <small class="text-muted">Recommended size: 200x50px</small>
+
+                                @if($settings->site_logo)
+                                    <div class="mt-2">
+                                        <img src="{{ asset('storage/'.$settings->site_logo) }}" alt="Current Logo"
+                                            class="img-thumbnail" style="max-height: 60px;">
+                                        <div class="small text-muted">Current Logo</div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_favicon" class="form-label">Site Favicon</label>
+                                <input type="file" class="form-control" id="site_favicon" name="site_favicon" accept="image/*">
+                                <small class="text-muted">Recommended: 32x32px (.ico, .png)</small>
+
+                                @if($settings->site_favicon)
+                                    <div class="mt-2">
+                                        <img src="{{ asset('storage/'.$settings->site_favicon) }}" alt="Current Favicon"
+                                            class="img-thumbnail" style="max-height: 32px;">
+                                        <div class="small text-muted">Current Favicon</div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Currency Settings -->
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="align-middle" data-feather="dollar-sign"></i> Currency Settings
+                    </h6>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_currency_code" class="form-label">Currency Code <span class="text-danger">*</span></label>
+                                <select class="form-select" id="site_currency_code" name="site_currency_code" required>
+                                    <option value="">Select Currency</option>
+                                    <option value="USD" {{ old('site_currency_code', $settings->site_currency_code) == 'USD' ? 'selected' : '' }}>USD - US Dollar</option>
+                                    <option value="EUR" {{ old('site_currency_code', $settings->site_currency_code) == 'EUR' ? 'selected' : '' }}>EUR - Euro</option>
+                                    <option value="NPR" {{ old('site_currency_code', $settings->site_currency_code) == 'NPR' ? 'selected' : '' }}>NPR - Nepalese Rupee</option>
+                                    <option value="INR" {{ old('site_currency_code', $settings->site_currency_code) == 'INR' ? 'selected' : '' }}>INR - Indian Rupee</option>
+                                    <option value="GBP" {{ old('site_currency_code', $settings->site_currency_code) == 'GBP' ? 'selected' : '' }}>GBP - British Pound</option>
+                                    <option value="JPY" {{ old('site_currency_code', $settings->site_currency_code) == 'JPY' ? 'selected' : '' }}>JPY - Japanese Yen</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_currency_symbol" class="form-label">Currency Symbol <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="site_currency_symbol" name="site_currency_symbol"
+                                    value="{{ old('site_currency_symbol', $settings->site_currency_symbol) }}"
+                                    placeholder="$, €, ₹, रू, etc." required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media Links -->
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="align-middle" data-feather="share-2"></i> Social Media Links
+                    </h6>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_facebook" class="form-label">Facebook URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i data-feather="facebook"></i></span>
+                                    <input type="url" class="form-control" id="site_facebook" name="site_facebook"
+                                        value="{{ old('site_facebook', $settings->site_facebook) }}"
+                                        placeholder="https://facebook.com/yourpage">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_twitter" class="form-label">Twitter URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i data-feather="twitter"></i></span>
+                                    <input type="url" class="form-control" id="site_twitter" name="site_twitter"
+                                        value="{{ old('site_twitter', $settings->site_twitter) }}"
+                                        placeholder="https://twitter.com/yourhandle">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_instagram" class="form-label">Instagram URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i data-feather="instagram"></i></span>
+                                    <input type="url" class="form-control" id="site_instagram" name="site_instagram"
+                                        value="{{ old('site_instagram', $settings->site_instagram) }}"
+                                        placeholder="https://instagram.com/yourprofile">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_linkedin" class="form-label">LinkedIn URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i data-feather="linkedin"></i></span>
+                                    <input type="url" class="form-control" id="site_linkedin" name="site_linkedin"
+                                        value="{{ old('site_linkedin', $settings->site_linkedin) }}"
+                                        placeholder="https://linkedin.com/company/yourcompany">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_youtube" class="form-label">YouTube URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i data-feather="youtube"></i></span>
+                                    <input type="url" class="form-control" id="site_youtube" name="site_youtube"
+                                        value="{{ old('site_youtube', $settings->site_youtube) }}"
+                                        placeholder="https://youtube.com/channel/yourchannel">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="align-middle" data-feather="save"></i> Save General Settings
                     </button>
                 </div>
-                <div class="card-body">
-                    <form action="{{ route('admin.settings.general') }}" method="POST" enctype="multipart/form-data" id="generalSettingsForm">
-                        @csrf
-
-                        <!-- Site Information -->
-                        <h5 class="form-section-title">
-                            <i data-feather="info" class="feather-sm me-1"></i> Site Information
-                        </h5>
-
-                        <div class="mb-3">
-                            <label for="site_name" class="form-label">Site Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('site_name') is-invalid @enderror"
-                                   id="site_name" name="site_name"
-                                   value="{{ old('site_name', $settingsArray['site_name'] ?? '') }}" required>
-                            @error('site_name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="site_logo" class="form-label">Site Logo</label>
-                                <div class="image-preview-container mb-2">
-                                    @if(isset($settingsArray['site_logo']))
-                                        <img src="{{ Storage::url($settingsArray['site_logo']) }}" alt="Site Logo" class="preview-image" id="logoPreview">
-                                        <div class="remove-image" data-input="site_logo">
-                                            <i data-feather="x" class="feather-sm"></i>
-                                        </div>
-                                    @else
-                                        <img src="{{ asset('saas_admin/img/placeholder-image.jpg') }}" alt="Site Logo" class="preview-image" id="logoPreview">
-                                    @endif
-                                </div>
-                                <div class="dropzone mb-3" id="logoDropzone">
-                                    <i data-feather="upload" class="feather mb-2"></i>
-                                    <p class="mb-0">Drag & drop or click to upload</p>
-                                    <small class="text-muted">PNG, JPG, GIF up to 2MB</small>
-                                    <input type="file" class="d-none" id="site_logo" name="site_logo" accept="image/*">
-                                </div>
-                                @error('site_logo')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="favicon" class="form-label">Favicon</label>
-                                <div class="image-preview-container mb-2">
-                                    @if(isset($settingsArray['favicon']))
-                                        <img src="{{ Storage::url($settingsArray['favicon']) }}" alt="Favicon" class="preview-image" id="faviconPreview">
-                                        <div class="remove-image" data-input="favicon">
-                                            <i data-feather="x" class="feather-sm"></i>
-                                        </div>
-                                    @else
-                                        <img src="{{ asset('saas_admin/img/placeholder-image.jpg') }}" alt="Favicon" class="preview-image" id="faviconPreview">
-                                    @endif
-                                </div>
-                                <div class="dropzone mb-3" id="faviconDropzone">
-                                    <i data-feather="upload" class="feather mb-2"></i>
-                                    <p class="mb-0">Drag & drop or click to upload</p>
-                                    <small class="text-muted">PNG, ICO up to 1MB</small>
-                                    <input type="file" class="d-none" id="favicon" name="favicon" accept="image/x-icon,image/png">
-                                </div>
-                                @error('favicon')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="site_description" class="form-label">Site Description</label>
-                            <textarea class="form-control @error('site_description') is-invalid @enderror"
-                                      id="site_description" name="site_description" rows="3">{{ old('site_description', $settingsArray['site_description'] ?? '') }}</textarea>
-                            @error('site_description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="site_keywords" class="form-label">Site Keywords</label>
-                            <input type="text" class="form-control @error('site_keywords') is-invalid @enderror"
-                                   id="site_keywords" name="site_keywords"
-                                   value="{{ old('site_keywords', $settingsArray['site_keywords'] ?? '') }}"
-                                   placeholder="e.g., ecommerce, shop, online">
-                            <small class="text-muted">Separate keywords with commas</small>
-                            @error('site_keywords')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="footer_text" class="form-label">Footer Text</label>
-                            <textarea class="form-control @error('footer_text') is-invalid @enderror"
-                                      id="footer_text" name="footer_text" rows="2">{{ old('footer_text', $settingsArray['footer_text'] ?? '© ' . date('Y') . ' ' . ($settingsArray['site_name'] ?? 'Multi Tenant E-commerce') . '. All rights reserved.') }}</textarea>
-                            @error('footer_text')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Contact Information -->
-                        <h5 class="form-section-title">
-                            <i data-feather="phone" class="feather-sm me-1"></i> Contact Information
-                        </h5>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="site_email" class="form-label">Site Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control @error('site_email') is-invalid @enderror"
-                                       id="site_email" name="site_email"
-                                       value="{{ old('site_email', $settingsArray['site_email'] ?? '') }}" required>
-                                @error('site_email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="site_phone" class="form-label">Site Phone</label>
-                                <input type="text" class="form-control @error('site_phone') is-invalid @enderror"
-                                       id="site_phone" name="site_phone"
-                                       value="{{ old('site_phone', $settingsArray['site_phone'] ?? '') }}">
-                                @error('site_phone')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="site_address" class="form-label">Site Address</label>
-                            <textarea class="form-control @error('site_address') is-invalid @enderror"
-                                      id="site_address" name="site_address" rows="2">{{ old('site_address', $settingsArray['site_address'] ?? '') }}</textarea>
-                            @error('site_address')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Social Media -->
-                        <h5 class="form-section-title">
-                            <i data-feather="share-2" class="feather-sm me-1"></i> Social Media
-                        </h5>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="social_facebook" class="form-label">Facebook URL</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i data-feather="facebook" class="feather-sm"></i></span>
-                                    <input type="url" class="form-control @error('social_facebook') is-invalid @enderror"
-                                           id="social_facebook" name="social_facebook"
-                                           value="{{ old('social_facebook', $settingsArray['social_facebook'] ?? '') }}">
-                                </div>
-                                @error('social_facebook')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="social_twitter" class="form-label">Twitter URL</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i data-feather="twitter" class="feather-sm"></i></span>
-                                    <input type="url" class="form-control @error('social_twitter') is-invalid @enderror"
-                                           id="social_twitter" name="social_twitter"
-                                           value="{{ old('social_twitter', $settingsArray['social_twitter'] ?? '') }}">
-                                </div>
-                                @error('social_twitter')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="social_instagram" class="form-label">Instagram URL</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i data-feather="instagram" class="feather-sm"></i></span>
-                                    <input type="url" class="form-control @error('social_instagram') is-invalid @enderror"
-                                           id="social_instagram" name="social_instagram"
-                                           value="{{ old('social_instagram', $settingsArray['social_instagram'] ?? '') }}">
-                                </div>
-                                @error('social_instagram')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="social_linkedin" class="form-label">LinkedIn URL</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i data-feather="linkedin" class="feather-sm"></i></span>
-                                    <input type="url" class="form-control @error('social_linkedin') is-invalid @enderror"
-                                           id="social_linkedin" name="social_linkedin"
-                                           value="{{ old('social_linkedin', $settingsArray['social_linkedin'] ?? '') }}">
-                                </div>
-                                @error('social_linkedin')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Currency Settings -->
-                        <h5 class="form-section-title">
-                            <i data-feather="dollar-sign" class="feather-sm me-1"></i> Currency Settings
-                        </h5>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="currency_symbol" class="form-label">Currency Symbol <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('currency_symbol') is-invalid @enderror"
-                                       id="currency_symbol" name="currency_symbol"
-                                       value="{{ old('currency_symbol', $settingsArray['currency_symbol'] ?? '$') }}" required>
-                                @error('currency_symbol')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="currency_code" class="form-label">Currency Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('currency_code') is-invalid @enderror"
-                                       id="currency_code" name="currency_code"
-                                       value="{{ old('currency_code', $settingsArray['currency_code'] ?? 'USD') }}" required>
-                                @error('currency_code')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="text-end mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i data-feather="save" class="feather-sm me-1"></i> Save Settings
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -361,113 +342,21 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Feather icons
-        feather.replace();
+    // Auto-fill currency symbol based on currency code selection
+    document.getElementById('site_currency_code').addEventListener('change', function() {
+        const symbols = {
+            'USD': '$',
+            'EUR': '€',
+            'NPR': 'रू',
+            'INR': '₹',
+            'GBP': '£',
+            'JPY': '¥'
+        };
 
-        // Logo dropzone functionality
-        const logoDropzone = document.getElementById('logoDropzone');
-        const logoInput = document.getElementById('site_logo');
-        const logoPreview = document.getElementById('logoPreview');
-
-        logoDropzone.addEventListener('click', function() {
-            logoInput.click();
-        });
-
-        logoDropzone.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            logoDropzone.classList.add('border-primary');
-        });
-
-        logoDropzone.addEventListener('dragleave', function() {
-            logoDropzone.classList.remove('border-primary');
-        });
-
-        logoDropzone.addEventListener('drop', function(e) {
-            e.preventDefault();
-            logoDropzone.classList.remove('border-primary');
-            if (e.dataTransfer.files.length) {
-                logoInput.files = e.dataTransfer.files;
-                updateImagePreview(logoInput, logoPreview);
-            }
-        });
-
-        logoInput.addEventListener('change', function() {
-            updateImagePreview(logoInput, logoPreview);
-        });
-
-        // Favicon dropzone functionality
-        const faviconDropzone = document.getElementById('faviconDropzone');
-        const faviconInput = document.getElementById('favicon');
-        const faviconPreview = document.getElementById('faviconPreview');
-
-        faviconDropzone.addEventListener('click', function() {
-            faviconInput.click();
-        });
-
-        faviconDropzone.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            faviconDropzone.classList.add('border-primary');
-        });
-
-        faviconDropzone.addEventListener('dragleave', function() {
-            faviconDropzone.classList.remove('border-primary');
-        });
-
-        faviconDropzone.addEventListener('drop', function(e) {
-            e.preventDefault();
-            faviconDropzone.classList.remove('border-primary');
-            if (e.dataTransfer.files.length) {
-                faviconInput.files = e.dataTransfer.files;
-                updateImagePreview(faviconInput, faviconPreview);
-            }
-        });
-
-        faviconInput.addEventListener('change', function() {
-            updateImagePreview(faviconInput, faviconPreview);
-        });
-
-        // Function to update image preview
-        function updateImagePreview(input, preview) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.parentElement.style.display = 'block';
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
+        const symbolInput = document.getElementById('site_currency_symbol');
+        if (symbols[this.value] && !symbolInput.value) {
+            symbolInput.value = symbols[this.value];
         }
-
-        // Remove image functionality
-        document.querySelectorAll('.remove-image').forEach(function(button) {
-            button.addEventListener('click', function() {
-                const inputName = this.dataset.input;
-                const input = document.getElementById(inputName);
-                const preview = document.getElementById(inputName + 'Preview');
-
-                // Reset file input
-                input.value = '';
-
-                // Reset preview
-                preview.src = '{{ asset("saas_admin/img/placeholder-image.jpg") }}';
-
-                // Hide the remove button
-                this.style.display = 'none';
-            });
-        });
-
-        // Reset form button
-        document.getElementById('resetForm').addEventListener('click', function() {
-            if (confirm('Are you sure you want to reset the form? All unsaved changes will be lost.')) {
-                document.getElementById('generalSettingsForm').reset();
-                document.getElementById('logoPreview').src = '{{ asset("saas_admin/img/placeholder-image.jpg") }}';
-                document.getElementById('faviconPreview').src = '{{ asset("saas_admin/img/placeholder-image.jpg") }}';
-                document.querySelectorAll('.remove-image').forEach(element => {
-                    element.style.display = 'none';
-                });
-            }
-        });
     });
 </script>
 @endsection

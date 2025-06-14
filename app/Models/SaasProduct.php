@@ -24,6 +24,7 @@ class SaasProduct extends Model
         'SKU',
         'unit_id',
         'stock',
+        'weight',
         'price',
         'discount',
         'discount_type',
@@ -194,10 +195,17 @@ class SaasProduct extends Model
      */
     public function getFinalPriceAttribute()
     {
-        if ($this->discount_type === 'percentage') {
-            return $this->price - (($this->price * $this->discount) / 100);
+        $finalPrice = $this->price;
+
+        if ($this->discount > 0) {
+            if ($this->discount_type === 'percentage') {
+                $finalPrice = $finalPrice - (($finalPrice * $this->discount) / 100);
+            } else {
+                $finalPrice = $finalPrice - $this->discount;
+            }
         }
-        return $this->price - $this->discount;
+
+        return max(0, $finalPrice);
     }
 
     /**

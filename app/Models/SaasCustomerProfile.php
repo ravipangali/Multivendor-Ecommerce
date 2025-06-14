@@ -15,6 +15,10 @@ class SaasCustomerProfile extends Model
         'billing_address',
     ];
 
+    protected $casts = [
+        //
+    ];
+
     /**
      * Get the user that owns the customer profile.
      */

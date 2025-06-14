@@ -16,10 +16,10 @@
                 </h5>
                 <div>
                     <div class="btn-group me-2" role="group">
-                        <a href="{{ route('admin.users.index') }}" class="btn {{ !request()->role ? 'btn-primary' : 'btn-outline-primary' }}">All</a>
-                        <a href="{{ route('admin.users.index', ['role' => 'admin']) }}" class="btn {{ request()->role == 'admin' ? 'btn-primary' : 'btn-outline-primary' }}">Admins</a>
-                        <a href="{{ route('admin.users.index', ['role' => 'seller']) }}" class="btn {{ request()->role == 'seller' ? 'btn-primary' : 'btn-outline-primary' }}">Sellers</a>
-                        <a href="{{ route('admin.users.index', ['role' => 'customer']) }}" class="btn {{ request()->role == 'customer' ? 'btn-primary' : 'btn-outline-primary' }}">Customers</a>
+                        <a href="{{ route('admin.users.index') }}" class="btn {{ !request()->role ? 'btn-primary' : 'btn-primary' }}">All</a>
+                        <a href="{{ route('admin.users.index', ['role' => 'admin']) }}" class="btn {{ request()->role == 'admin' ? 'btn-primary' : 'btn-primary' }}">Admins</a>
+                        <a href="{{ route('admin.users.index', ['role' => 'seller']) }}" class="btn {{ request()->role == 'seller' ? 'btn-primary' : 'btn-primary' }}">Sellers</a>
+                        <a href="{{ route('admin.users.index', ['role' => 'customer']) }}" class="btn {{ request()->role == 'customer' ? 'btn-primary' : 'btn-primary' }}">Customers</a>
                     </div>
                     <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
                         <i class="align-middle" data-feather="plus"></i> Add New User

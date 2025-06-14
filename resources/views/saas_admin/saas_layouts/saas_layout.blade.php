@@ -190,9 +190,7 @@
 
                             <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#"
                                 data-bs-toggle="dropdown">
-                                <img src="{{ asset('saas_admin/img/avatars/avatar.jpg') }}"
-                                    class="avatar rounded-circle img-fluid me-1" alt="avatar" /> <span
-                                    class="text-dark">{{ request()->user()->name }}</span>
+                                <i style="width: 1.5rem; height: 1.5rem;" class="align-middle" data-feather="user"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 {{-- <a class="dropdown-item" href="pages-profile.html"><i class="align-middle me-1"
@@ -232,8 +230,7 @@
                     <div class="row text-muted">
                         <div class="col-6 text-start">
                             <p class="mb-0">
-                                <a class="text-muted" href="https://ravipangali.com.np/" target="_blank"><strong>Ravi
-                                        Pangali</strong></a> Multi Vendor
+                                <a class="text-muted" target="_blank"><strong>Saas Tech Nepal</strong></a> Multi Vendor
                                         Ecommerce &copy;
                             </p>
                         </div>

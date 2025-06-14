@@ -45,6 +45,8 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
     Route::resource('units', SaasUnitController::class);
     Route::resource('products', SaasProductController::class);
     Route::resource('product-reviews', SaasProductReviewController::class);
+    Route::patch('product-reviews/{productReview}/toggle-approval', [SaasProductReviewController::class, 'toggleApproval'])->name('product-reviews.toggle-approval');
+    Route::patch('product-reviews/{productReview}/clear-report', [SaasProductReviewController::class, 'clearReport'])->name('product-reviews.clear-report');
 
     // Marketing
     Route::resource('banners', SaasBannerController::class);
@@ -76,10 +78,14 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
 
     // Settings
     Route::prefix('settings')->group(function () {
+        Route::get('/', [SaasSettingsController::class, 'index'])->name('settings.index');
         Route::match(['get', 'post'], '/general', [SaasSettingsController::class, 'general'])->name('settings.general');
         Route::match(['get', 'post'], '/email', [SaasSettingsController::class, 'email'])->name('settings.email');
         Route::match(['get', 'post'], '/payment', [SaasSettingsController::class, 'payment'])->name('settings.payment');
         Route::match(['get', 'post'], '/shipping', [SaasSettingsController::class, 'shipping'])->name('settings.shipping');
+        Route::match(['get', 'post'], '/tax', [SaasSettingsController::class, 'tax'])->name('settings.tax');
         Route::post('/test-email', [SaasSettingsController::class, 'testEmail'])->name('settings.test-email');
+        Route::post('/clear-cache', [SaasSettingsController::class, 'clearCache'])->name('settings.clear-cache');
+        Route::get('/export', [SaasSettingsController::class, 'exportSettings'])->name('settings.export');
     });
 });

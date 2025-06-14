@@ -160,6 +160,12 @@
                 Settings
             </li>
 
+            <li class="sidebar-item {{ request()->routeIs('admin.settings.index') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.settings.index') }}">
+                    <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Settings Dashboard</span>
+                </a>
+            </li>
+
             <li class="sidebar-item {{ request()->routeIs('admin.settings.general') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('admin.settings.general') }}">
                     <i class="align-middle" data-feather="settings"></i> <span class="align-middle">General Settings</span>
@@ -181,6 +187,12 @@
             <li class="sidebar-item {{ request()->routeIs('admin.settings.shipping') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('admin.settings.shipping') }}">
                     <i class="align-middle" data-feather="truck"></i> <span class="align-middle">Shipping Settings</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item {{ request()->routeIs('admin.settings.tax') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.settings.tax') }}">
+                    <i class="align-middle" data-feather="percent"></i> <span class="align-middle">Tax Settings</span>
                 </a>
             </li>
         </ul>

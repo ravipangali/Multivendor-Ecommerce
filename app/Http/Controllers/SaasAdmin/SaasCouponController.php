@@ -65,7 +65,19 @@ class SaasCouponController extends Controller
     public function show(SaasCoupon $coupon)
     {
         $coupon->load('seller');
-        return view('saas_admin.saas_coupon.saas_show', compact('coupon'));
+
+        // Get recent orders that used this coupon
+        $recentOrders = \App\Models\SaasOrder::where('coupon_code', $coupon->code)
+            ->with(['customer', 'seller'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Get usage statistics
+        $couponService = app(\App\Services\SaasCouponService::class);
+        $usageStats = $couponService->getCouponUsageStats($coupon);
+
+        return view('saas_admin.saas_coupon.saas_show', compact('coupon', 'recentOrders', 'usageStats'));
     }
 
     /**

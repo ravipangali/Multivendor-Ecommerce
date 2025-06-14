@@ -232,8 +232,7 @@
                     <div class="row text-muted">
                         <div class="col-6 text-start">
                             <p class="mb-0">
-                                <a class="text-muted" href="https://ravipangali.com.np/" target="_blank"><strong>Ravi
-                                        Pangali</strong></a> Multi Vendor
+                                <a class="text-muted" target="_blank"><strong>Saas Tech Nepal</strong></a> Multi Vendor
                                         Ecommerce &copy;
                             </p>
                         </div>

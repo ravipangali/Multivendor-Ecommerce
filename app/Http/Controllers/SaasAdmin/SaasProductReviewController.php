@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SaasProductReview;
 use App\Models\SaasProduct;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SaasProductReviewController extends Controller
 {
@@ -15,21 +16,29 @@ class SaasProductReviewController extends Controller
     public function index(Request $request)
     {
         $productId = $request->product_id;
+        $status = $request->status;
+
+        $query = SaasProductReview::with(['product', 'customer', 'seller']);
 
         if ($productId) {
-            $reviews = SaasProductReview::with(['product', 'customer'])
-                ->where('product_id', $productId)
-                ->latest()
-                ->paginate(15);
+            $query->where('product_id', $productId);
             $product = SaasProduct::findOrFail($productId);
         } else {
-            $reviews = SaasProductReview::with(['product', 'customer'])
-                ->latest()
-                ->paginate(15);
             $product = null;
         }
 
-        return view('saas_admin.saas_product_review.saas_index', compact('reviews', 'product'));
+        // Filter by status
+        if ($status === 'reported') {
+            $query->where('is_reported', true);
+        } elseif ($status === 'pending') {
+            $query->where('is_approved', false);
+        } elseif ($status === 'approved') {
+            $query->where('is_approved', true);
+        }
+
+        $reviews = $query->latest()->paginate(15);
+
+        return view('saas_admin.saas_product_review.saas_index', compact('reviews', 'product', 'status'));
     }
 
     /**
@@ -87,10 +96,44 @@ class SaasProductReviewController extends Controller
      */
     public function destroy(SaasProductReview $productReview)
     {
+        // Delete review images if they exist
+        if ($productReview->hasImages()) {
+            foreach ($productReview->images as $image) {
+                Storage::disk('public')->delete($image);
+            }
+        }
+
         // Admin can delete inappropriate reviews
         $productReview->delete();
 
         toast('Review deleted successfully', 'success');
         return redirect()->route('admin.product-reviews.index');
+    }
+
+    /**
+     * Toggle review approval status.
+     */
+    public function toggleApproval(SaasProductReview $productReview)
+    {
+        $productReview->is_approved = !$productReview->is_approved;
+        $productReview->save();
+
+        $status = $productReview->is_approved ? 'approved' : 'disapproved';
+        toast("Review {$status} successfully", 'success');
+
+        return redirect()->back();
+    }
+
+    /**
+     * Clear reported status.
+     */
+    public function clearReport(SaasProductReview $productReview)
+    {
+        $productReview->is_reported = false;
+        $productReview->report_reason = null;
+        $productReview->save();
+
+        toast('Report cleared successfully', 'success');
+        return redirect()->back();
     }
 }

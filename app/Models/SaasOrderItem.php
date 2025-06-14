@@ -48,9 +48,9 @@ class SaasOrderItem extends Model
     /**
      * Get the variation of the item.
      */
-    public function variation()
+    public function productVariation()
     {
-        return $this->belongsTo(SaasProductVariation::class);
+        return $this->belongsTo(SaasProductVariation::class, 'variation_id');
     }
 
     /**

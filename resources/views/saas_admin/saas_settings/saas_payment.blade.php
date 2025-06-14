@@ -4,391 +4,360 @@
 
 @section('styles')
 <style>
-    .settings-card {
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-    }
-    .settings-card:hover {
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
     .settings-nav {
-        position: sticky;
-        top: 1rem;
+        background: #fff;
         border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
+        margin-bottom: 2rem;
     }
-    .settings-nav .list-group-item {
-        border-left: 0;
-        border-right: 0;
-        padding: 1rem 1.25rem;
-        display: flex;
-        align-items: center;
-    }
-    .settings-nav .list-group-item.active {
-        background-color: #3b7ddd;
-        border-color: #3b7ddd;
-    }
-    .settings-nav .list-group-item i {
-        margin-right: 10px;
-    }
-    .form-section-title {
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #dee2e6;
-        color: #3b7ddd;
-    }
-    .form-section-title:first-of-type {
-        margin-top: 0;
-    }
-    .payment-method-card {
-        border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        margin-bottom: 1.5rem;
-        border: 1px solid #dee2e6;
-    }
-    .payment-method-card:hover {
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-    .payment-method-header {
-        padding: 1rem 1.5rem;
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .payment-method-body {
-        padding: 1.5rem;
-        display: none;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    .payment-method-body.active {
-        display: block;
-        opacity: 1;
-    }
-    .toggle-method-details {
-        background: transparent;
+    .settings-nav .nav-link {
+        color: #6c757d;
         border: none;
-        color: #3b7ddd;
-        cursor: pointer;
-        transition: transform 0.3s ease;
+        padding: 1rem 1.5rem;
+        border-radius: 0;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
-    .toggle-method-details.collapsed {
-        transform: rotate(180deg);
+    .settings-nav .nav-link:first-child {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
     }
-    .payment-logo {
+    .settings-nav .nav-link:last-child {
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+    .settings-nav .nav-link.active {
+        background: linear-gradient(135deg, #4c8bef 0%, #024dc4 100%);
+        color: white;
+    }
+    .settings-nav .nav-link:hover:not(.active) {
+        background: #f8f9fa;
+        color: #495057;
+    }
+    .settings-card {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
+        border: none;
+        overflow: hidden;
+    }
+    .settings-card .card-header {
+        background: linear-gradient(135deg, #4c8bef 0%, #024dc4 100%);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+    }
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
+    }
+    .form-section h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #e0e6ed;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #4c8bef 0%, #024dc4 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .input-group-text {
+        background: #f8f9fa;
+        border: 1px solid #e0e6ed;
+        color: #6c757d;
+        font-weight: 600;
+    }
+    .gateway-section {
+        background: linear-gradient(135deg, #cdfff8 0%, #e1edff 100%);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e1edff;
+    }
+    .gateway-logo {
         height: 40px;
         width: auto;
-        margin-right: 15px;
-        object-fit: contain;
-    }
-    .payment-logo-fallback {
-        height: 40px;
-        width: 100px;
-        margin-right: 15px;
-        background-color: #3b7ddd;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 5px;
-        font-size: 14px;
-        font-weight: bold;
-    }
-    .form-switch {
-        padding-left: 2.5em;
-    }
-    .form-switch .form-check-input {
-        width: 2em;
-        margin-left: -2.5em;
-        height: 1em;
-    }
-    .password-toggle {
-        cursor: pointer;
-    }
-    .payment-description {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 1.5rem;
-    }
-    .withdrawal-rules {
-        padding: 1.5rem;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        margin-top: 2rem;
-        border: 1px solid #dee2e6;
+        margin-bottom: 1rem;
     }
 </style>
 @endsection
 
 @section('content')
 <div class="col-12">
-    <div class="row">
-        <!-- Settings navigation -->
-        <div class="col-md-3 mb-4">
-            <div class="settings-nav">
-                <div class="list-group list-group-flush">
-                    <a href="{{ route('admin.settings.general') }}" class="list-group-item list-group-item-action">
-                        <i data-feather="settings" class="feather-sm"></i> General
-                    </a>
-                    <a href="{{ route('admin.settings.email') }}" class="list-group-item list-group-item-action">
-                        <i data-feather="mail" class="feather-sm"></i> Email
-                    </a>
-                    <a href="{{ route('admin.settings.payment') }}" class="list-group-item list-group-item-action active">
-                        <i data-feather="credit-card" class="feather-sm"></i> Payment
-                    </a>
-                    <a href="{{ route('admin.settings.shipping') }}" class="list-group-item list-group-item-action">
-                        <i data-feather="truck" class="feather-sm"></i> Shipping
-                    </a>
-                </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Payment Settings</h5>
+                <a href="{{ route('admin.settings.index') }}" class="btn btn-secondary">
+                    <i class="align-middle" data-feather="arrow-left"></i> Back to Settings
+                </a>
             </div>
         </div>
-
-        <!-- Settings content -->
-        <div class="col-md-9">
-            <div class="card settings-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Payment Settings</h5>
+        <div class="card-body">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="card-body">
-                    <form action="{{ route('admin.settings.payment') }}" method="POST" id="paymentSettingsForm">
-                        @csrf
+            @endif
 
-                        <!-- Payment Methods Section -->
-                        <h5 class="form-section-title">
-                            <i data-feather="credit-card" class="feather-sm me-1"></i> Payment Methods
-                        </h5>
-                        <p class="payment-description">
-                            Configure the payment methods that will be available for customers during checkout.
-                        </p>
+            <form action="{{ route('admin.settings.payment') }}" method="POST">
+                @csrf
 
-                        <!-- Bank Transfer Payment Method -->
-                        <div class="payment-method-card">
-                            <div class="payment-method-header">
-                                <div class="d-flex align-items-center">
-                                    <div class="payment-logo-fallback">Bank Transfer</div>
-                                    <h6 class="mb-0">Bank Transfer</h6>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check form-switch me-3">
-                                        <input class="form-check-input payment-method-toggle" type="checkbox" id="payment_bank_enable" name="payment_bank_enable" value="1"
-                                            {{ old('payment_bank_enable', $settingsArray['payment_bank_enable'] ?? 0) == 1 ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="payment_bank_enable">Enable</label>
-                                    </div>
-                                    <button type="button" class="toggle-method-details" data-target="bank-transfer-details">
-                                        <i data-feather="chevron-down" class="feather-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="payment-method-body" id="bank-transfer-details">
-                                <div class="mb-3">
-                                    <label for="payment_bank_details" class="form-label">Bank Account Details <span class="text-danger">*</span></label>
-                                    <textarea class="form-control @error('payment_bank_details') is-invalid @enderror"
-                                            id="payment_bank_details" name="payment_bank_details" rows="4"
-                                            {{ old('payment_bank_enable', $settingsArray['payment_bank_enable'] ?? 0) == 1 ? 'required' : '' }}>{{ old('payment_bank_details', $settingsArray['payment_bank_details'] ?? '') }}</textarea>
-                                    <small class="form-text text-muted">Enter the bank account details that will be shown to customers for bank transfers. Include account number, bank name, branch, etc.</small>
-                                    <div class="invalid-feedback">
-                                        Please provide bank account details.
-                                    </div>
-                                    @error('payment_bank_details')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
+                <!-- Withdrawal Settings -->
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="align-middle" data-feather="dollar-sign"></i> Withdrawal Settings
+                    </h6>
 
-                        <!-- eSewa Payment Method -->
-                        <div class="payment-method-card">
-                            <div class="payment-method-header">
-                                <div class="d-flex align-items-center">
-                                    <div class="payment-logo-fallback">eSewa</div>
-                                    <h6 class="mb-0">eSewa</h6>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check form-switch me-3">
-                                        <input class="form-check-input payment-method-toggle" type="checkbox" id="payment_esewa_enable" name="payment_esewa_enable" value="1"
-                                            {{ old('payment_esewa_enable', $settingsArray['payment_esewa_enable'] ?? 0) == 1 ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="payment_esewa_enable">Enable</label>
-                                    </div>
-                                    <button type="button" class="toggle-method-details" data-target="esewa-details">
-                                        <i data-feather="chevron-down" class="feather-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="payment-method-body" id="esewa-details">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="payment_esewa_merchant_id" class="form-label">Merchant ID <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('payment_esewa_merchant_id') is-invalid @enderror"
-                                               id="payment_esewa_merchant_id" name="payment_esewa_merchant_id"
-                                               value="{{ old('payment_esewa_merchant_id', $settingsArray['payment_esewa_merchant_id'] ?? '') }}"
-                                               {{ old('payment_esewa_enable', $settingsArray['payment_esewa_enable'] ?? 0) == 1 ? 'required' : '' }}>
-                                        <div class="invalid-feedback">
-                                            Please provide the eSewa merchant ID.
-                                        </div>
-                                        @error('payment_esewa_merchant_id')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="payment_esewa_secret_key" class="form-label">Secret Key <span class="text-danger">*</span></label>
-                                        <div class="input-group">
-                                            <input type="password" class="form-control @error('payment_esewa_secret_key') is-invalid @enderror"
-                                                   id="payment_esewa_secret_key" name="payment_esewa_secret_key"
-                                                   value="{{ old('payment_esewa_secret_key', $settingsArray['payment_esewa_secret_key'] ?? '') }}"
-                                                   {{ old('payment_esewa_enable', $settingsArray['payment_esewa_enable'] ?? 0) == 1 ? 'required' : '' }}>
-                                            <span class="input-group-text password-toggle" data-target="payment_esewa_secret_key">
-                                                <i data-feather="eye" class="feather-sm"></i>
-                                            </span>
-                                            <div class="invalid-feedback">
-                                                Please provide the eSewa secret key.
-                                            </div>
-                                        </div>
-                                        @error('payment_esewa_secret_key')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="form-text text-muted mb-3">
-                                    Sign up for a eSewa account at <a href="https://esewa.com.np/" target="_blank">esewa.com.np</a> to get your API credentials.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Khalti Payment Method -->
-                        <div class="payment-method-card">
-                            <div class="payment-method-header">
-                                <div class="d-flex align-items-center">
-                                    <div class="payment-logo-fallback">Khalti</div>
-                                    <h6 class="mb-0">Khalti</h6>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check form-switch me-3">
-                                        <input class="form-check-input payment-method-toggle" type="checkbox" id="payment_khalti_enable" name="payment_khalti_enable" value="1"
-                                            {{ old('payment_khalti_enable', $settingsArray['payment_khalti_enable'] ?? 0) == 1 ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="payment_khalti_enable">Enable</label>
-                                    </div>
-                                    <button type="button" class="toggle-method-details" data-target="khalti-details">
-                                        <i data-feather="chevron-down" class="feather-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="payment-method-body" id="khalti-details">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="payment_khalti_public_key" class="form-label">Public Key <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('payment_khalti_public_key') is-invalid @enderror"
-                                               id="payment_khalti_public_key" name="payment_khalti_public_key"
-                                               value="{{ old('payment_khalti_public_key', $settingsArray['payment_khalti_public_key'] ?? '') }}"
-                                               {{ old('payment_khalti_enable', $settingsArray['payment_khalti_enable'] ?? 0) == 1 ? 'required' : '' }}>
-                                        <div class="invalid-feedback">
-                                            Please provide the Khalti public key.
-                                        </div>
-                                        @error('payment_khalti_public_key')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="payment_khalti_secret_key" class="form-label">Secret Key <span class="text-danger">*</span></label>
-                                        <div class="input-group">
-                                            <input type="password" class="form-control @error('payment_khalti_secret_key') is-invalid @enderror"
-                                                   id="payment_khalti_secret_key" name="payment_khalti_secret_key"
-                                                   value="{{ old('payment_khalti_secret_key', $settingsArray['payment_khalti_secret_key'] ?? '') }}"
-                                                   {{ old('payment_khalti_enable', $settingsArray['payment_khalti_enable'] ?? 0) == 1 ? 'required' : '' }}>
-                                            <span class="input-group-text password-toggle" data-target="payment_khalti_secret_key">
-                                                <i data-feather="eye" class="feather-sm"></i>
-                                            </span>
-                                            <div class="invalid-feedback">
-                                                Please provide the Khalti secret key.
-                                            </div>
-                                        </div>
-                                        @error('payment_khalti_secret_key')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="form-text text-muted mb-3">
-                                    Sign up for a Khalti account at <a href="https://khalti.com/" target="_blank">khalti.com</a> to get your API credentials.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Cash on Delivery Payment Method -->
-                        <div class="payment-method-card">
-                            <div class="payment-method-header">
-                                <div class="d-flex align-items-center">
-                                    <div class="payment-logo-fallback">COD</div>
-                                    <h6 class="mb-0">Cash on Delivery</h6>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check form-switch me-3">
-                                        <input class="form-check-input" type="checkbox" id="payment_cod_enable" name="payment_cod_enable" value="1"
-                                            {{ old('payment_cod_enable', $settingsArray['payment_cod_enable'] ?? 0) == 1 ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="payment_cod_enable">Enable</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Payment Rules Section -->
-                        <h5 class="form-section-title mt-4">
-                            <i data-feather="sliders" class="feather-sm me-1"></i> Payment Rules
-                        </h5>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="payment_gateway_transaction_fee" class="form-label">Gateway Transaction Fee (%)</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="minimum_withdrawal_amount" class="form-label">Minimum Withdrawal Amount <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="number" step="0.01" min="0" max="100" class="form-control @error('payment_gateway_transaction_fee') is-invalid @enderror"
-                                           id="payment_gateway_transaction_fee" name="payment_gateway_transaction_fee"
-                                           value="{{ old('payment_gateway_transaction_fee', $settingsArray['payment_gateway_transaction_fee'] ?? '0') }}">
+                                    <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                    <input type="number" class="form-control" id="minimum_withdrawal_amount" name="minimum_withdrawal_amount"
+                                        value="{{ old('minimum_withdrawal_amount', $settings->minimum_withdrawal_amount) }}"
+                                        placeholder="100" step="0.01" min="0" required>
+                                </div>
+                                <small class="text-muted">Minimum amount sellers can withdraw from their earnings</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="gateway_transaction_fee" class="form-label">Platform Transaction Fee <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="gateway_transaction_fee" name="gateway_transaction_fee"
+                                        value="{{ old('gateway_transaction_fee', $settings->gateway_transaction_fee) }}"
+                                        placeholder="2.5" step="0.01" min="0" max="100" required>
                                     <span class="input-group-text">%</span>
                                 </div>
-                                <small class="form-text text-muted">Transaction fee charged by payment gateways (will be deducted from seller's earnings)</small>
-                                @error('payment_gateway_transaction_fee')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="payment_min_withdrawal_amount" class="form-label">Minimum Withdrawal Amount</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input type="number" step="0.01" min="0" class="form-control @error('payment_min_withdrawal_amount') is-invalid @enderror"
-                                           id="payment_min_withdrawal_amount" name="payment_min_withdrawal_amount"
-                                           value="{{ old('payment_min_withdrawal_amount', $settingsArray['payment_min_withdrawal_amount'] ?? '50') }}">
-                                </div>
-                                <small class="form-text text-muted">Minimum amount sellers must have in their balance to request a withdrawal</small>
-                                @error('payment_min_withdrawal_amount')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <small class="text-muted">Percentage fee charged on each transaction</small>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="withdrawal-rules">
-                            <h6 class="mb-3">Withdrawal Rules</h6>
-                            <ul class="mb-0">
-                                <li>Seller balance must meet or exceed the minimum withdrawal amount</li>
-                                <li>Payment processing may take 2-3 business days</li>
-                                <li>Platform fees and transaction fees will be automatically deducted</li>
-                                <li>Sellers must provide valid bank account information</li>
-                                <li>All withdrawal requests are subject to review</li>
-                            </ul>
-                        </div>
-
-                        <div class="text-end mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i data-feather="save" class="feather-sm me-1"></i> Save Settings
-                            </button>
-                        </div>
-                    </form>
+                    <div class="mb-3">
+                        <label for="withdrawal_policy" class="form-label">Withdrawal Policy</label>
+                        <textarea class="form-control" id="withdrawal_policy" name="withdrawal_policy" rows="4">{{ old('withdrawal_policy', $settings->withdrawal_policy) }}</textarea>
+                        <small class="text-muted">Terms and conditions for seller withdrawals (displayed to sellers)</small>
+                    </div>
                 </div>
-            </div>
+
+                <!-- eSewa Settings -->
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="align-middle" data-feather="credit-card"></i> eSewa Configuration
+                        <span class="badge bg-success ms-2">Nepal</span>
+                    </h6>
+
+                    <div class="alert alert-info">
+                        <i class="align-middle" data-feather="info"></i>
+                        <strong>eSewa Integration:</strong> Popular digital wallet and payment gateway in Nepal.
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="esewa_merchant_id" class="form-label">eSewa Merchant ID</label>
+                                <input type="text" class="form-control" id="esewa_merchant_id" name="esewa_merchant_id"
+                                    value="{{ old('esewa_merchant_id', $settings->esewa_merchant_id) }}"
+                                    placeholder="Your eSewa Merchant ID">
+                                <small class="text-muted">Obtain from your eSewa merchant account</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="esewa_secret_key" class="form-label">eSewa Secret Key</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="esewa_secret_key" name="esewa_secret_key"
+                                        value="{{ old('esewa_secret_key', $settings->esewa_secret_key) }}"
+                                        placeholder="Your eSewa Secret Key">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('esewa_secret_key')">
+                                        <i data-feather="eye"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Keep this secret and secure</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">eSewa Setup Instructions</h6>
+                                    <ol class="small mb-0">
+                                        <li>Register as a merchant at <a href="https://merchant.esewa.com.np" target="_blank">eSewa Merchant Portal</a></li>
+                                        <li>Complete the verification process</li>
+                                        <li>Obtain your Merchant ID and Secret Key</li>
+                                        <li>Configure the success and failure URLs in your eSewa merchant panel</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Khalti Settings -->
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="align-middle" data-feather="smartphone"></i> Khalti Configuration
+                        <span class="badge bg-success ms-2">Nepal</span>
+                    </h6>
+
+                    <div class="alert alert-info">
+                        <i class="align-middle" data-feather="info"></i>
+                        <strong>Khalti Integration:</strong> Leading digital wallet in Nepal with wide merchant acceptance.
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="khalti_public_key" class="form-label">Khalti Public Key</label>
+                                <input type="text" class="form-control" id="khalti_public_key" name="khalti_public_key"
+                                    value="{{ old('khalti_public_key', $settings->khalti_public_key) }}"
+                                    placeholder="Your Khalti Public Key">
+                                <small class="text-muted">Public key for client-side integration</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="khalti_secret_key" class="form-label">Khalti Secret Key</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="khalti_secret_key" name="khalti_secret_key"
+                                        value="{{ old('khalti_secret_key', $settings->khalti_secret_key) }}"
+                                        placeholder="Your Khalti Secret Key">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('khalti_secret_key')">
+                                        <i data-feather="eye"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Server-side secret key - keep secure</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Khalti Setup Instructions</h6>
+                                    <ol class="small mb-0">
+                                        <li>Register at <a href="https://khalti.com" target="_blank">Khalti Merchant Dashboard</a></li>
+                                        <li>Complete merchant verification</li>
+                                        <li>Generate API keys from the developer section</li>
+                                        <li>Test with sandbox keys before going live</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Gateway Status -->
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="align-middle" data-feather="activity"></i> Payment Gateway Status
+                    </h6>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">eSewa</h6>
+                                    @if($settings->esewa_merchant_id && $settings->esewa_secret_key)
+                                        <span class="badge bg-success fs-6">
+                                            <i class="align-middle" data-feather="check-circle"></i> Configured
+                                        </span>
+                                    @else
+                                        <span class="badge bg-danger fs-6">
+                                            <i class="align-middle" data-feather="x-circle"></i> Not Configured
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Khalti</h6>
+                                    @if($settings->khalti_public_key && $settings->khalti_secret_key)
+                                        <span class="badge bg-success fs-6">
+                                            <i class="align-middle" data-feather="check-circle"></i> Configured
+                                        </span>
+                                    @else
+                                        <span class="badge bg-danger fs-6">
+                                            <i class="align-middle" data-feather="x-circle"></i> Not Configured
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction Fee Calculator -->
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="align-middle" data-feather="calculator"></i> Transaction Fee Calculator
+                    </h6>
+
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Sale Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                        <input type="number" class="form-control" id="calculator_amount" placeholder="100" value="100">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Fee Breakdown</label>
+                                    <div class="text-muted">
+                                        <div>Platform Fee (<span id="calc_fee_rate">{{ $settings->gateway_transaction_fee ?: 2.5 }}</span>%): <span class="fw-bold" id="calc_platform_fee">{{ $settings->site_currency_symbol ?: '$' }}{{ number_format((($settings->gateway_transaction_fee ?: 2.5) / 100) * 100, 2) }}</span></div>
+                                        <div>Seller Receives: <span class="fw-bold text-success" id="calc_seller_amount">{{ $settings->site_currency_symbol ?: '$' }}{{ number_format(100 - (($settings->gateway_transaction_fee ?: 2.5) / 100) * 100, 2) }}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="align-middle" data-feather="save"></i> Save Payment Settings
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -396,242 +365,48 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Feather icons
+    // Toggle password visibility
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const button = field.nextElementSibling;
+        const icon = button.querySelector('[data-feather]');
+
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.setAttribute('data-feather', 'eye-off');
+        } else {
+            field.type = 'password';
+            icon.setAttribute('data-feather', 'eye');
+        }
         feather.replace();
+    }
 
-        // Toggle payment method details
-        const toggleButtons = document.querySelectorAll('.toggle-method-details');
-        toggleButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const targetElement = document.getElementById(targetId);
+    // Update fee calculator when transaction fee changes
+    document.getElementById('gateway_transaction_fee').addEventListener('input', function() {
+        updateCalculator();
+    });
 
-                if (targetElement.classList.contains('active')) {
-                    targetElement.style.opacity = '0';
-                    this.classList.add('collapsed');
-                    this.querySelector('svg').style.transform = 'rotate(0deg)';
-                    setTimeout(() => {
-                        targetElement.classList.remove('active');
-                    }, 300);
-                } else {
-                    targetElement.classList.add('active');
-                    this.classList.remove('collapsed');
-                    this.querySelector('svg').style.transform = 'rotate(180deg)';
-                    setTimeout(() => {
-                        targetElement.style.opacity = '1';
-                    }, 10);
-                }
-            });
-        });
+    // Update fee calculator when amount changes
+    document.getElementById('calculator_amount').addEventListener('input', function() {
+        updateCalculator();
+    });
 
-        // Show active payment method details on page load
-        const activeToggles = document.querySelectorAll('.payment-method-toggle:checked');
-        activeToggles.forEach(toggle => {
-            const methodId = toggle.id.replace('payment_', '').replace('_enable', '');
-            const detailsElement = document.getElementById(methodId + '-details');
-            if (detailsElement) {
-                detailsElement.classList.add('active');
-                const button = document.querySelector(`[data-target="${methodId}-details"]`);
-                if (button) {
-                    button.classList.remove('collapsed');
-                    button.querySelector('svg').style.transform = 'rotate(180deg)';
-                }
-            }
-        });
+    function updateCalculator() {
+        const amount = parseFloat(document.getElementById('calculator_amount').value) || 0;
+        const feeRate = parseFloat(document.getElementById('gateway_transaction_fee').value) || 0;
+        const currencySymbol = '{{ $settings->site_currency_symbol ?: "$" }}';
 
-        // Password toggle functionality
-        const passwordToggles = document.querySelectorAll('.password-toggle');
-        passwordToggles.forEach(toggle => {
-            toggle.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const passwordField = document.getElementById(targetId);
+        const platformFee = (feeRate / 100) * amount;
+        const sellerAmount = amount - platformFee;
 
-                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordField.setAttribute('type', type);
+        document.getElementById('calc_fee_rate').textContent = feeRate;
+        document.getElementById('calc_platform_fee').textContent = currencySymbol + platformFee.toFixed(2);
+        document.getElementById('calc_seller_amount').textContent = currencySymbol + sellerAmount.toFixed(2);
+    }
 
-                // Toggle the eye icon
-                const eyeIcon = this.querySelector('svg');
-                if (type === 'text') {
-                    eyeIcon.setAttribute('data-feather', 'eye-off');
-                } else {
-                    eyeIcon.setAttribute('data-feather', 'eye');
-                }
-                feather.replace();
-            });
-        });
-
-        // Required attributes toggling with improved UX
-        const methodToggles = document.querySelectorAll('.payment-method-toggle');
-        methodToggles.forEach(toggle => {
-            toggle.addEventListener('change', function() {
-                const methodId = this.id.replace('payment_', '').replace('_enable', '');
-                const detailsElement = document.getElementById(methodId + '-details');
-                const methodCard = this.closest('.payment-method-card');
-
-                if (detailsElement) {
-                    // Animate the details section
-                    if (this.checked) {
-                        // If toggle is checked but details are not visible, show them
-                        if (!detailsElement.classList.contains('active')) {
-                            const button = document.querySelector(`[data-target="${methodId}-details"]`);
-                            if (button) {
-                                button.classList.remove('collapsed');
-                                button.querySelector('svg').style.transform = 'rotate(180deg)';
-                                detailsElement.classList.add('active');
-                            }
-                        }
-
-                        // Highlight the card
-                        methodCard.style.borderColor = '#3b7ddd';
-                        setTimeout(() => {
-                            methodCard.style.borderColor = '';
-                        }, 1000);
-                    }
-
-                    // Handle required fields
-                    const requiredInputs = detailsElement.querySelectorAll('input, textarea');
-                    requiredInputs.forEach(input => {
-                        if (input.hasAttribute('required-if-enabled') || input.closest('.form-group').querySelector('label span.text-danger')) {
-                            if (this.checked) {
-                                input.setAttribute('required', '');
-                                input.classList.add('required-field');
-                            } else {
-                                input.removeAttribute('required');
-                                input.classList.remove('required-field');
-
-                                // Clear validation errors when disabling
-                                input.classList.remove('is-invalid');
-                                const feedback = input.closest('.form-group').querySelector('.invalid-feedback');
-                                if (feedback) {
-                                    feedback.style.display = 'none';
-                                }
-                            }
-                        }
-                    });
-                }
-
-                // Show toast notification
-                if (typeof showToast === 'function') {
-                    const methodName = methodCard.querySelector('h6').textContent;
-                    if (this.checked) {
-                        showToast('Payment Method Enabled', `${methodName} has been enabled`, 'success');
-                    } else {
-                        showToast('Payment Method Disabled', `${methodName} has been disabled`, 'info');
-                    }
-                }
-            });
-        });
-
-        // Form validation
-        const paymentSettingsForm = document.getElementById('paymentSettingsForm');
-        if (paymentSettingsForm) {
-            paymentSettingsForm.addEventListener('submit', function(event) {
-                let hasErrors = false;
-
-                // Check required fields for enabled payment methods
-                methodToggles.forEach(toggle => {
-                    if (toggle.checked) {
-                        const methodId = toggle.id.replace('payment_', '').replace('_enable', '');
-                        const detailsElement = document.getElementById(methodId + '-details');
-
-                        if (detailsElement) {
-                            const requiredInputs = detailsElement.querySelectorAll('[required]');
-                            requiredInputs.forEach(input => {
-                                if (!input.value.trim()) {
-                                    input.classList.add('is-invalid');
-                                    const feedback = input.nextElementSibling;
-                                    if (feedback && feedback.classList.contains('invalid-feedback')) {
-                                        feedback.style.display = 'block';
-                                    }
-                                    hasErrors = true;
-                                }
-                            });
-                        }
-                    }
-                });
-
-                if (hasErrors) {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    // Scroll to first error
-                    const firstError = document.querySelector('.is-invalid');
-                    if (firstError) {
-                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        firstError.focus();
-                    }
-
-                    if (typeof showToast === 'function') {
-                        showToast('Validation Error', 'Please fill in all required fields', 'error');
-                    }
-                }
-            });
-
-            // Clear validation state when input changes
-            paymentSettingsForm.querySelectorAll('input, textarea').forEach(input => {
-                input.addEventListener('input', function() {
-                    this.classList.remove('is-invalid');
-                    const feedback = this.nextElementSibling;
-                    if (feedback && feedback.classList.contains('invalid-feedback')) {
-                        feedback.style.display = 'none';
-                    }
-                });
-            });
-        }
-
-        // Save settings with AJAX (optional)
-        const saveWithAjax = false; // Set to true to enable AJAX saving
-        if (saveWithAjax && paymentSettingsForm) {
-            paymentSettingsForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const formData = new FormData(paymentSettingsForm);
-                const submitBtn = paymentSettingsForm.querySelector('[type="submit"]');
-                const originalBtnText = submitBtn.innerHTML;
-
-                // Show loading state
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
-
-                fetch(paymentSettingsForm.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Reset button
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnText;
-
-                    // Show response
-                    if (data.success) {
-                        if (typeof showToast === 'function') {
-                            showToast('Success', 'Payment settings saved successfully', 'success');
-                        }
-                    } else {
-                        if (typeof showToast === 'function') {
-                            showToast('Error', data.message || 'Failed to save settings', 'error');
-                        }
-                    }
-                })
-                .catch(error => {
-                    // Reset button
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnText;
-
-                    // Show error
-                    if (typeof showToast === 'function') {
-                        showToast('Error', 'An unexpected error occurred', 'error');
-                    }
-                    console.error('Error:', error);
-                });
-            });
-        }
+    // Initialize calculator on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCalculator();
     });
 </script>
 @endsection

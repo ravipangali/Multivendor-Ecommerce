@@ -185,6 +185,95 @@
                 </div>
             </div>
 
+            @if($recentOrders->count() > 0)
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h6 class="text-muted">Recent Orders Using This Coupon</h6>
+                    <div class="card border">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Order #</th>
+                                            <th>Customer</th>
+                                            <th>Date</th>
+                                            <th>Subtotal</th>
+                                            <th>Discount Applied</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($recentOrders as $order)
+                                        <tr>
+                                            <td>
+                                                <a href="{{ route('admin.orders.show', $order->id) }}" class="text-decoration-none">
+                                                    {{ $order->order_number }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                @if($order->customer)
+                                                    {{ $order->customer->name }}
+                                                    <br><small class="text-muted">{{ $order->customer->email }}</small>
+                                                @else
+                                                    <span class="text-muted">Guest</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $order->created_at->format('M d, Y') }}</td>
+                                            <td>Rs. {{ number_format($order->subtotal ?? 0, 2) }}</td>
+                                            <td class="text-success">
+                                                <strong>Rs. {{ number_format($order->coupon_discount_amount ?? 0, 2) }}</strong>
+                                                @if($order->coupon_discount_type === 'percentage' && $order->subtotal > 0)
+                                                    <br><small class="text-muted">({{ round(($order->coupon_discount_amount / $order->subtotal) * 100, 1) }}%)</small>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge
+                                                    @if($order->order_status === 'pending') bg-warning
+                                                    @elseif($order->order_status === 'processing') bg-info
+                                                    @elseif($order->order_status === 'shipped') bg-primary
+                                                    @elseif($order->order_status === 'delivered') bg-success
+                                                    @elseif($order->order_status === 'cancelled') bg-danger
+                                                    @elseif($order->order_status === 'refunded') bg-secondary
+                                                    @else bg-light @endif">
+                                                    {{ ucfirst($order->order_status) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-outline-primary btn-sm">
+                                                    <i class="align-middle" data-feather="eye"></i> View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            @if($coupon->used_count > 10)
+                            <div class="text-center mt-3">
+                                <a href="{{ route('admin.orders.index', ['coupon_code' => $coupon->code]) }}" class="btn btn-outline-secondary">
+                                    <i class="align-middle me-1" data-feather="list"></i> View All Orders with This Coupon ({{ $coupon->used_count }} total)
+                                </a>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @else
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h6 class="text-muted">Recent Orders Using This Coupon</h6>
+                    <div class="alert alert-info">
+                        <i class="align-middle me-2" data-feather="info"></i>
+                        No orders have used this coupon yet.
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <div class="text-end mt-3">
                 <form action="{{ route('admin.coupons.destroy', $coupon->id) }}" method="POST" class="d-inline">
                     @csrf

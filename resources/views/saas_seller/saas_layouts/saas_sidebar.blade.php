@@ -36,18 +36,6 @@
                 </a>
             </li>
 
-            <li class="sidebar-item {{ request()->routeIs('seller.products.images.*') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('seller.products.index') }}">
-                    <i class="align-middle" data-feather="image"></i> <span class="align-middle">Product Images</span>
-                </a>
-            </li>
-
-            <li class="sidebar-item {{ request()->routeIs('seller.products.variations.*') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('seller.products.index') }}">
-                    <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Product Variations</span>
-                </a>
-            </li>
-
             <li class="sidebar-item {{ request()->routeIs('seller.reviews.*') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('seller.reviews.index') }}">
                     <i class="align-middle" data-feather="star"></i> <span class="align-middle">Product Reviews</span>
@@ -107,12 +95,6 @@
             <li class="sidebar-item {{ request()->routeIs('seller.flash-deals.*') && !request()->routeIs('seller.flash-deals.products.*') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('seller.flash-deals.index') }}">
                     <i class="align-middle" data-feather="zap"></i> <span class="align-middle">Flash Deals</span>
-                </a>
-            </li>
-
-            <li class="sidebar-item {{ request()->routeIs('seller.flash-deals.products.*') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('seller.flash-deals.index') }}">
-                    <i class="align-middle" data-feather="gift"></i> <span class="align-middle">Flash Deal Products</span>
                 </a>
             </li>
 

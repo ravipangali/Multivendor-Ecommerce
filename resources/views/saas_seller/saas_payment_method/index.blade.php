@@ -73,7 +73,7 @@
                                         @else
                                             <form action="{{ route('seller.payment-methods.set-default', $method) }}" method="POST" style="display: inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-sm btn-outline-primary">Set Default</button>
+                                                <button type="submit" class="btn btn-sm btn-primary">Set Default</button>
                                             </form>
                                         @endif
                                     </td>

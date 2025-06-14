@@ -21,13 +21,39 @@ class SaasOrder extends Model
         'payment_status',
         'order_status',
         'payment_method',
-        'shipping_address',
-        'billing_address',
+        'order_notes',
         'placed_at',
+        // Individual shipping address fields
+        'shipping_name',
+        'shipping_email',
+        'shipping_phone',
+        'shipping_country',
+        'shipping_street_address',
+        'shipping_city',
+        'shipping_state',
+        'shipping_postal_code',
+        // Individual billing address fields
+        'billing_name',
+        'billing_email',
+        'billing_phone',
+        'billing_country',
+        'billing_street_address',
+        'billing_city',
+        'billing_state',
+        'billing_postal_code',
+        // Coupon tracking
+        'coupon_code',
+        'coupon_discount_amount',
+        'coupon_discount_type',
+        // Cancellation and admin fields
+        'cancelled_at',
+        'cancellation_reason',
+        'admin_note',
     ];
 
     protected $casts = [
         'placed_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
     /**
@@ -78,14 +104,80 @@ class SaasOrder extends Model
         });
 
         $tax = $items->sum(function ($item) {
-            return $item->tax;
+            return $item->tax ?? 0;
         });
 
         $this->subtotal = $subtotal;
         $this->tax = $tax;
-        $this->total = $subtotal + $tax + $this->shipping_fee - $this->discount;
+        $this->total = $subtotal + $tax + ($this->shipping_fee ?? 0) - ($this->discount ?? 0);
 
         return $this;
+    }
+
+    /**
+     * Get tax amount with fallback
+     */
+    public function getTaxAmountAttribute()
+    {
+        return $this->tax ?? 0;
+    }
+
+    /**
+     * Get shipping fee with fallback
+     */
+    public function getShippingFeeAmountAttribute()
+    {
+        return $this->shipping_fee ?? 0;
+    }
+
+    /**
+     * Get discount amount with fallback
+     */
+    public function getDiscountAmountAttribute()
+    {
+        return $this->discount ?? 0;
+    }
+
+    /**
+     * Get order total with proper calculation
+     */
+    public function getTotalAmountAttribute()
+    {
+        return ($this->subtotal ?? 0) + ($this->tax ?? 0) + ($this->shipping_fee ?? 0) - ($this->discount ?? 0);
+    }
+
+    /**
+     * Check if order has tax applied
+     */
+    public function hasTax()
+    {
+        return ($this->tax ?? 0) > 0;
+    }
+
+    /**
+     * Get tax percentage based on subtotal
+     */
+    public function getTaxPercentageAttribute()
+    {
+        if (!$this->subtotal || $this->subtotal <= 0) {
+            return 0;
+        }
+
+        return round((($this->tax ?? 0) / $this->subtotal) * 100, 2);
+    }
+
+    /**
+     * Get formatted tax display
+     */
+    public function getFormattedTaxAttribute()
+    {
+        $taxAmount = $this->tax ?? 0;
+        if ($taxAmount <= 0) {
+            return 'Tax: Rs. 0.00';
+        }
+
+        $taxPercentage = $this->tax_percentage;
+        return "Tax ({$taxPercentage}%): Rs. " . number_format($taxAmount, 2);
     }
 
     /**
@@ -142,5 +234,107 @@ class SaasOrder extends Model
     public function isRefunded()
     {
         return $this->order_status === 'refunded';
+    }
+
+    /**
+     * Get the coupon used for this order.
+     */
+    public function coupon()
+    {
+        return $this->belongsTo(SaasCoupon::class, 'coupon_code', 'code');
+    }
+
+    /**
+     * Check if order has a coupon applied
+     */
+    public function hasCoupon()
+    {
+        return !empty($this->coupon_code) && ($this->coupon_discount_amount ?? 0) > 0;
+    }
+
+    /**
+     * Get formatted coupon discount amount
+     */
+    public function getFormattedCouponDiscountAttribute()
+    {
+        if (!$this->hasCoupon()) {
+            return 'Rs. 0.00';
+        }
+
+        return 'Rs. ' . number_format($this->coupon_discount_amount, 2);
+    }
+
+    /**
+     * Get coupon discount percentage
+     */
+    public function getCouponDiscountPercentageAttribute()
+    {
+        if (!$this->hasCoupon() || ($this->subtotal ?? 0) <= 0) {
+            return 0;
+        }
+
+        return round(($this->coupon_discount_amount / $this->subtotal) * 100, 2);
+    }
+
+    /**
+     * Get formatted coupon details for display
+     */
+    public function getFormattedCouponDetailsAttribute()
+    {
+        if (!$this->hasCoupon()) {
+            return null;
+        }
+
+        $details = [
+            'code' => $this->coupon_code,
+            'discount_amount' => $this->coupon_discount_amount,
+            'discount_type' => $this->coupon_discount_type,
+            'formatted_amount' => $this->formatted_coupon_discount,
+            'percentage' => $this->coupon_discount_percentage,
+        ];
+
+        if ($this->coupon_discount_type === 'percentage') {
+            $details['display'] = $this->coupon_discount_percentage . '% off';
+        } else {
+            $details['display'] = 'Rs. ' . number_format($this->coupon_discount_amount, 2) . ' off';
+        }
+
+        return $details;
+    }
+
+    /**
+     * Get formatted shipping address.
+     */
+    public function getFormattedShippingAddressAttribute()
+    {
+        $address = [];
+        if ($this->shipping_name) $address[] = $this->shipping_name;
+        if ($this->shipping_email) $address[] = $this->shipping_email;
+        if ($this->shipping_phone) $address[] = $this->shipping_phone;
+        if ($this->shipping_street_address) $address[] = $this->shipping_street_address;
+        if ($this->shipping_city) $address[] = $this->shipping_city;
+        if ($this->shipping_state) $address[] = $this->shipping_state;
+        if ($this->shipping_postal_code) $address[] = $this->shipping_postal_code;
+        if ($this->shipping_country) $address[] = $this->shipping_country;
+
+        return implode(', ', $address);
+    }
+
+    /**
+     * Get formatted billing address.
+     */
+    public function getFormattedBillingAddressAttribute()
+    {
+        $address = [];
+        if ($this->billing_name) $address[] = $this->billing_name;
+        if ($this->billing_email) $address[] = $this->billing_email;
+        if ($this->billing_phone) $address[] = $this->billing_phone;
+        if ($this->billing_street_address) $address[] = $this->billing_street_address;
+        if ($this->billing_city) $address[] = $this->billing_city;
+        if ($this->billing_state) $address[] = $this->billing_state;
+        if ($this->billing_postal_code) $address[] = $this->billing_postal_code;
+        if ($this->billing_country) $address[] = $this->billing_country;
+
+        return implode(', ', $address);
     }
 }
