@@ -7,10 +7,27 @@ use App\Http\Controllers\SaasCustomer\SaasCustomerWishlistController;
 use App\Http\Controllers\SaasCustomer\SaasCustomerAccountController;
 use App\Http\Controllers\SaasCustomer\SaasCustomerSearchController;
 use App\Http\Controllers\SaasCustomer\SaasCustomerSellerController;
+use App\Http\Controllers\SaasCustomer\SaasPageController;
+use App\Http\Controllers\SaasCustomer\SaasBlogController;
 use Illuminate\Support\Facades\Route;
 
 // Home page
 Route::get('/', [SaasCustomerController::class, 'home'])->name('customer.home');
+
+// CMS Pages
+Route::get('/page/{slug}', [SaasPageController::class, 'show'])->name('customer.page');
+Route::get('/terms-and-conditions', [SaasPageController::class, 'terms'])->name('customer.terms');
+Route::get('/privacy-policy', [SaasPageController::class, 'privacy'])->name('customer.privacy');
+Route::get('/about-us', [SaasPageController::class, 'about'])->name('customer.about');
+Route::get('/contact-us', [SaasPageController::class, 'contact'])->name('customer.contact');
+
+// Blog Routes
+Route::prefix('blog')->name('customer.blog.')->group(function () {
+    Route::get('/', [SaasBlogController::class, 'index'])->name('index');
+    Route::get('/search', [SaasBlogController::class, 'search'])->name('search');
+    Route::get('/category/{slug}', [SaasBlogController::class, 'category'])->name('category');
+    Route::get('/{slug}', [SaasBlogController::class, 'show'])->name('show');
+});
 
 // Product routes
 Route::get('/products', [SaasCustomerController::class, 'saasProductListing'])->name('customer.products');

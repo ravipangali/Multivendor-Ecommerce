@@ -48,5 +48,11 @@
         </ul>
       </li>
     @endif
+
+    <!-- Additional Menu Items -->
+    <li class="title my-3 bb1 pl20 fz20 fw500 pb-3">More</li>
+    <li><a href="{{ route('customer.blog.index') }}"><i class="flaticon-blog mr20"></i>Blog</a></li>
+    <li><a href="{{ route('customer.about') }}"><i class="flaticon-info mr20"></i>About Us</a></li>
+    <li><a href="{{ route('customer.contact') }}"><i class="flaticon-phone mr20"></i>Contact Us</a></li>
   </ul>
 </nav>

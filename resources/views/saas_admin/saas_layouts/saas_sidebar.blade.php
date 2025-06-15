@@ -97,6 +97,28 @@
             </li>
 
             <li class="sidebar-header">
+                Content Management
+            </li>
+
+            <li class="sidebar-item {{ request()->routeIs('admin.pages.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.pages.index') }}">
+                    <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">CMS Pages</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item {{ request()->routeIs('admin.blog-categories.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.blog-categories.index') }}">
+                    <i class="align-middle" data-feather="folder"></i> <span class="align-middle">Blog Categories</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item {{ request()->routeIs('admin.blog-posts.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.blog-posts.index') }}">
+                    <i class="align-middle" data-feather="edit-3"></i> <span class="align-middle">Blog Posts</span>
+                </a>
+            </li>
+
+            <li class="sidebar-header">
                 Sales
             </li>
 

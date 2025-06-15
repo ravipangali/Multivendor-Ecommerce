@@ -24,6 +24,10 @@ use App\Http\Controllers\SaasAdmin\SaasSellerProfileController;
 use App\Http\Controllers\SaasAdmin\SaasSettingsController;
 use App\Http\Controllers\SaasAdmin\SaasUnitController;
 use App\Http\Controllers\SaasAdmin\SaasUserController;
+use App\Http\Controllers\SaasAdmin\SaasPageController;
+use App\Http\Controllers\SaasAdmin\SaasBlogCategoryController;
+use App\Http\Controllers\SaasAdmin\SaasBlogPostController;
+use App\Http\Controllers\SaasAdmin\TinyMCEController;
 
 Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('admin.')->group(function () {
 
@@ -68,6 +72,16 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
     Route::resource('sellers', SaasSellerController::class);
     Route::patch('sellers/{seller}/toggle-approval', [SaasSellerController::class, 'toggleApproval'])->name('sellers.toggle-approval');
 
+    // CMS Management
+    Route::resource('pages', SaasPageController::class);
+    Route::patch('pages/{page}/toggle-status', [SaasPageController::class, 'toggleStatus'])->name('pages.toggle-status');
+
+    // Blog Management
+    Route::resource('blog-categories', SaasBlogCategoryController::class);
+    Route::patch('blog-categories/{blog_category}/toggle-status', [SaasBlogCategoryController::class, 'toggleStatus'])->name('blog-categories.toggle-status');
+    Route::resource('blog-posts', SaasBlogPostController::class);
+    Route::patch('blog-posts/{blog_post}/toggle-status', [SaasBlogPostController::class, 'toggleStatus'])->name('blog-posts.toggle-status');
+
     // Reports
     Route::prefix('reports')->group(function () {
         Route::get('/sales', [SaasReportController::class, 'salesReport'])->name('reports.sales');
@@ -88,4 +102,13 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
         Route::post('/clear-cache', [SaasSettingsController::class, 'clearCache'])->name('settings.clear-cache');
         Route::get('/export', [SaasSettingsController::class, 'exportSettings'])->name('settings.export');
     });
+
+    // TinyMCE Image Upload
+    Route::post('tinymce/upload', [TinyMCEController::class, 'upload'])->name('tinymce.upload');
+    Route::get('tinymce/test', [TinyMCEController::class, 'test'])->name('tinymce.test');
+
+    // Test page for TinyMCE
+    Route::get('tinymce/test-page', function() {
+        return view('saas_admin.tinymce_test');
+    })->name('tinymce.test-page');
 });

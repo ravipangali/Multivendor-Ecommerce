@@ -46,7 +46,7 @@
                         <div class="card-content">
                             <span class="card-subtitle">Sign Up For Free</span>
                             <h3 class="card-title">Sell your products & Services</h3>
-                            <a href="{{ route('register') }}" class="btn btn-primary">
+                            <a href="{{ route('seller.register') }}" class="btn btn-primary">
                                 <i class="fas fa-store me-2"></i>Become A Vendor
                             </a>
                         </div>

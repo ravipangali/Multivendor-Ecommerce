@@ -16,6 +16,7 @@
 
     <title>Admin Dashboard</title>
     @yield('styles')
+    @stack('styles')
     @livewireStyles
 
     <link href="{{ asset('saas_admin/css/my.css') }}" rel="stylesheet">
@@ -370,6 +371,7 @@
 
     @if(View::exists('saas_admin.saas_layouts.saas_layout'))
         @yield('scripts')
+        @stack('scripts')
 
         <!-- Add professional functionality enhancements -->
         <script>

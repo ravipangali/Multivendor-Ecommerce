@@ -513,6 +513,14 @@
             <li class=""> <a href="{{ route('customer.products') }}"><span class="title">Products</span></a> </li>
             <li class=""> <a href="{{ route('customer.brands') }}"><span class="title">Brands</span></a> </li>
             <li class=""> <a href="{{ route('customer.sellers') }}"><span class="title">Sellers</span></a> </li>
+            <li class=""> <a href="{{ route('customer.blog.index') }}"><span class="title">Blog</span></a> </li>
+            <li class="dropdown-submenu">
+              <a href="#"><span class="title">More</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('customer.about') }}">About Us</a></li>
+                <li><a href="{{ route('customer.contact') }}">Contact Us</a></li>
+              </ul>
+            </li>
           </ul>
           <div class="widget_menu_home2">
             <p class="is-marquee">
@@ -644,7 +652,7 @@
             <div class="col-lg-6">
               <div
                 class="copyright-widget home2_style text-center text-lg-end d-block d-lg-flex justify-content-lg-end mb15-md">
-                <p><a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Sitemap</a></p>
+                <p><a href="{{ route('customer.privacy') }}">Privacy Policy</a> · <a href="{{ route('customer.terms') }}">Terms & Conditions</a> · <a href="{{ route('customer.blog.index') }}">Blog</a></p>
               </div>
             </div>
           </div>
