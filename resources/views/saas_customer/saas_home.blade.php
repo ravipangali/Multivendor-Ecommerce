@@ -37,7 +37,7 @@
     <!-- Action Cards -->
     <section class="action-cards py-5">
         <div class="container">
-            <div class="row g-4">
+            <div class="row justify-content-center g-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="action-card vendor-card">
                         <div class="card-icon">
@@ -48,20 +48,6 @@
                             <h3 class="card-title">Sell your products & Services</h3>
                             <a href="{{ route('seller.register') }}" class="btn btn-primary">
                                 <i class="fas fa-store me-2"></i>Become A Vendor
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="action-card demand-card">
-                        <div class="card-icon">
-                            <img src="{{ asset('saas_frontend/img/request.png') }}" alt="Make Demand">
-                        </div>
-                        <div class="card-content">
-                            <span class="card-subtitle">Don't See What You Want?</span>
-                            <h3 class="card-title">Make a demand for a product or service</h3>
-                            <a href="#" class="btn btn-secondary">
-                                <i class="fas fa-bullhorn me-2"></i>Make A Demand
                             </a>
                         </div>
                     </div>

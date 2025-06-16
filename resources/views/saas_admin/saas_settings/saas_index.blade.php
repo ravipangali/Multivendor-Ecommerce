@@ -1,6 +1,5 @@
 @extends('saas_admin.saas_layouts.saas_layout')
 
-@section('title', 'Settings Dashboard')
 
 @section('content')
 <div class="col-12">

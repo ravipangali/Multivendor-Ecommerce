@@ -1,7 +1,5 @@
 @extends('saas_seller.saas_layouts.saas_layout')
 
-@section('title', 'Coupons')
-
 @section('content')
 <div class="container-fluid p-0">
     <div class="row mb-2 mb-xl-3">

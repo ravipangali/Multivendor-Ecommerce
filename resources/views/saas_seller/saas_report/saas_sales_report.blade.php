@@ -1,7 +1,5 @@
 @extends('saas_seller.saas_layouts.saas_layout')
 
-@section('title', 'Sales Report')
-
 @section('styles')
 <style>
     .stat-card {

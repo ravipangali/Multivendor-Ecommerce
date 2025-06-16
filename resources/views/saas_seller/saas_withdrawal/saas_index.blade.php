@@ -1,6 +1,5 @@
 @extends('saas_seller.saas_layouts.saas_layout')
 
-@section('title', 'Withdrawals')
 
 @section('content')
 <div class="container-fluid p-0">

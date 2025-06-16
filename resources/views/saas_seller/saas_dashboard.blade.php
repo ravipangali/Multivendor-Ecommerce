@@ -1,7 +1,5 @@
 @extends('saas_seller.saas_layouts.saas_layout')
 
-@section('title', 'Seller Dashboard')
-
 @section('styles')
 <style>
     /* Modern Dashboard Styling */
@@ -590,7 +588,7 @@
         <div class="hero-content">
             <div class="d-flex justify-content-between align-items-start flex-wrap">
                 <div>
-                    <h1 class="hero-title">🎉 Welcome back, {{ Auth::user()->name }}!</h1>
+                    <h1 class="hero-title text-white">🎉 Welcome back, {{ Auth::user()->name }}!</h1>
                     <p class="hero-subtitle">Here's what's happening with your store today. Let's make it a great day!</p>
                 </div>
                 <div class="text-end">

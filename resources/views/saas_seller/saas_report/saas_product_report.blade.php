@@ -1,7 +1,5 @@
 @extends('saas_seller.saas_layouts.saas_layout')
 
-@section('title', 'Product Performance Report')
-
 @section('styles')
 <style>
     .analytics-card {

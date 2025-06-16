@@ -1,7 +1,5 @@
 @extends('saas_seller.saas_layouts.saas_layout')
 
-@section('title', 'Customer Analytics Report')
-
 @section('styles')
 <style>
     .customer-analytics-card {
