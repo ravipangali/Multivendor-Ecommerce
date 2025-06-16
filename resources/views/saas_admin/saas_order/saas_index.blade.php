@@ -52,7 +52,7 @@
                                 <td>#{{ $order->order_number }}</td>
                                 <td>{{ $order->customer->name ?? 'N/A' }}</td>
                                 <td>{{ $order->seller->name ?? 'N/A' }}</td>
-                                <td>Rs{{ number_format($order->total, 2) }}</td>
+                                <td>Rs {{ number_format($order->total, 2) }}</td>
                                 <td>
                                     @if($order->payment_status == 'paid')
                                         <span class="badge bg-success">Paid</span>

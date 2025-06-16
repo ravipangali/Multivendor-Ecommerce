@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SaasSeller\SaasCouponController;
-use App\Http\Controllers\SaasSeller\SaasFlashDealController;
 use App\Http\Controllers\SaasSeller\SaasOrderController;
 use App\Http\Controllers\SaasSeller\SaasOrderItemController;
 use App\Http\Controllers\SaasSeller\SaasPaymentMethodController;
@@ -38,6 +37,9 @@ Route::middleware(['auth', 'saasrolemanager:seller'])->prefix('seller')->name('s
 
     // Products Management
     Route::resource('products', SaasProductController::class);
+    // Digital Product File Access Routes
+    Route::get('/products/{product}/file/preview', [SaasProductController::class, 'previewFile'])->name('products.file.preview');
+    Route::get('/products/{product}/file/download', [SaasProductController::class, 'downloadFile'])->name('products.file.download');
     Route::get('/get-subcategories/{categoryId}', [SaasProductController::class, 'getSubcategories']);
     Route::get('/get-child-categories/{subcategoryId}', [SaasProductController::class, 'getChildCategories']);
 
@@ -67,13 +69,12 @@ Route::get('/reviews/product/{product}', [SaasProductReviewController::class, 'p
     // Coupons
     Route::resource('coupons', SaasCouponController::class);
 
-    // Flash Deals
-    Route::resource('flash-deals', SaasFlashDealController::class);
+
 
     // Reports
     Route::get('/reports/sales', [SaasReportController::class, 'salesReport'])->name('reports.sales');
-    Route::get('/reports/products', [SaasReportController::class, 'productReport'])->name('reports.products');
-    Route::get('/reports/customers', [SaasReportController::class, 'customerReport'])->name('reports.customers');
+    Route::get('/reports/products', [SaasReportController::class, 'productReport'])->name('reports.product');
+    Route::get('/reports/customers', [SaasReportController::class, 'customerReport'])->name('reports.customer');
 
     // Withdrawals
     Route::get('/withdrawals', [SaasWithdrawalController::class, 'index'])->name('withdrawals.index');

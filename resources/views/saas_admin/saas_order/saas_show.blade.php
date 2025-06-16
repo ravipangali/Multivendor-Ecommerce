@@ -182,10 +182,15 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 @if($item->product && isset($item->product->images) && $item->product->images->count() > 0)
-                                                    <img src="{{ asset('storage/'. $item->product->images->first()->image_url) }}"
+                                                    <img src="{{ $item->product->images->first()->image_url }}"
                                                          alt="{{ $item->product->name }}"
                                                          width="40"
                                                          class="img-thumbnail me-2 rounded">
+                                                @else
+                                                    <div class="bg-light d-flex align-items-center justify-content-center me-2 rounded"
+                                                         style="width: 40px; height: 40px; min-width: 40px;">
+                                                        <i data-feather="image" class="text-muted" style="width: 16px; height: 16px;"></i>
+                                                    </div>
                                                 @endif
                                                 <div>
                                                     <div class="fw-bold">{{ $item->product->name ?? 'Product Name' }}</div>

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 2);
             $table->decimal('fee', 10, 2)->default(0.00);
             $table->decimal('balance_after', 15, 2); // Wallet balance after transaction
-            $table->string('currency', 3)->default('Rs');
+            $table->string('currency', 3)->default('NPR');
             $table->enum('status', ['pending', 'completed', 'failed', 'reversed'])->default('completed');
             $table->morphs('transactionable', 'trans_morph_idx'); // Using shorter custom index name
             $table->enum('source', ['order', 'withdrawal', 'refund', 'adjustment', 'manual', 'commission', 'other'])->index();

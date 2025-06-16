@@ -116,8 +116,13 @@
                                         <div class="order-items">
                                             @foreach($order->items->take(2) as $item)
                                                 <div class="order-item">
-                                                    <img src="{{ $item->product->images->first()->image_url ?? asset('saas_frontend/images/shop-items/shop-item27.png') }}"
-                                                         alt="{{ $item->product->name }}" class="item-image">
+                                                    @if($item->product && $item->product->images->count() > 0)
+                                                        <img src="{{ $item->product->images->first()->image_url }}"
+                                                             alt="{{ $item->product->name }}" class="item-image">
+                                                    @else
+                                                        <img src="{{ asset('saas_frontend/images/shop-items/shop-item27.png') }}"
+                                                             alt="{{ $item->product->name }}" class="item-image">
+                                                    @endif
                                                     <div class="item-details">
                                                         <h6 class="item-name">{{ Str::limit($item->product->name, 30) }}</h6>
                                                         <span class="item-quantity">Qty: {{ $item->quantity }}</span>

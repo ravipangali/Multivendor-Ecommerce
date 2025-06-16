@@ -135,7 +135,7 @@
                 <!-- Withdrawal Settings -->
                 <div class="mb-4">
                     <h6 class="text-primary border-bottom pb-2 mb-3">
-                        <i class="align-middle" data-feather="dollar-sign"></i> Withdrawal Settings
+                        <span class="rs-icon align-middle">Rs</span> Withdrawal Settings
                     </h6>
 
                     <div class="row">
@@ -143,7 +143,7 @@
                             <div class="mb-3">
                                 <label for="minimum_withdrawal_amount" class="form-label">Minimum Withdrawal Amount <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                    <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                     <input type="number" class="form-control" id="minimum_withdrawal_amount" name="minimum_withdrawal_amount"
                                         value="{{ old('minimum_withdrawal_amount', $settings->minimum_withdrawal_amount) }}"
                                         placeholder="100" step="0.01" min="0" required>
@@ -336,15 +336,15 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Sale Amount</label>
                                     <div class="input-group">
-                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                         <input type="number" class="form-control" id="calculator_amount" placeholder="100" value="100">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Fee Breakdown</label>
                                     <div class="text-muted">
-                                        <div>Platform Fee (<span id="calc_fee_rate">{{ $settings->gateway_transaction_fee ?: 2.5 }}</span>%): <span class="fw-bold" id="calc_platform_fee">{{ $settings->site_currency_symbol ?: '$' }}{{ number_format((($settings->gateway_transaction_fee ?: 2.5) / 100) * 100, 2) }}</span></div>
-                                        <div>Seller Receives: <span class="fw-bold text-success" id="calc_seller_amount">{{ $settings->site_currency_symbol ?: '$' }}{{ number_format(100 - (($settings->gateway_transaction_fee ?: 2.5) / 100) * 100, 2) }}</span></div>
+                                        <div>Platform Fee (<span id="calc_fee_rate">{{ $settings->gateway_transaction_fee ?: 2.5 }}</span>%): <span class="fw-bold" id="calc_platform_fee">{{ $settings->site_currency_symbol ?: 'Rs ' }}{{ number_format((($settings->gateway_transaction_fee ?: 2.5) / 100) * 100, 2) }}</span></div>
+                                        <div>Seller Receives: <span class="fw-bold text-success" id="calc_seller_amount">{{ $settings->site_currency_symbol ?: 'Rs ' }}{{ number_format(100 - (($settings->gateway_transaction_fee ?: 2.5) / 100) * 100, 2) }}</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -394,7 +394,7 @@
     function updateCalculator() {
         const amount = parseFloat(document.getElementById('calculator_amount').value) || 0;
         const feeRate = parseFloat(document.getElementById('gateway_transaction_fee').value) || 0;
-        const currencySymbol = '{{ $settings->site_currency_symbol ?: "$" }}';
+        const currencySymbol = '{{ $settings->site_currency_symbol ?: "Rs " }}';
 
         const platformFee = (feeRate / 100) * amount;
         const sellerAmount = amount - platformFee;

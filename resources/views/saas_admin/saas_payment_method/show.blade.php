@@ -61,7 +61,7 @@
                         <span class="badge bg-purple fs-6">Khalti</span>
                     @elseif($paymentMethod->type == 'cash')
                         <div class="mb-2">
-                            <i data-feather="dollar-sign" class="text-warning" style="width: 32px; height: 32px;"></i>
+                            <span class="rs-icon rs-icon-xl text-warning">Rs</span>
                         </div>
                         <span class="badge bg-warning fs-6">Cash</span>
                     @else

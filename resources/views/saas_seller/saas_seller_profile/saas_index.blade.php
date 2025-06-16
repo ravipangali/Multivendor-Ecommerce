@@ -9,7 +9,7 @@
         <div class="card-body p-0">
             <!-- Banner -->
             <div class="position-relative">
-                <div class="profile-banner" style="height: 200px; background-color: #f5f7fb; background-image: url('{{ $sellerProfile->store_banner ? Storage::url($sellerProfile->store_banner) : asset('assets/img/default-banner.jpg') }}'); background-size: cover; background-position: center;">
+                <div class="profile-banner" style="height: 200px; background-color: #f5f7fb; background-image: url('{{ $sellerProfile->store_banner ? asset('storage/' . $sellerProfile->store_banner) : asset('assets/img/default-banner.jpg') }}'); background-size: cover; background-position: center;">
                 </div>
                 <div class="position-absolute top-0 end-0 p-3">
                     <a href="{{ route('seller.profile.edit') }}" class="btn btn-light btn-sm shadow-sm">
@@ -23,7 +23,7 @@
                 <div class="d-flex align-items-end">
                     <div class="profile-avatar position-relative mt-n5 me-3">
                         @if($sellerProfile->store_logo)
-                            <img src="{{ Storage::url($sellerProfile->store_logo) }}"
+                            <img src="{{ asset('storage/' . $sellerProfile->store_logo) }}"
                                 alt="{{ $sellerProfile->store_name }}"
                                 class="rounded-circle border border-4 border-white shadow-sm"
                                 width="120" height="120" style="object-fit: cover;">
@@ -166,43 +166,71 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    @if(isset($user->paymentMethods) && $user->paymentMethods->count() > 0)
+                    @if(isset($paymentMethods) && $paymentMethods->count() > 0)
                         <div class="payment-methods-list">
-                            @foreach($user->paymentMethods as $paymentMethod)
+                            @foreach($paymentMethods as $paymentMethod)
                                 <div class="payment-method-card p-3 mb-3 rounded-3 {{ $paymentMethod->is_default ? 'border border-primary' : 'bg-light' }}">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
                                             <div class="d-flex align-items-center mb-2">
                                                 @php
                                                     $iconClass = 'credit-card';
-                                                    if($paymentMethod->method_type == 'bank_transfer') {
+                                                    if($paymentMethod->type == 'bank_transfer') {
                                                         $iconClass = 'briefcase';
-                                                    } elseif(in_array($paymentMethod->method_type, ['esewa', 'khalti'])) {
+                                                    } elseif(in_array($paymentMethod->type, ['esewa', 'khalti'])) {
                                                         $iconClass = 'smartphone';
-                                                    } elseif($paymentMethod->method_type == 'cash') {
-                                                        $iconClass = 'dollar-sign';
+                                                    } elseif($paymentMethod->type == 'cash') {
+                                                        $iconClass = 'rs-icon'; // Custom Rs icon for cash payments
                                                     }
                                                 @endphp
                                                 <div class="me-2 p-2 rounded-circle {{ $paymentMethod->is_default ? 'bg-primary' : 'bg-secondary' }} bg-opacity-10">
-                                                    <i data-feather="{{ $iconClass }}" class="{{ $paymentMethod->is_default ? 'text-primary' : 'text-secondary' }} feather-sm"></i>
+                                                    @if($iconClass == 'rs-icon')
+                                                        <span class="rs-icon rs-icon-sm {{ $paymentMethod->is_default ? 'text-primary' : 'text-secondary' }}">Rs</span>
+                                                    @else
+                                                        <i data-feather="{{ $iconClass }}" class="{{ $paymentMethod->is_default ? 'text-primary' : 'text-secondary' }} feather-sm"></i>
+                                                    @endif
                                                 </div>
-                                                <h6 class="mb-0">{{ ucfirst(str_replace('_', ' ', $paymentMethod->method_type)) }}</h6>
+                                                <h6 class="mb-0">{{ ucfirst(str_replace('_', ' ', $paymentMethod->type)) }}</h6>
                                                 @if($paymentMethod->is_default)
                                                     <span class="badge bg-primary ms-2">Default</span>
                                                 @endif
                                             </div>
                                             <p class="mb-1 text-muted small">{{ $paymentMethod->title }}</p>
                                             <p class="mb-0 small">
-                                                @if($paymentMethod->method_type == 'bank_transfer')
-                                                    {{ $paymentMethod->bank_name ?? '' }} {{ $paymentMethod->account_number ? '- ' . $paymentMethod->account_number : '' }}
-                                                @elseif(in_array($paymentMethod->method_type, ['esewa', 'khalti']))
+                                                @if($paymentMethod->type == 'bank_transfer')
+                                                    {{ $paymentMethod->bank_name ?? '' }} {{ $paymentMethod->account_number ? ' - ' . $paymentMethod->account_number : '' }}
+                                                @elseif(in_array($paymentMethod->type, ['esewa', 'khalti']))
                                                     {{ $paymentMethod->mobile_number ?? '' }}
                                                 @endif
                                             </p>
                                         </div>
-                                        <a href="{{ route('seller.payment-methods.edit', $paymentMethod->id) }}" class="btn btn-sm btn-primary">
-                                            <i data-feather="edit" class="feather-sm"></i>
-                                        </a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                                                <i data-feather="more-vertical" class="feather-sm"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('seller.payment-methods.show', $paymentMethod->id) }}">
+                                                        <i data-feather="eye" class="feather-sm me-2"></i> View
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('seller.payment-methods.edit', $paymentMethod->id) }}">
+                                                        <i data-feather="edit" class="feather-sm me-2"></i> Edit
+                                                    </a>
+                                                </li>
+                                                @if(!$paymentMethod->is_default)
+                                                <li>
+                                                    <form action="{{ route('seller.payment-methods.set-default', $paymentMethod->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" class="dropdown-item border-0 bg-transparent">
+                                                            <i data-feather="star" class="feather-sm me-2"></i> Set as Default
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                @endif
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach

@@ -120,12 +120,12 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
                         <div class="report-icon bg-success-subtle me-3">
-                            <i class="align-middle text-success" data-feather="dollar-sign"></i>
+                            <i class="align-middle text-success" data-feather="trending-up"></i>
                         </div>
                         <h5 class="card-title mb-0">Total Sales by Sellers</h5>
                     </div>
                     <h3 class="mt-1 mb-3">
-                        ${{ number_format($topSellers->sum('total_sales'), 2) }}
+                        Rs {{ number_format($topSellers->sum('total_sales'), 2) }}
                     </h3>
                     <div class="mb-0">
                         <span class="text-muted">From {{ date('M d, Y', strtotime($startDate)) }} to {{ date('M d, Y', strtotime($endDate)) }}</span>
@@ -173,7 +173,7 @@
                                                 <i class="align-middle" data-feather="star"></i>
                                             @endfor
                                         </div>
-                                        <p class="card-text mb-1">Total Sales: <strong>${{ number_format($seller->total_sales, 2) }}</strong></p>
+                                        <p class="card-text mb-1">Total Sales: <strong>Rs {{ number_format($seller->total_sales, 2) }}</strong></p>
                                         <p class="card-text mb-3">Orders: <strong>{{ $seller->order_count }}</strong></p>
                                         <a href="{{ $seller->seller ? route('admin.sellers.show', $seller->seller->id) : '#' }}" class="btn btn-sm btn-primary">View Profile</a>
                                     </div>
@@ -233,8 +233,8 @@
                                         </div>
                                     </td>
                                     <td>{{ $seller->order_count }}</td>
-                                    <td>${{ number_format($seller->total_sales, 2) }}</td>
-                                    <td>${{ $seller->order_count > 0 ? number_format($seller->total_sales / $seller->order_count, 2) : '0.00' }}</td>
+                                    <td>Rs {{ number_format($seller->total_sales, 2) }}</td>
+                                    <td>Rs {{ $seller->order_count > 0 ? number_format($seller->total_sales / $seller->order_count, 2) : '0.00' }}</td>
                                     <td>
                                         @if($seller->seller && $seller->seller->is_active)
                                             <span class="badge bg-success">Active</span>

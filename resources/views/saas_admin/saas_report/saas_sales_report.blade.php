@@ -66,11 +66,11 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
                         <div class="report-icon bg-primary-subtle me-3">
-                            <i class="align-middle text-primary" data-feather="dollar-sign"></i>
+                            <span class="rs-icon align-middle">Rs</span>
                         </div>
                         <h5 class="card-title mb-0">Total Sales</h5>
                     </div>
-                    <h3 class="mt-1 mb-3">${{ number_format($totalSales, 2) }}</h3>
+                    <h3 class="mt-1 mb-3">Rs {{ number_format($totalSales, 2) }}</h3>
                     <div class="mb-0">
                         <span class="text-muted">From {{ date('M d, Y', strtotime($startDate)) }} to {{ date('M d, Y', strtotime($endDate)) }}</span>
                     </div>
@@ -103,7 +103,7 @@
                         <h5 class="card-title mb-0">Avg. Order Value</h5>
                     </div>
                     <h3 class="mt-1 mb-3">
-                        ${{ $recentOrders->count() > 0 ? number_format($totalSales / $recentOrders->count(), 2) : '0.00' }}
+                        Rs {{ $recentOrders->count() > 0 ? number_format($totalSales / $recentOrders->count(), 2) : '0.00' }}
                     </h3>
                     <div class="mb-0">
                         <span class="text-muted">From {{ date('M d, Y', strtotime($startDate)) }} to {{ date('M d, Y', strtotime($endDate)) }}</span>
@@ -164,7 +164,7 @@
                             <td><a href="{{ route('admin.orders.show', $order->id) }}" class="fw-bold">#{{ $order->id }}</a></td>
                             <td>{{ $order->customer ? $order->customer->name : 'N/A' }}</td>
                             <td>{{ $order->seller ? $order->seller->name : 'N/A' }}</td>
-                            <td>${{ number_format($order->total, 2) }}</td>
+                            <td>Rs {{ number_format($order->total, 2) }}</td>
                             <td>
                                 <span class="badge bg-info">{{ ucfirst($order->payment_method) }}</span>
                             </td>
@@ -235,7 +235,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return '$' + value;
+                                return 'Rs ' + value;
                             }
                         }
                     }
@@ -247,7 +247,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return '$' + context.raw;
+                                return 'Rs ' + context.raw;
                             }
                         }
                     }
@@ -290,7 +290,7 @@
                             label: function(context) {
                                 const value = context.raw;
                                 const count = counts[context.dataIndex];
-                                return `$${value} (${count} orders)`;
+                                return `Rs ${value} (${count} orders)`;
                             }
                         }
                     }

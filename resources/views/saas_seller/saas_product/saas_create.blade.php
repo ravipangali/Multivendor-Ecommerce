@@ -40,6 +40,26 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label for="product_type" class="form-label">Product Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="product_type" name="product_type" required>
+                                        <option value="">Select Product Type</option>
+                                        <option value="Digital" {{ old('product_type') == 'Digital' ? 'selected' : '' }}>
+                                            Digital Product
+                                        </option>
+                                        <option value="Physical" {{ old('product_type', 'Physical') == 'Physical' ? 'selected' : '' }}>
+                                            Physical Product
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3" id="digital_file_section" style="display: none;">
+                                    <label for="file" class="form-label">Digital Product File <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" id="file" name="file"
+                                        accept=".pdf,.doc,.docx,.zip,.rar,.txt,.mp3,.mp4,.avi,.mov">
+                                    <small class="text-muted">Supported formats: PDF, DOC, DOCX, ZIP, RAR, TXT, MP3, MP4, AVI, MOV (Max: 50MB)</small>
+                                </div>
+
+                                <div class="mb-3">
                                     <label for="short_description" class="form-label">Short Description <span class="text-danger">*</span></label>
                                     <textarea class="form-control" id="short_description" name="short_description" rows="3" required>{{ old('short_description') }}</textarea>
                                 </div>
@@ -133,9 +153,10 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <div class="mb-3">
+                                        <div class="mb-3" id="stock_section">
                                             <label for="stock" class="form-label">Stock Quantity <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" id="stock" name="stock" value="{{ old('stock', 0) }}" min="0">
+                                            <small class="text-muted">Leave blank for digital products (unlimited stock)</small>
                                         </div>
                                     </div>
                                 </div>
@@ -207,6 +228,42 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Handle product type changes
+        const productTypeSelect = document.getElementById('product_type');
+        const digitalFileSection = document.getElementById('digital_file_section');
+        const stockSection = document.getElementById('stock_section');
+        const stockInput = document.getElementById('stock');
+        const fileInput = document.getElementById('file');
+
+        function toggleProductTypeFields() {
+            const selectedType = productTypeSelect.value;
+
+            if (selectedType === 'Digital') {
+                digitalFileSection.style.display = 'block';
+                stockSection.style.display = 'none';
+                fileInput.required = true;
+                stockInput.required = false;
+                stockInput.value = '';
+            } else if (selectedType === 'Physical') {
+                digitalFileSection.style.display = 'none';
+                stockSection.style.display = 'block';
+                fileInput.required = false;
+                stockInput.required = true;
+                fileInput.value = '';
+            } else {
+                digitalFileSection.style.display = 'none';
+                stockSection.style.display = 'block';
+                fileInput.required = false;
+                stockInput.required = true;
+            }
+        }
+
+        // Initial check
+        toggleProductTypeFields();
+
+        // Listen for changes
+        productTypeSelect.addEventListener('change', toggleProductTypeFields);
+
         // Don't hide regular pricing and inventory when variations are enabled
         Livewire.on('hasVariationsChanged', hasVariations => {
             // No need to hide regular pricing now

@@ -1,466 +1,980 @@
 @extends('saas_seller.saas_layouts.saas_layout')
 
+@section('title', 'Seller Dashboard')
+
+@section('styles')
+<style>
+    /* Modern Dashboard Styling */
+    .dashboard-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px 20px;
+        margin-bottom: 25px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: rotate(45deg);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-bottom: 20px;
+    }
+
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .hero-stat {
+        text-align: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-stat-value {
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .hero-stat-label {
+        font-size: 0.75rem;
+        opacity: 0.9;
+    }
+
+    /* Compact Dashboard Cards */
+    .dashboard-card {
+        background: white;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .dashboard-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 12px 12px 0 0;
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .metric-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: white;
+        margin-bottom: 12px;
+        flex-shrink: 0;
+    }
+
+    .metric-value {
+        font-size: 1.6rem;
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #2c3e50;
+        line-height: 1.2;
+    }
+
+    .metric-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        line-height: 1.2;
+    }
+
+    .metric-change {
+        font-size: 0.72rem;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .metric-change.positive {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+    }
+
+    .metric-change.negative {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #721c24;
+    }
+
+    .metric-change.neutral {
+        background: linear-gradient(135deg, #e2e3e5, #d6d8db);
+        color: #495057;
+    }
+
+    .metric-change i {
+        font-size: 10px;
+    }
+
+    /* Color Themes for Metric Cards */
+    .metric-card.primary { border-left: 3px solid #667eea; }
+    .metric-card.success { border-left: 3px solid #1cc88a; }
+    .metric-card.info { border-left: 3px solid #36b9cc; }
+    .metric-card.warning { border-left: 3px solid #f6c23e; }
+    .metric-card.danger { border-left: 3px solid #e74a3b; }
+    .metric-card.secondary { border-left: 3px solid #858796; }
+
+    .metric-card.primary .metric-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .metric-card.success .metric-icon { background: linear-gradient(135deg, #1cc88a, #17a2b8); }
+    .metric-card.info .metric-icon { background: linear-gradient(135deg, #36b9cc, #17a2b8); }
+    .metric-card.warning .metric-icon { background: linear-gradient(135deg, #f6c23e, #f39c12); }
+    .metric-card.danger .metric-icon { background: linear-gradient(135deg, #e74a3b, #dc3545); }
+    .metric-card.secondary .metric-icon { background: linear-gradient(135deg, #858796, #6c757d); }
+
+    /* Enhanced Chart Containers */
+    .chart-container-modern {
+        background: #fafbfc;
+        border-radius: 12px;
+        padding: 15px;
+        margin: 15px 0;
+        position: relative;
+        height: 300px;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .chart-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .chart-subtitle {
+        color: #6c757d;
+        font-size: 0.75rem;
+        margin: 0;
+    }
+
+    /* Enhanced Tables */
+    .modern-table {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        background: white;
+        font-size: 0.85rem;
+    }
+
+    .modern-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .modern-table th,
+    .modern-table td {
+        padding: 10px 12px;
+        vertical-align: middle;
+    }
+
+    .modern-table th {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+    }
+
+    .modern-table td {
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .modern-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .modern-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        margin-bottom: 25px;
+    }
+
+    .quick-action-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+    }
+
+    .action-btn {
+        background: white;
+        border: none;
+        border-radius: 12px;
+        padding: 15px;
+        text-decoration: none;
+        color: #2c3e50;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .action-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .action-content h6 {
+        margin: 0 0 2px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .action-content small {
+        color: #6c757d;
+        font-size: 0.72rem;
+    }
+
+    /* Responsive Grid */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 992px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-title {
+            font-size: 1.5rem;
+        }
+
+        .metrics-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+    }
+
+    /* Product Performance Cards */
+    .product-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .product-item:last-child {
+        border-bottom: none;
+    }
+
+    .product-info {
+        flex: 1;
+    }
+
+    .product-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .product-stats {
+        font-size: 0.72rem;
+        color: #6c757d;
+    }
+
+    .product-performance {
+        text-align: right;
+        min-width: 80px;
+    }
+
+    .performance-bar {
+        width: 60px;
+        height: 4px;
+        background: #f1f3f4;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 4px;
+    }
+
+    .performance-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 2px;
+    }
+
+    .performance-value {
+        font-size: 0.7rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    /* Recent Reviews */
+    .review-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .review-item:last-child {
+        border-bottom: none;
+    }
+
+    .review-info {
+        flex: 1;
+    }
+
+    .review-rating {
+        color: #ffc107;
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+    }
+
+    .review-text {
+        font-size: 0.8rem;
+        color: #2c3e50;
+        margin-bottom: 4px;
+        line-height: 1.4;
+    }
+
+    .review-meta {
+        font-size: 0.7rem;
+        color: #6c757d;
+    }
+
+    /* Utilities */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    .slide-up {
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Compact badges and buttons */
+    .btn-sm {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
+    .badge {
+        font-size: 0.65rem;
+        padding: 3px 6px;
+        border-radius: 6px;
+    }
+
+    /* Small text utilities */
+    small {
+        font-size: 0.7rem;
+    }
+
+    .text-xs {
+        font-size: 0.65rem;
+    }
+
+    /* Compact table status badges */
+    .status-badge {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+        /* Compact metric card bottom section */
+    .metric-card .d-flex {
+        align-items: center;
+        margin-top: 8px;
+    }
+
+    .metric-card .d-flex small {
+        font-size: 0.68rem;
+    }
+
+    .metric-card .btn-sm {
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .metric-card .btn-sm svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* Feather icon sizing */
+    .metric-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .action-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .metric-change svg {
+        width: 10px;
+        height: 10px;
+    }
+
+    /* Perfect alignment for metric cards */
+    .metric-card {
+        min-height: 140px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .metric-card .metric-icon {
+        margin-bottom: 8px;
+    }
+
+    .metric-card .metric-value {
+        flex-grow: 1;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .metric-card .d-flex:last-child {
+        margin-top: auto;
+    }
+
+    /* Quick action alignment */
+    .action-btn {
+        min-height: 70px;
+        align-items: center;
+    }
+
+    .action-content {
+        flex-grow: 1;
+    }
+
+    /* Table responsive improvements */
+    .table-responsive {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    /* Status badge improvements */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 70px;
+        text-align: center;
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="col-12">
-    <!-- Welcome Message -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="h3 mb-3">Welcome back, {{ Auth::user()->name }}!</h1>
-            <p class="text-muted">Here's what's happening with your store today.</p>
+<div class="container-fluid p-0">
+    <!-- Hero Section -->
+    <div class="dashboard-hero fade-in">
+        <div class="hero-content">
+            <div class="d-flex justify-content-between align-items-start flex-wrap">
+                <div>
+                    <h1 class="hero-title">🎉 Welcome back, {{ Auth::user()->name }}!</h1>
+                    <p class="hero-subtitle">Here's what's happening with your store today. Let's make it a great day!</p>
+                </div>
+                <div class="text-end">
+                    <div class="text-white-50 mb-1 text-xs">{{ date('l, F j, Y') }}</div>
+                    <div class="fs-6 fw-bold">{{ date('g:i A') }}</div>
+                </div>
+            </div>
+
+            <div class="quick-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">Rs {{ number_format($wallet->balance, 0) }}</div>
+                    <div class="hero-stat-label">💰 Available Balance</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">{{ $pendingOrders }}</div>
+                    <div class="hero-stat-label">⏳ Pending Orders</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">Rs {{ number_format($todaySales, 0) }}</div>
+                    <div class="hero-stat-label">📈 Today's Sales</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">{{ number_format($averageRating, 1) }} ⭐</div>
+                    <div class="hero-stat-label">🌟 Store Rating</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Statistics Cards Row 1 -->
-    <div class="row">
+    <!-- Key Metrics Grid -->
+    <div class="metrics-grid slide-up">
         <!-- Wallet Balance -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Wallet Balance
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                Rs {{ number_format($wallet->balance, 2) }}
-                            </div>
-                            <div class="text-xs text-muted mt-1">
-                                Pending: Rs {{ number_format($wallet->pending_balance, 2) }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-wallet fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="metric-card primary">
+            <div class="metric-icon">
+                <i data-feather="credit-card"></i>
+            </div>
+            <div class="metric-value">Rs {{ number_format($wallet->balance, 2) }}</div>
+            <div class="metric-label">Wallet Balance</div>
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">Pending: Rs {{ number_format($wallet->pending_balance, 2) }}</small>
+                <a href="{{ route('seller.withdrawals.index') }}" class="btn btn-sm btn-outline-primary">
+                    <i data-feather="arrow-right"></i>
+                </a>
             </div>
         </div>
 
         <!-- Total Sales -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Sales (All Time)
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                Rs {{ number_format($totalSales, 2) }}
-                            </div>
-                            <div class="text-xs text-muted mt-1">
-                                Today: Rs {{ number_format($todaySales, 2) }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="metric-card success">
+            <div class="metric-icon">
+                <i data-feather="trending-up"></i>
+            </div>
+            <div class="metric-value">Rs {{ number_format($totalSales, 2) }}</div>
+            <div class="metric-label">Total Sales (All Time)</div>
+            <div class="metric-change positive">
+                <i data-feather="arrow-up"></i> Today: Rs {{ number_format($todaySales, 2) }}
             </div>
         </div>
 
         <!-- Monthly Sales -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                This Month's Sales
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                Rs {{ number_format($thisMonthSales, 2) }}
-                            </div>
-                            <div class="text-xs mt-1">
-                                @if($growthPercentage > 0)
-                                    <span class="text-success">
-                                        <i class="fas fa-arrow-up"></i> {{ $growthPercentage }}%
-                                    </span>
-                                @elseif($growthPercentage < 0)
-                                    <span class="text-danger">
-                                        <i class="fas fa-arrow-down"></i> {{ abs($growthPercentage) }}%
-                                    </span>
-                                @else
-                                    <span class="text-muted">
-                                        <i class="fas fa-minus"></i> 0%
-                                    </span>
-                                @endif
-                                vs last month
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-chart-line fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="metric-card info">
+            <div class="metric-icon">
+                <i data-feather="calendar"></i>
+            </div>
+            <div class="metric-value">Rs {{ number_format($thisMonthSales, 2) }}</div>
+            <div class="metric-label">This Month's Sales</div>
+            <div class="metric-change {{ $growthPercentage > 0 ? 'positive' : ($growthPercentage < 0 ? 'negative' : 'neutral') }}">
+                @if($growthPercentage > 0)
+                    <i data-feather="arrow-up"></i> +{{ $growthPercentage }}%
+                @elseif($growthPercentage < 0)
+                    <i data-feather="arrow-down"></i> {{ $growthPercentage }}%
+                @else
+                    <i data-feather="minus"></i> 0%
+                @endif
+                vs last month
             </div>
         </div>
 
         <!-- Pending Orders -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Pending Orders
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pendingOrders }}</div>
-                            <div class="text-xs text-muted mt-1">
-                                Total Orders: {{ $totalOrders }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="metric-card warning">
+            <div class="metric-icon">
+                <i data-feather="shopping-cart"></i>
+            </div>
+            <div class="metric-value">{{ $pendingOrders }}</div>
+            <div class="metric-label">Pending Orders</div>
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">Total: {{ $totalOrders }}</small>
+                <a href="{{ route('seller.orders.index') }}" class="btn btn-sm btn-outline-warning">
+                    <i data-feather="eye"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Total Products -->
+        <div class="metric-card secondary">
+            <div class="metric-icon">
+                <i data-feather="package"></i>
+            </div>
+            <div class="metric-value">{{ $totalProducts }}</div>
+            <div class="metric-label">Total Products</div>
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-success">Active: {{ $activeProducts }}</small>
+                <a href="{{ route('seller.products.index') }}" class="btn btn-sm btn-outline-secondary">
+                    <i data-feather="plus"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Stock Alert -->
+        <div class="metric-card danger">
+            <div class="metric-icon">
+                <i data-feather="alert-triangle"></i>
+            </div>
+            <div class="metric-value">{{ $outOfStockProducts + $lowStockProducts }}</div>
+            <div class="metric-label">Stock Alerts</div>
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-danger">Out: {{ $outOfStockProducts }} | Low: {{ $lowStockProducts }}</small>
+                <button class="btn btn-sm btn-outline-danger" onclick="alert('Check inventory management')">
+                    <i data-feather="bell"></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Statistics Cards Row 2 -->
-    <div class="row">
-        <!-- Total Products -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-secondary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
-                                Total Products
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalProducts }}</div>
-                            <div class="text-xs text-muted mt-1">
-                                Active: {{ $activeProducts }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-box fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+    <!-- Quick Actions Panel -->
+    <div class="quick-actions slide-up">
+        <h5 class="quick-action-title">🚀 Quick Actions</h5>
+        <div class="action-grid">
+            <a href="{{ route('seller.products.create') }}" class="action-btn">
+                <div class="action-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                    <i data-feather="plus"></i>
                 </div>
-            </div>
-        </div>
+                <div class="action-content">
+                    <h6>Add New Product</h6>
+                    <small>Expand your inventory</small>
+                </div>
+            </a>
 
-        <!-- Low Stock Alert -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Stock Alert
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $outOfStockProducts + $lowStockProducts }}
-                            </div>
-                            <div class="text-xs text-muted mt-1">
-                                Out: {{ $outOfStockProducts }} | Low: {{ $lowStockProducts }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+            <a href="{{ route('seller.orders.index') }}" class="action-btn">
+                <div class="action-icon" style="background: linear-gradient(135deg, #f6c23e, #f39c12);">
+                    <i data-feather="shopping-bag"></i>
                 </div>
-            </div>
-        </div>
+                <div class="action-content">
+                    <h6>Manage Orders</h6>
+                    <small>Process customer orders</small>
+                </div>
+            </a>
 
-        <!-- Customer Reviews -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Customer Reviews
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $totalReviews }}
-                            </div>
-                            <div class="text-xs text-muted mt-1">
-                                Avg Rating: {{ number_format($averageRating, 1) }} ⭐
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-star fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+            <a href="{{ route('seller.reports.sales') }}" class="action-btn">
+                <div class="action-icon" style="background: linear-gradient(135deg, #1cc88a, #17a2b8);">
+                    <i data-feather="bar-chart-2"></i>
                 </div>
-            </div>
-        </div>
+                <div class="action-content">
+                    <h6>View Reports</h6>
+                    <small>Analyze your performance</small>
+                </div>
+            </a>
 
-        <!-- Pending Withdrawals -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Pending Withdrawals
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                Rs {{ number_format($pendingWithdrawals, 2) }}
-                            </div>
-                            <div class="text-xs text-muted mt-1">
-                                <a href="{{ route('seller.withdrawals.index') }}" class="text-info">View All</a>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-money-check-alt fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+            <a href="{{ route('seller.withdrawals.create') }}" class="action-btn">
+                <div class="action-icon" style="background: linear-gradient(135deg, #36b9cc, #17a2b8);">
+                    <i data-feather="credit-card"></i>
                 </div>
-            </div>
+                <div class="action-content">
+                    <h6>Request Withdrawal</h6>
+                    <small>Transfer your earnings</small>
+                </div>
+            </a>
         </div>
     </div>
 
     <!-- Charts Row -->
-    <div class="row">
+    <div class="charts-grid slide-up">
         <!-- Sales Chart -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Sales Overview (Last 12 Months)</h6>
+        <div class="dashboard-card">
+            <div class="chart-header">
+                <div>
+                    <h5 class="chart-title">📊 Sales & Orders Overview</h5>
+                    <p class="chart-subtitle">Performance trends over the last 12 months</p>
                 </div>
-                <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="salesChart"></canvas>
-                    </div>
-                </div>
+            </div>
+            <div class="chart-container-modern">
+                <canvas id="salesChart"></canvas>
             </div>
         </div>
 
-        <!-- Order Status Pie Chart -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Order Status Distribution</h6>
+        <!-- Order Status Distribution -->
+        <div class="dashboard-card">
+            <div class="chart-header">
+                <div>
+                    <h5 class="chart-title">🎯 Order Status</h5>
+                    <p class="chart-subtitle">Current order distribution</p>
                 </div>
-                <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="orderStatusChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center small">
-                        @php
-                            $statusColors = [
-                                'pending' => ['color' => '#f6c23e', 'label' => 'Pending'],
-                                'processing' => ['color' => '#4e73df', 'label' => 'Processing'],
-                                'shipped' => ['color' => '#36b9cc', 'label' => 'Shipped'],
-                                'delivered' => ['color' => '#1cc88a', 'label' => 'Delivered'],
-                                'cancelled' => ['color' => '#e74a3b', 'label' => 'Cancelled'],
-                                'refunded' => ['color' => '#858796', 'label' => 'Refunded']
-                            ];
-                        @endphp
-                        @foreach($statusColors as $status => $config)
-                            @if(isset($orderStatusData[$status]) && $orderStatusData[$status] > 0)
-                                <span class="mr-2">
-                                    <i class="fas fa-circle" style="color: {{ $config['color'] }}"></i>
-                                    {{ $config['label'] }} ({{ $orderStatusData[$status] }})
-                                </span>
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
+            </div>
+            <div class="chart-container-modern" style="height: 240px;">
+                <canvas id="orderStatusChart"></canvas>
+            </div>
+            <div class="mt-2 text-center">
+                @php
+                    $statusColors = [
+                        'pending' => ['color' => '#f6c23e', 'label' => 'Pending'],
+                        'processing' => ['color' => '#4e73df', 'label' => 'Processing'],
+                        'shipped' => ['color' => '#36b9cc', 'label' => 'Shipped'],
+                        'delivered' => ['color' => '#1cc88a', 'label' => 'Delivered'],
+                        'cancelled' => ['color' => '#e74a3b', 'label' => 'Cancelled'],
+                        'refunded' => ['color' => '#858796', 'label' => 'Refunded']
+                    ];
+                @endphp
+                @foreach($statusColors as $status => $config)
+                    @if(isset($orderStatusData[$status]) && $orderStatusData[$status] > 0)
+                        <span class="badge me-1 mb-1" style="background: {{ $config['color'] }};">
+                            {{ $config['label'] }} ({{ $orderStatusData[$status] }})
+                        </span>
+                    @endif
+                @endforeach
             </div>
         </div>
     </div>
 
-    <!-- Recent Orders and Top Products Row -->
+    <!-- Content Row -->
     <div class="row">
         <!-- Recent Orders -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>Order #</th>
-                                    <th>Customer</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($recentOrders as $order)
-                                <tr>
-                                    <td>{{ $order->order_number }}</td>
-                                    <td>{{ $order->customer ? $order->customer->name : 'Guest' }}</td>
-                                    <td>{{ $order->created_at->format('d M Y') }}</td>
-                                    <td>Rs {{ number_format($order->total, 2) }}</td>
-                                    <td>
-                                        @php
-                                            $statusClasses = [
-                                                'pending' => 'warning',
-                                                'processing' => 'info',
-                                                'shipped' => 'primary',
-                                                'delivered' => 'success',
-                                                'cancelled' => 'danger',
-                                                'refunded' => 'secondary'
-                                            ];
-                                        @endphp
-                                        <span class="badge badge-{{ $statusClasses[$order->order_status] ?? 'secondary' }}">
-                                            {{ ucfirst($order->order_status) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('seller.orders.show', $order->id) }}"
-                                           class="btn btn-sm btn-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="6" class="text-center">No recent orders found</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+        <div class="col-xl-8">
+            <div class="dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="chart-title">📋 Recent Orders</h5>
+                        <p class="chart-subtitle">Latest customer orders requiring attention</p>
                     </div>
-                    @if($recentOrders->count() > 0)
-                        <div class="text-center mt-3">
-                            <a href="{{ route('seller.orders.index') }}" class="btn btn-primary btn-sm">
-                                View All Orders
-                            </a>
-                        </div>
-                    @endif
+                    <a href="{{ route('seller.orders.index') }}" class="btn btn-primary btn-sm">
+                        <i data-feather="arrow-right"></i> View All
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="modern-table table">
+                        <thead>
+                            <tr>
+                                <th class="text-white">Order #</th>
+                                <th class="text-white">Customer</th>
+                                <th class="text-white">Date</th>
+                                <th class="text-white">Amount</th>
+                                <th class="text-white">Status</th>
+                                <th class="text-white">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentOrders as $order)
+                            <tr>
+                                <td>
+                                    <strong class="text-primary">#{{ $order->id }}</strong>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0 me-2">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                                                <i data-feather="user" style="width: 14px; height: 14px;" class="text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">{{ $order->customer ? $order->customer->name : 'Deleted User' }}</div>
+                                            <small class="text-muted">{{ $order->customer ? $order->customer->email : 'N/A' }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>{{ $order->created_at->format('M d, Y') }}</div>
+                                    <small class="text-muted">{{ $order->created_at->format('h:i A') }}</small>
+                                </td>
+                                <td>
+                                    <strong class="text-success">Rs {{ number_format($order->total_amount, 2) }}</strong>
+                                </td>
+                                <td>
+                                    @php
+                                        $statusClasses = [
+                                            'pending' => 'bg-warning text-dark',
+                                            'processing' => 'bg-info text-white',
+                                            'shipped' => 'bg-primary text-white',
+                                            'delivered' => 'bg-success text-white',
+                                            'cancelled' => 'bg-danger text-white',
+                                            'refunded' => 'bg-secondary text-white'
+                                        ];
+                                    @endphp
+                                    <span class="status-badge {{ $statusClasses[$order->status] ?? 'bg-secondary text-white' }}">
+                                        {{ ucfirst($order->status) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ route('seller.orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i data-feather="eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i data-feather="package" style="width: 24px; height: 24px;" class="mb-2"></i>
+                                        <p class="mb-0">No recent orders found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Top Products -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Top Selling Products</h6>
+        <!-- Sidebar -->
+        <div class="col-xl-4">
+            <!-- Top Products -->
+            <div class="dashboard-card mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="chart-title">🏆 Top Products</h5>
+                        <p class="chart-subtitle">Best performing items</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    @forelse($topProducts as $product)
-                    <div class="mb-3">
-                        <h6 class="small font-weight-bold">
-                            {{ Str::limit($product->name, 30) }}
-                            <span class="float-right">{{ $product->quantity_sold }} sold</span>
-                        </h6>
-                        <div class="progress mb-2">
-                            @php
-                                $maxSold = $topProducts->max('quantity_sold');
-                                $percentage = $maxSold > 0 ? ($product->quantity_sold / $maxSold) * 100 : 0;
-                            @endphp
-                            <div class="progress-bar bg-primary" role="progressbar"
-                                 style="width: {{ $percentage }}%"
-                                 aria-valuenow="{{ $percentage }}"
-                                 aria-valuemin="0"
-                                 aria-valuemax="100">
-                            </div>
-                        </div>
-                        <small class="text-muted">
-                            Rs {{ number_format($product->price, 2) }} |
+
+                @forelse($topProducts as $product)
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-name">{{ Str::limit($product->name, 25) }}</div>
+                        <div class="product-stats">
+                            Rs {{ number_format($product->price, 2) }} •
                             Revenue: Rs {{ number_format($product->total_sales, 2) }}
-                        </small>
+                        </div>
                     </div>
-                    @empty
-                    <p class="text-center text-muted">No sales data available</p>
-                    @endforelse
+                    <div class="product-performance">
+                        @php
+                            $maxSold = $topProducts->max('quantity_sold');
+                            $percentage = $maxSold > 0 ? ($product->quantity_sold / $maxSold) * 100 : 0;
+                        @endphp
+                        <div class="performance-bar">
+                            <div class="performance-fill" style="width: {{ $percentage }}%"></div>
+                        </div>
+                        <div class="performance-value">{{ $product->quantity_sold }} sold</div>
+                    </div>
                 </div>
+                @empty
+                <div class="text-center py-3">
+                    <i data-feather="package" style="width: 24px; height: 24px;" class="text-muted mb-2"></i>
+                    <p class="text-muted mb-0 small">No sales data available</p>
+                </div>
+                @endforelse
             </div>
-        </div>
-    </div>
 
-    <!-- Recent Reviews -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Customer Reviews</h6>
+            <!-- Recent Reviews -->
+            <div class="dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="chart-title">⭐ Recent Reviews</h5>
+                        <p class="chart-subtitle">Latest customer feedback</p>
+                    </div>
+                    <a href="{{ route('seller.reviews.index') }}" class="btn btn-sm btn-outline-primary">
+                        <i data-feather="arrow-right"></i>
+                    </a>
                 </div>
-                <div class="card-body">
-                    @forelse($recentReviews as $review)
-                    <div class="mb-3 pb-3 border-bottom">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="font-weight-bold mb-1">
-                                    {{ $review->product->name }}
-                                </h6>
-                                <div class="mb-1">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= $review->rating)
-                                            <i class="fas fa-star text-warning"></i>
-                                        @else
-                                            <i class="far fa-star text-warning"></i>
-                                        @endif
-                                    @endfor
-                                    <span class="ml-2 text-muted">by {{ $review->customer->name }}</span>
-                                </div>
-                                @if($review->comment)
-                                    <p class="mb-0 text-gray-800">{{ $review->comment }}</p>
+
+                @forelse($recentReviews as $review)
+                <div class="review-item">
+                    <div class="review-info">
+                        <div class="review-rating">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <= $review->rating)
+                                    <i data-feather="star" style="width: 12px; height: 12px; fill: currentColor;"></i>
+                                @else
+                                    <i data-feather="star" style="width: 12px; height: 12px;"></i>
                                 @endif
-                            </div>
-                            <div class="text-right">
-                                <small class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
-                                <br>
-                                <a href="{{ route('seller.reviews.show', $review->id) }}"
-                                   class="btn btn-sm btn-primary mt-1">
-                                    Respond
-                                </a>
-                            </div>
+                            @endfor
                         </div>
-                    </div>
-                    @empty
-                    <p class="text-center text-muted">No reviews yet</p>
-                    @endforelse
-
-                    @if($recentReviews->count() > 0)
-                        <div class="text-center">
-                            <a href="{{ route('seller.reviews.index') }}" class="btn btn-primary btn-sm">
-                                View All Reviews
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('seller.products.create') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-plus"></i> Add New Product
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('seller.orders.pending') }}" class="btn btn-warning btn-block">
-                                <i class="fas fa-clock"></i> View Pending Orders
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('seller.withdrawals.create') }}" class="btn btn-success btn-block">
-                                <i class="fas fa-money-bill-wave"></i> Request Withdrawal
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('seller.reports.sales') }}" class="btn btn-info btn-block">
-                                <i class="fas fa-chart-bar"></i> View Reports
-                            </a>
+                        <div class="review-text">{{ Str::limit($review->review ?? $review->comment ?? 'No comment', 50) }}</div>
+                                                                        <div class="review-meta">
+                            <strong>{{ $review->product ? $review->product->name : 'Deleted Product' }}</strong> •
+                            {{ $review->customer ? $review->customer->name : 'Deleted User' }} •
+                            {{ $review->created_at->diffForHumans() }}
                         </div>
                     </div>
                 </div>
+                @empty
+                <div class="text-center py-3">
+                    <i data-feather="message-circle" style="width: 24px; height: 24px;" class="text-muted mb-2"></i>
+                    <p class="text-muted mb-0 small">No reviews yet</p>
+                </div>
+                @endforelse
             </div>
         </div>
     </div>
@@ -470,7 +984,8 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Sales Chart
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced Sales Chart
     var ctx = document.getElementById('salesChart').getContext('2d');
     var salesChart = new Chart(ctx, {
         type: 'line',
@@ -479,113 +994,113 @@
             datasets: [{
                 label: 'Sales (Rs)',
                 data: @json($salesChartValues),
-                backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                borderColor: 'rgba(78, 115, 223, 1)',
-                pointRadius: 3,
-                pointBackgroundColor: 'rgba(78, 115, 223, 1)',
-                pointBorderColor: 'rgba(78, 115, 223, 1)',
-                pointHoverRadius: 3,
-                pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
-                pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderColor: '#667eea',
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#667eea',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 3,
+                pointHoverBackgroundColor: '#667eea',
+                pointHoverBorderColor: '#ffffff',
                 pointHitRadius: 10,
-                pointBorderWidth: 2,
-                lineTension: 0.3
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true
             }, {
                 label: 'Orders',
                 data: @json($ordersChartValues),
-                backgroundColor: 'rgba(28, 200, 138, 0.05)',
-                borderColor: 'rgba(28, 200, 138, 1)',
-                pointRadius: 3,
-                pointBackgroundColor: 'rgba(28, 200, 138, 1)',
-                pointBorderColor: 'rgba(28, 200, 138, 1)',
-                pointHoverRadius: 3,
-                pointHoverBackgroundColor: 'rgba(28, 200, 138, 1)',
-                pointHoverBorderColor: 'rgba(28, 200, 138, 1)',
+                backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                borderColor: '#1cc88a',
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#1cc88a',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 3,
+                pointHoverBackgroundColor: '#1cc88a',
+                pointHoverBorderColor: '#ffffff',
                 pointHitRadius: 10,
-                pointBorderWidth: 2,
-                lineTension: 0.3,
+                borderWidth: 3,
+                tension: 0.4,
                 yAxisID: 'y-axis-2'
             }]
         },
         options: {
+            responsive: true,
             maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    left: 10,
-                    right: 25,
-                    top: 25,
-                    bottom: 0
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            if (context.datasetIndex === 0) {
+                                return 'Sales: Rs ' + context.parsed.y.toLocaleString();
+                            } else {
+                                return 'Orders: ' + context.parsed.y;
+                            }
+                        }
+                    }
                 }
             },
             scales: {
-                xAxes: [{
-                    time: {
-                        unit: 'date'
-                    },
-                    gridLines: {
-                        display: false,
-                        drawBorder: false
+                x: {
+                    display: true,
+                    grid: {
+                        display: false
                     },
                     ticks: {
-                        maxTicksLimit: 7
+                        font: {
+                            size: 11
+                        }
                     }
-                }],
-                yAxes: [{
+                },
+                y: {
                     id: 'y-axis-1',
                     position: 'left',
-                    ticks: {
-                        maxTicksLimit: 5,
-                        padding: 10,
-                        callback: function(value, index, values) {
-                            return 'Rs ' + value.toLocaleString();
-                        }
+                    display: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
                     },
-                    gridLines: {
-                        color: 'rgb(234, 236, 244)',
-                        zeroLineColor: 'rgb(234, 236, 244)',
-                        drawBorder: false,
-                        borderDash: [2],
-                        zeroLineBorderDash: [2]
+                    ticks: {
+                        callback: function(value) {
+                            return 'Rs ' + value.toLocaleString();
+                        },
+                        font: {
+                            size: 11
+                        }
                     }
-                }, {
+                },
+                'y-axis-2': {
                     id: 'y-axis-2',
                     position: 'right',
-                    ticks: {
-                        maxTicksLimit: 5,
-                        padding: 10,
-                        callback: function(value, index, values) {
-                            return value + ' orders';
-                        }
-                    },
-                    gridLines: {
+                    display: true,
+                    grid: {
                         display: false
-                    }
-                }]
-            },
-            legend: {
-                display: true
-            },
-            tooltips: {
-                backgroundColor: 'rgb(255,255,255)',
-                bodyFontColor: '#858796',
-                titleMarginBottom: 10,
-                titleFontColor: '#6e707e',
-                titleFontSize: 14,
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                intersect: false,
-                mode: 'index',
-                caretPadding: 10,
-                callbacks: {
-                    label: function(tooltipItem, chart) {
-                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                        if (tooltipItem.datasetIndex === 0) {
-                            return datasetLabel + ': Rs ' + tooltipItem.yLabel.toLocaleString();
-                        } else {
-                            return datasetLabel + ': ' + tooltipItem.yLabel;
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + ' orders';
+                        },
+                        font: {
+                            size: 11
                         }
                     }
                 }
@@ -593,7 +1108,7 @@
         }
     });
 
-    // Order Status Pie Chart
+    // Enhanced Order Status Pie Chart
     var statusData = @json($orderStatusData);
     var labels = [];
     var data = [];
@@ -625,28 +1140,78 @@
                 datasets: [{
                     data: data,
                     backgroundColor: backgroundColor,
-                    hoverBorderColor: 'rgba(234, 236, 244, 1)',
+                    borderWidth: 4,
+                    borderColor: '#ffffff',
+                    hoverBorderWidth: 6,
+                    hoverOffset: 8
                 }],
             },
             options: {
+                responsive: true,
                 maintainAspectRatio: false,
-                tooltips: {
-                    backgroundColor: 'rgb(255,255,255)',
-                    bodyFontColor: '#858796',
-                    borderColor: '#dddfeb',
-                    borderWidth: 1,
-                    xPadding: 15,
-                    yPadding: 15,
-                    displayColors: false,
-                    caretPadding: 10,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
                 },
-                legend: {
-                    display: false
-                },
-                cutoutPercentage: 80,
-            },
+                cutout: '65%',
+                animation: {
+                    animateRotate: true,
+                    duration: 1500
+                }
+            }
         });
     }
+});
+
+// Add smooth scrolling animations
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+// Observe all metric cards for animation
+document.querySelectorAll('.metric-card, .dashboard-card').forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'all 0.6s ease';
+    observer.observe(card);
+});
+
+// Initialize Feather icons
+if (typeof feather !== 'undefined') {
+    feather.replace();
+}
 </script>
 @endsection
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -15,6 +16,9 @@ class SaasProduct extends Model
         'seller_id',
         'name',
         'slug',
+        'product_type',
+        'is_in_house_product',
+        'file',
         'description',
         'short_description',
         'category_id',
@@ -40,7 +44,65 @@ class SaasProduct extends Model
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'has_variations' => 'boolean',
+        'is_in_house_product' => 'boolean',
     ];
+
+    // Product type constants
+    const PRODUCT_TYPE_DIGITAL = 'Digital';
+    const PRODUCT_TYPE_PHYSICAL = 'Physical';
+
+    public static function getProductTypes()
+    {
+        return [
+            self::PRODUCT_TYPE_DIGITAL => 'Digital Product',
+            self::PRODUCT_TYPE_PHYSICAL => 'Physical Product',
+        ];
+    }
+
+    public function isDigital()
+    {
+        return $this->product_type === self::PRODUCT_TYPE_DIGITAL;
+    }
+
+    public function isPhysical()
+    {
+        return $this->product_type === self::PRODUCT_TYPE_PHYSICAL;
+    }
+
+    public function getFileUrlAttribute()
+    {
+        if ($this->file && Storage::disk('public')->exists($this->file)) {
+            return asset('storage/' . $this->file);
+        }
+        return null;
+    }
+
+    public function saveDigitalFile($file)
+    {
+                Log::info('saveDigitalFile called', [
+            'original_name' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+            'mime_type' => $file->getMimeType()
+        ]);
+
+        if ($this->file) {
+            Storage::disk('public')->delete($this->file);
+            Log::info('Deleted old file', ['old_file' => $this->file]);
+        }
+
+        $filename = 'digital_products/' . uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        Log::info('Generated filename', ['filename' => $filename]);
+
+        $result = $file->storeAs('', $filename, 'public');
+        Log::info('File storage result', ['result' => $result, 'exists' => Storage::disk('public')->exists($filename)]);
+
+        $this->file = $filename;
+        $this->save();
+
+        Log::info('Product saved with file', ['product_id' => $this->id, 'file' => $this->file]);
+
+        return $filename;
+    }
 
     protected static function boot()
     {
@@ -214,7 +276,7 @@ class SaasProduct extends Model
     public function saveImage($image)
     {
         $filename = 'product_images/' . uniqid() . '.' . $image->getClientOriginalExtension();
-        $image->storeAs($filename);
+        $image->storeAs('', $filename, 'public');
 
         $productImage = new SaasProductImage([
             'product_id' => $this->id,

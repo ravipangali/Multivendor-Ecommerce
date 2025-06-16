@@ -264,7 +264,7 @@
                     <div class="filter-group-enhanced">
                         <div class="filter-header collapsible" data-toggle="priceRange">
                             <h6 class="filter-title">
-                                <i class="fas fa-dollar-sign me-2"></i>
+                                <span class="rs-icon me-2">Rs</span>
                                 Price Range
                             </h6>
                             <i class="fas fa-chevron-down filter-toggle"></i>

@@ -8,7 +8,7 @@ use App\Models\SaasBrand;
 use App\Models\SaasCategory;
 use App\Models\SaasProduct;
 use App\Models\SaasProductVariation;
-use App\Models\SaasFlashDeal;
+
 use App\Models\SaasProductReview;
 use App\Models\SaasCart;
 use App\Models\SaasWishlist;
@@ -74,11 +74,7 @@ class SaasCustomerController extends Controller
             ->orderBy('wishlists_count', 'desc')
             ->take(6)->get();
 
-        // Get flash deals
-        $activeFlashDeals = SaasFlashDeal::where('start_time', '<=', now())
-            ->where('end_time', '>=', now())
-            ->with(['products.images', 'products.brand'])
-            ->first();
+
 
         return view('saas_customer.saas_home', compact(
             'sliderBanners',
@@ -89,8 +85,7 @@ class SaasCustomerController extends Controller
             'newArrivals',
             'topSellingProducts',
             'popularBrands',
-            'demandProducts',
-            'activeFlashDeals'
+            'demandProducts'
         ));
     }
 
@@ -571,4 +566,6 @@ class SaasCustomerController extends Controller
             'variations' => $variations
         ]);
     }
+
+
 }

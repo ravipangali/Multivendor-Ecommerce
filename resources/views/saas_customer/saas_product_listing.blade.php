@@ -740,7 +740,7 @@
                     <!-- Price Range -->
                     <div class="filter-section">
                         <h6 class="filter-title">
-                            <i class="fas fa-dollar-sign"></i>
+                                                                <span class="rs-icon">Rs</span>
                             Price Range
                         </h6>
                         <div class="filter-content">

@@ -175,7 +175,7 @@
                                 <div class="mb-3">
                                     <label for="shipping_free_min_amount" class="form-label">Minimum Order Amount</label>
                                     <div class="input-group">
-                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                         <input type="number" class="form-control" id="shipping_free_min_amount" name="shipping_free_min_amount"
                                             value="{{ old('shipping_free_min_amount', $settings->shipping_free_min_amount) }}"
                                             placeholder="50" step="0.01" min="0">
@@ -210,7 +210,7 @@
                                 <div class="mb-3">
                                     <label for="shipping_flat_rate_cost" class="form-label">Flat Rate Cost <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                         <input type="number" class="form-control" id="shipping_flat_rate_cost" name="shipping_flat_rate_cost"
                                             value="{{ old('shipping_flat_rate_cost', $settings->shipping_flat_rate_cost) }}"
                                             placeholder="10" step="0.01" min="0">
@@ -245,7 +245,7 @@
                                 <div class="mb-3">
                                     <label for="shipping_local_pickup_cost" class="form-label">Local Pickup Cost</label>
                                     <div class="input-group">
-                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                         <input type="number" class="form-control" id="shipping_local_pickup_cost" name="shipping_local_pickup_cost"
                                             value="{{ old('shipping_local_pickup_cost', $settings->shipping_local_pickup_cost) }}"
                                             placeholder="0" step="0.01" min="0">
@@ -280,7 +280,7 @@
                                 <div class="mb-3">
                                     <label for="shipping_local_rate" class="form-label">Local Zone Rate</label>
                                     <div class="input-group">
-                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                         <input type="number" class="form-control" id="shipping_local_rate" name="shipping_local_rate"
                                             value="{{ old('shipping_local_rate', $settings->shipping_local_rate) }}"
                                             placeholder="5" step="0.01" min="0">
@@ -292,7 +292,7 @@
                                 <div class="mb-3">
                                     <label for="shipping_regional_rate" class="form-label">Regional Zone Rate</label>
                                     <div class="input-group">
-                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                         <input type="number" class="form-control" id="shipping_regional_rate" name="shipping_regional_rate"
                                             value="{{ old('shipping_regional_rate', $settings->shipping_regional_rate) }}"
                                             placeholder="10" step="0.01" min="0">
@@ -304,7 +304,7 @@
                                 <div class="mb-3">
                                     <label for="shipping_remote_rate" class="form-label">Remote Zone Rate</label>
                                     <div class="input-group">
-                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                        <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                         <input type="number" class="form-control" id="shipping_remote_rate" name="shipping_remote_rate"
                                             value="{{ old('shipping_remote_rate', $settings->shipping_remote_rate) }}"
                                             placeholder="20" step="0.01" min="0">
@@ -327,7 +327,7 @@
                             <div class="mb-3">
                                 <label for="shipping_weight_rate" class="form-label">Rate per Weight Unit</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                    <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                     <input type="number" class="form-control" id="shipping_weight_rate" name="shipping_weight_rate"
                                         value="{{ old('shipping_weight_rate', $settings->shipping_weight_rate) }}"
                                         placeholder="1.5" step="0.01" min="0">
@@ -439,7 +439,7 @@
                                     <div class="mb-3">
                                         <label class="form-label">Order Value</label>
                                         <div class="input-group">
-                                            <span class="input-group-text">{{ $settings->site_currency_symbol ?: '$' }}</span>
+                                            <span class="input-group-text">{{ $settings->site_currency_symbol ?: 'Rs ' }}</span>
                                             <input type="number" class="form-control" id="calc_order_value" value="25" placeholder="25">
                                         </div>
                                     </div>
@@ -512,7 +512,7 @@
         const orderValue = parseFloat(document.getElementById('calc_order_value').value) || 0;
         const weight = parseFloat(document.getElementById('calc_weight').value) || 0;
         const zone = document.getElementById('calc_zone').value;
-        const currencySymbol = '{{ $settings->site_currency_symbol ?: "$" }}';
+        const currencySymbol = '{{ $settings->site_currency_symbol ?: "Rs " }}';
 
         let results = [];
 

@@ -332,6 +332,18 @@
     color: var(--white);
   }
 
+  .btn-success-custom {
+    background: linear-gradient(135deg, var(--success), #28a745);
+    color: var(--white);
+  }
+
+  .btn-success-custom:hover {
+    background: linear-gradient(135deg, #218838, #1e7e34);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    color: var(--white);
+  }
+
   .empty-orders {
     text-align: center;
     padding: 4rem 2rem;
@@ -647,9 +659,15 @@
                                     <div class="order-items">
                                         @foreach($order->items->take(3) as $item)
                                             <div class="order-item">
-                                                <img src="{{ $item->product->images->first()->image_url ?? asset('saas_frontend/images/shop-items/shop-item27.png') }}"
-                                                     alt="{{ $item->product->name }}"
-                                                     class="item-image">
+                                                @if($item->product && $item->product->images->count() > 0)
+                                                    <img src="{{ $item->product->images->first()->image_url }}"
+                                                         alt="{{ $item->product->name }}"
+                                                         class="item-image">
+                                                @else
+                                                    <img src="{{ asset('saas_frontend/images/shop-items/shop-item27.png') }}"
+                                                         alt="{{ $item->product->name }}"
+                                                         class="item-image">
+                                                @endif
                                                 <div class="item-details">
                                                     <div class="item-name">{{ $item->product->name }}</div>
                                                     @if($item->variation)
@@ -707,6 +725,11 @@
                                             @if($order->order_status == 'delivered')
                                                 <a href="{{ route('customer.order.review', $order->id) }}" class="btn btn-primary-custom">
                                                     <i class="fa fa-star"></i> Review
+                                                </a>
+                                            @endif
+                                            @if($order->hasDigitalProducts() && $order->canDownloadDigitalProducts())
+                                                <a href="{{ route('customer.order.detail', $order->id) }}#digital-downloads" class="btn btn-success-custom">
+                                                    <i class="fa fa-download"></i> Download
                                                 </a>
                                             @endif
                                         </div>

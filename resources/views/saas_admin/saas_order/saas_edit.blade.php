@@ -111,9 +111,24 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="payment_status" class="form-label">Payment Status (Read Only)</label>
-                            <input type="text" class="form-control" value="{{ ucfirst($order->payment_status) }}" readonly>
-                            <small class="text-muted">Payment status cannot be changed from here.</small>
+                            <label for="payment_status" class="form-label">Payment Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="payment_status" name="payment_status" required>
+                                @php
+                                    $paymentStatuses = [
+                                        'pending' => 'Pending',
+                                        'paid' => 'Paid',
+                                        'failed' => 'Failed',
+                                        'refunded' => 'Refunded',
+                                        'canceled' => 'Canceled'
+                                    ];
+                                @endphp
+                                @foreach($paymentStatuses as $value => $label)
+                                    <option value="{{ $value }}" {{ $order->payment_status == $value ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <small class="text-muted">Update the payment status for this order.</small>
                         </div>
                     </div>
                 </div>

@@ -40,8 +40,8 @@
                             <tr>
                                 <td>{{ $product->id }}</td>
                                 <td>
-                                    @if($product->images->count() > 0)
-                                        <img src="{{ asset('storage/' . $product->images->first()->image_url) }}"
+                                    @if($product->images && $product->images->count() > 0)
+                                        <img src="{{ $product->images->first()->image_url }}"
                                             alt="{{ $product->name }}" style="width: 50px; height: 50px; object-fit: cover;">
                                     @else
                                         <div style="width: 50px; height: 50px; background-color: #eee; display: flex; align-items: center; justify-content: center;">
@@ -63,17 +63,17 @@
                                             $minPrice = $variations->min('price');
                                             $maxPrice = $variations->max('price');
                                         @endphp
-                                        @if($minPrice === $maxPrice)
-                                            Rs{{ number_format($minPrice, 2) }}
-                                        @else
-                                            Rs{{ number_format($minPrice, 2) }} - Rs{{ number_format($maxPrice, 2) }}
-                                        @endif
+                                                                            @if($minPrice === $maxPrice)
+                                        Rs {{ number_format($minPrice, 2) }}
+                                    @else
+                                        Rs {{ number_format($minPrice, 2) }} - Rs {{ number_format($maxPrice, 2) }}
+                                    @endif
                                     @else
                                         @if($product->discount > 0)
-                                            <span class="text-decoration-line-through text-muted">Rs{{ number_format($product->price, 2) }}</span>
-                                            <span class="text-danger">Rs{{ number_format($product->final_price, 2) }}</span>
+                                                                                    <span class="text-decoration-line-through text-muted">Rs {{ number_format($product->price, 2) }}</span>
+                                        <span class="text-danger">Rs {{ number_format($product->final_price, 2) }}</span>
                                         @else
-                                            Rs{{ number_format($product->price, 2) }}
+                                            Rs {{ number_format($product->price, 2) }}
                                         @endif
                                     @endif
                                 </td>

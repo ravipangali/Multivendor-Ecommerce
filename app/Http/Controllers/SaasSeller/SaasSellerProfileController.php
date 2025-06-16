@@ -27,7 +27,13 @@ class SaasSellerProfileController extends Controller
             $sellerProfile->save();
         }
 
-        return view('saas_seller.saas_seller_profile.saas_index', compact('sellerProfile', 'user'));
+        // Load payment methods for the user
+        $paymentMethods = \App\Models\SaasPaymentMethod::where('user_id', $user->id)
+            ->orderBy('is_default', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('saas_seller.saas_seller_profile.saas_index', compact('sellerProfile', 'user', 'paymentMethods'));
     }
 
     /**
@@ -84,7 +90,6 @@ class SaasSellerProfileController extends Controller
             $sellerProfile->saveStoreBanner($request->file('store_banner'));
         }
 
-        toast('Profile updated successfully', 'success');
-        return redirect()->route('seller.profile');
+        return redirect()->route('seller.profile')->with('success', 'Profile updated successfully');
     }
 }

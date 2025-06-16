@@ -38,13 +38,13 @@
                         </div>
                         <div class="col-auto">
                             <div class="stat text-primary">
-                                <i class="align-middle" data-feather="dollar-sign"></i>
+                                <span class="rs-icon align-middle">Rs</span>
                             </div>
                         </div>
                     </div>
-                    <h1 class="mt-1 mb-3">Rs{{ number_format($totalSales, 2) }}</h1>
+                    <h1 class="mt-1 mb-3">Rs {{ number_format($totalSales, 2) }}</h1>
                     <div class="mb-0">
-                        <span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> Rs{{ number_format($recentSales, 2) }} </span>
+                        <span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> Rs {{ number_format($recentSales, 2) }} </span>
                         <span class="text-muted">Sales today</span>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
                                 <td>{{ $order->order_number }}</td>
                                 <td>{{ $order->customer ? $order->customer->name : 'N/A' }}</td>
                                 <td>{{ $order->created_at->format('d M Y') }}</td>
-                                <td>${{ number_format($order->total, 2) }}</td>
+                                <td>Rs {{ number_format($order->total, 2) }}</td>
                                 <td>
                                     @if($order->order_status == 'pending')
                                         <span class="badge bg-warning">Pending</span>
@@ -206,7 +206,7 @@
         var salesData = {
             labels: @json($salesChartLabels),
             datasets: [{
-                label: 'Sales ($)',
+                label: 'Sales (Rs)',
                 backgroundColor: 'rgba(0, 123, 255, 0.2)',
                 borderColor: 'rgba(0, 123, 255, 1)',
                 data: @json($salesChartValues)

@@ -95,12 +95,12 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
                         <div class="report-icon bg-success-subtle me-3">
-                            <i class="align-middle text-success" data-feather="dollar-sign"></i>
+                            <span class="rs-icon align-middle">Rs</span>
                         </div>
                         <h5 class="card-title mb-0">Avg. Customer Spend</h5>
                     </div>
                     <h3 class="mt-1 mb-3">
-                        ${{ $topCustomers->count() > 0 ? number_format($topCustomers->sum('total_spent') / $topCustomers->count(), 2) : '0.00' }}
+                        Rs {{ $topCustomers->count() > 0 ? number_format($topCustomers->sum('total_spent') / $topCustomers->count(), 2) : '0.00' }}
                     </h3>
                     <div class="mb-0">
                         <span class="text-muted">Based on {{ $topCustomers->count() }} customers</span>
@@ -215,8 +215,8 @@
                             </td>
                             <td>{{ $customer->customer ? $customer->customer->email : 'N/A' }}</td>
                             <td>{{ $customer->order_count }}</td>
-                            <td>${{ number_format($customer->total_spent, 2) }}</td>
-                            <td>${{ $customer->order_count > 0 ? number_format($customer->total_spent / $customer->order_count, 2) : '0.00' }}</td>
+                            <td>Rs {{ number_format($customer->total_spent, 2) }}</td>
+                            <td>Rs {{ $customer->order_count > 0 ? number_format($customer->total_spent / $customer->order_count, 2) : '0.00' }}</td>
                             <td>{{ $customer->customer ? $customer->customer->created_at->format('M d, Y') : 'N/A' }}</td>
                             <td>
                                 @if($customer->customer)

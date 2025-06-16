@@ -94,7 +94,7 @@
                                             <p class="text-muted mb-0 small">Total Spent</p>
                                         </div>
                                         <div class="bg-success bg-opacity-10 p-3 rounded">
-                                            <i data-feather="dollar-sign" class="text-success" style="width: 1.5rem; height: 1.5rem;"></i>
+                                            <span class="rs-icon rs-icon-xl text-success">Rs</span>
                                         </div>
                                     </div>
                                 </div>
@@ -224,7 +224,7 @@
                                                             </div>
                                                         @else
                                                             <div class="rounded-circle bg-light p-2 me-2">
-                                                                <i data-feather="dollar-sign" class="text-secondary"></i>
+                                                                <span class="rs-icon text-secondary">Rs</span>
                                                             </div>
                                                         @endif
                                                         <div>

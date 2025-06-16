@@ -491,6 +491,32 @@
     color: var(--white);
     text-decoration: none;
   }
+
+  /* Digital Download Styles */
+  .digital-download-section {
+    margin-top: 8px;
+  }
+
+  .digital-download-section .btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .digital-products-section {
+    margin: 2rem 0;
+  }
+
+  .digital-products-section .card {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .digital-products-section .card-header {
+    border-bottom: none;
+  }
+
+  .digital-products-section .btn {
+    font-size: 0.875rem;
+  }
 </style>
 @endpush
 
@@ -637,9 +663,15 @@
                                     <div class="row align-items-center">
                                         <div class="col-md-2">
                                             <div class="item-image">
-                                                <img src="{{ $item->product->images->first()->image_url ?? asset('saas_frontend/images/shop-items/shop-item27.png') }}"
-                                                     alt="{{ $item->product->name }}"
-                                                     class="img-fluid rounded">
+                                                @if($item->product && $item->product->images->count() > 0)
+                                                    <img src="{{ $item->product->images->first()->image_url }}"
+                                                         alt="{{ $item->product->name }}"
+                                                         class="img-fluid rounded">
+                                                @else
+                                                    <img src="{{ asset('saas_frontend/images/shop-items/shop-item27.png') }}"
+                                                         alt="{{ $item->product->name }}"
+                                                         class="img-fluid rounded">
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="col-md-5">
@@ -671,6 +703,46 @@
                                             <div class="item-total">
                                                 <strong>Rs. {{ number_format($item->total, 2) }}</strong>
                                             </div>
+
+                                            <!-- Digital Product Download Section -->
+                                            @if($item->product->product_type == 'Digital' && $order->canDownloadDigitalProducts() && $item->product->file)
+                                                <div class="digital-download-section mt-2">
+                                                    <div class="d-flex gap-1">
+                                                        <a href="{{ route('customer.digital-product.download', ['orderId' => $order->id, 'productId' => $item->product->id]) }}"
+                                                           class="btn btn-sm btn-success">
+                                                            <i class="fa fa-download me-1"></i>
+                                                        </a>
+                                                        <a href="{{ route('customer.digital-product.preview', ['orderId' => $order->id, 'productId' => $item->product->id]) }}"
+                                                           class="btn btn-sm btn-outline-primary"
+                                                           target="_blank">
+                                                            <i class="fa fa-eye me-1"></i>
+                                                        </a>
+                                                    </div>
+                                                    <small class="text-success d-block mt-1">
+                                                        <i class="fa fa-check-circle me-1"></i>Ready for download
+                                                    </small>
+                                                </div>
+                                            @elseif($item->product->product_type == 'Digital' && !$order->canDownloadDigitalProducts())
+                                                <div class="digital-download-section mt-2">
+                                                    <small class="text-muted d-block">
+                                                        <i class="fa fa-clock me-1"></i>
+                                                        @if($order->order_status != 'delivered')
+                                                            Download available after delivery
+                                                        @elseif($order->payment_status != 'paid')
+                                                            Download available after payment confirmation
+                                                        @else
+                                                            Download not available
+                                                        @endif
+                                                    </small>
+                                                </div>
+                                            @elseif($item->product->product_type == 'Digital' && !$item->product->file)
+                                                <div class="digital-download-section mt-2">
+                                                    <small class="text-warning d-block">
+                                                        <i class="fa fa-exclamation-triangle me-1"></i>Digital file not available
+                                                    </small>
+                                                </div>
+                                            @endif
+
                                             @if($order->order_status == 'delivered')
                                                 <div class="review-action mt-2">
                                                     @php
@@ -697,6 +769,71 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Digital Products Download Section -->
+                @if($order->hasDigitalProducts() && $order->canDownloadDigitalProducts())
+                    <div class="digital-products-section" id="digital-downloads">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-download me-2"></i>
+                                    Digital Products Ready for Download
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-success mb-3">
+                                    <i class="fa fa-check-circle me-1"></i>
+                                    Your order has been delivered and payment confirmed. You can now download your digital products.
+                                </p>
+                                <div class="row">
+                                    @foreach($order->getDownloadableDigitalProducts() as $product)
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card border-light">
+                                                <div class="card-body p-3">
+                                                    <h6 class="card-title">{{ $product->name }}</h6>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{{ route('customer.digital-product.download', ['orderId' => $order->id, 'productId' => $product->id]) }}"
+                                                           class="btn btn-success btn-sm">
+                                                            <i class="fa fa-download me-1"></i>Download
+                                                        </a>
+                                                        <a href="{{ route('customer.digital-product.preview', ['orderId' => $order->id, 'productId' => $product->id]) }}"
+                                                           class="btn btn-outline-primary btn-sm"
+                                                           target="_blank">
+                                                            <i class="fa fa-eye me-1"></i>Preview
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @elseif($order->hasDigitalProducts() && !$order->canDownloadDigitalProducts())
+                    <div class="digital-products-section">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-clock me-2"></i>
+                                    Digital Products Pending
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-0">
+                                    <i class="fa fa-info-circle me-1"></i>
+                                    @if($order->order_status != 'delivered')
+                                        Your digital products will be available for download once your order is delivered.
+                                    @elseif($order->payment_status != 'paid')
+                                        Your digital products will be available for download once payment is confirmed.
+                                    @else
+                                        Digital products are not available for download at this time.
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 @if($order->order_status == 'delivered')
                     <!-- Order Actions -->

@@ -126,7 +126,7 @@
                                         </div>
                                     </td>
                                     <td>{{ $product->quantity_sold }}</td>
-                                    <td>${{ number_format($product->total_sales, 2) }}</td>
+                                    <td>Rs {{ number_format($product->total_sales, 2) }}</td>
                                     <td>
                                         <div class="progress">
                                             @php
@@ -198,7 +198,7 @@
                             </td>
                             <td>{{ $product->category ? $product->category->name : 'N/A' }}</td>
                             <td>{{ $product->seller ? $product->seller->name : 'N/A' }}</td>
-                            <td>${{ number_format($product->price, 2) }}</td>
+                            <td>Rs {{ number_format($product->price, 2) }}</td>
                             <td>
                                 @if($product->stock < 5)
                                     <span class="stock-indicator stock-low"></span>

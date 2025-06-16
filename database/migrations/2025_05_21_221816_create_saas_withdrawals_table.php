@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 2);
             $table->decimal('fee', 10, 2)->default(0.00); // Transaction fee if applicable
             $table->decimal('net_amount', 15, 2); // Amount after fees
-            $table->string('currency', 3)->default('Rs');
+            $table->string('currency', 3)->default('NPR');
             $table->enum('status', ['pending', 'processing', 'completed', 'rejected', 'cancelled'])->default('pending');
             $table->text('notes')->nullable();
             $table->text('admin_notes')->nullable(); // For internal use

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('pending_balance', 15, 2)->default(0.00); // For funds that aren't yet available for withdrawal
             $table->decimal('total_withdrawn', 15, 2)->default(0.00);
             $table->decimal('total_earned', 15, 2)->default(0.00);
-            $table->string('currency', 3)->default('Rs');
+            $table->string('currency', 3)->default('NPR');
             $table->timestamp('last_activity_at')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

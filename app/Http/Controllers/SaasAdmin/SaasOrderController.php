@@ -125,16 +125,19 @@ class SaasOrderController extends Controller
     {
         $request->validate([
             'order_status' => 'required|in:pending,processing,shipped,delivered,cancelled,refunded',
+            'payment_status' => 'required|in:pending,paid,failed,refunded,canceled',
             'admin_note' => 'nullable|string|max:1000',
         ]);
 
         // Load necessary relationships for email notifications
         $order->load(['customer', 'seller', 'items.product', 'items.productVariation']);
 
-        // Record the previous status for notification purposes
-        $previousStatus = $order->order_status;
+        // Record the previous statuses for notification purposes
+        $previousOrderStatus = $order->order_status;
+        $previousPaymentStatus = $order->payment_status;
 
         $order->order_status = $request->order_status;
+        $order->payment_status = $request->payment_status;
 
         // Update admin note if provided
         if ($request->has('admin_note')) {
@@ -144,16 +147,16 @@ class SaasOrderController extends Controller
         $order->save();
 
         // If status changed, send notification
-        if ($previousStatus != $request->order_status) {
+        if ($previousOrderStatus != $request->order_status || $previousPaymentStatus != $request->payment_status) {
             try {
                 // Send email to customer
                 Mail::to($order->customer->email)->send(
-                    new \App\Mail\SaasOrderStatusChanged($order, $previousStatus, 'customer')
+                    new \App\Mail\SaasOrderStatusChanged($order, $previousOrderStatus, 'customer')
                 );
 
                 // Send email to seller
                 Mail::to($order->seller->email)->send(
-                    new \App\Mail\SaasOrderStatusChanged($order, $previousStatus, 'seller')
+                    new \App\Mail\SaasOrderStatusChanged($order, $previousOrderStatus, 'seller')
                 );
             } catch (\Exception $e) {
                 // Log email error but don't fail the status update
@@ -161,11 +164,13 @@ class SaasOrderController extends Controller
             }
 
             // Log the status change
-            Log::info('Order status changed', [
+            Log::info('Order status or payment status changed', [
                 'order_id' => $order->id,
                 'order_number' => $order->order_number,
-                'previous_status' => $previousStatus,
-                'new_status' => $request->order_status,
+                'previous_order_status' => $previousOrderStatus,
+                'new_order_status' => $request->order_status,
+                'previous_payment_status' => $previousPaymentStatus,
+                'new_payment_status' => $request->payment_status,
                 'admin_id' => \Illuminate\Support\Facades\Auth::id(),
             ]);
         }

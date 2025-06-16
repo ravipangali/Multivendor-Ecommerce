@@ -84,7 +84,7 @@
                                 <div class="mt-2">
                                     <label class="font-weight-bold">Current Logo:</label>
                                     <div class="border p-2 text-center">
-                                        <img src="{{ Storage::url($sellerProfile->store_logo) }}"
+                                        <img src="{{ asset('storage/' . $sellerProfile->store_logo) }}"
                                              alt="Store Logo"
                                              class="img-fluid"
                                              style="max-height: 100px;">
@@ -111,7 +111,7 @@
                                 <div class="mt-2">
                                     <label class="font-weight-bold">Current Banner:</label>
                                     <div class="border p-2 text-center">
-                                        <img src="{{ Storage::url($sellerProfile->store_banner) }}"
+                                        <img src="{{ asset('storage/' . $sellerProfile->store_banner) }}"
                                              alt="Store Banner"
                                              class="img-fluid"
                                              style="max-height: 150px;">

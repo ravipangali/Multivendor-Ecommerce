@@ -56,6 +56,24 @@ class SaasOrder extends Model
         'cancelled_at' => 'datetime',
     ];
 
+    // Payment status constants
+    const PAYMENT_STATUS_PAID = 'paid';
+    const PAYMENT_STATUS_PENDING = 'pending';
+    const PAYMENT_STATUS_FAILED = 'failed';
+    const PAYMENT_STATUS_REFUNDED = 'refunded';
+    const PAYMENT_STATUS_CANCELED = 'canceled';
+
+    public static function getPaymentStatuses()
+    {
+        return [
+            self::PAYMENT_STATUS_PENDING => 'Pending',
+            self::PAYMENT_STATUS_PAID => 'Paid',
+            self::PAYMENT_STATUS_FAILED => 'Failed',
+            self::PAYMENT_STATUS_REFUNDED => 'Refunded',
+            self::PAYMENT_STATUS_CANCELED => 'Canceled',
+        ];
+    }
+
     /**
      * Get the customer that placed the order.
      */
@@ -185,7 +203,68 @@ class SaasOrder extends Model
      */
     public function isPaid()
     {
-        return $this->payment_status === 'paid';
+        return $this->payment_status === self::PAYMENT_STATUS_PAID;
+    }
+
+    /**
+     * Check if payment is pending.
+     */
+    public function isPaymentPending()
+    {
+        return $this->payment_status === self::PAYMENT_STATUS_PENDING;
+    }
+
+    /**
+     * Check if payment is refunded.
+     */
+    public function isPaymentRefunded()
+    {
+        return $this->payment_status === self::PAYMENT_STATUS_REFUNDED;
+    }
+
+    /**
+     * Check if payment is canceled.
+     */
+    public function isPaymentCanceled()
+    {
+        return $this->payment_status === self::PAYMENT_STATUS_CANCELED;
+    }
+
+    /**
+     * Check if digital products in this order can be downloaded.
+     */
+    public function canDownloadDigitalProducts()
+    {
+        return $this->isDelivered() && $this->isPaid();
+    }
+
+    /**
+     * Get downloadable digital products from this order.
+     */
+    public function getDownloadableDigitalProducts()
+    {
+        if (!$this->canDownloadDigitalProducts()) {
+            return collect();
+        }
+
+        return $this->items()->with('product')
+            ->whereHas('product', function ($query) {
+                $query->where('product_type', 'Digital')
+                      ->whereNotNull('file');
+            })
+            ->get()
+            ->pluck('product')
+            ->unique('id');
+    }
+
+    /**
+     * Check if order has digital products.
+     */
+    public function hasDigitalProducts()
+    {
+        return $this->items()->whereHas('product', function ($query) {
+            $query->where('product_type', 'Digital');
+        })->exists();
     }
 
     /**

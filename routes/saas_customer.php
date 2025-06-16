@@ -9,6 +9,7 @@ use App\Http\Controllers\SaasCustomer\SaasCustomerSearchController;
 use App\Http\Controllers\SaasCustomer\SaasCustomerSellerController;
 use App\Http\Controllers\SaasCustomer\SaasPageController;
 use App\Http\Controllers\SaasCustomer\SaasBlogController;
+use App\Http\Controllers\SaasCustomer\SaasDigitalProductController;
 use Illuminate\Support\Facades\Route;
 
 // Home page
@@ -35,6 +36,8 @@ Route::get('/product/{slug}', [SaasCustomerController::class, 'saasProductDetail
 Route::get('/category/{slug}', [SaasCustomerController::class, 'saasCategoryProducts'])->name('customer.category');
 Route::get('/brand/{slug}', [SaasCustomerController::class, 'saasBrandProducts'])->name('customer.brand');
 Route::get('/search', [SaasCustomerSearchController::class, 'saasSearch'])->name('customer.search');
+
+
 
 // Brands and Sellers routes
 Route::get('/brands', [SaasCustomerSellerController::class, 'saasBrandsListing'])->name('customer.brands');
@@ -91,6 +94,11 @@ Route::middleware(['auth', 'saasrolemanager:customer'])->prefix('customer')->nam
     Route::post('/product/{product}/review', [SaasCustomerAccountController::class, 'saasAddReview'])->name('product.review');
     Route::put('/review/{review}/update', [SaasCustomerAccountController::class, 'saasUpdateReview'])->name('review.update');
     Route::delete('/review/{review}/delete', [SaasCustomerAccountController::class, 'saasDeleteReview'])->name('review.delete');
+
+    // Digital Product Downloads
+    Route::get('/order/{orderId}/digital-product/{productId}/download', [SaasDigitalProductController::class, 'download'])->name('digital-product.download');
+    Route::get('/order/{orderId}/digital-product/{productId}/preview', [SaasDigitalProductController::class, 'preview'])->name('digital-product.preview');
+    Route::get('/order/{orderId}/digital-products', [SaasDigitalProductController::class, 'getDownloadableProducts'])->name('digital-products.list');
 });
 
 // AJAX routes for dynamic functionality

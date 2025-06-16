@@ -16,6 +16,12 @@
                 </a>
             </li>
 
+            <li class="sidebar-item {{ request()->routeIs('admin.pos.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.pos.index') }}">
+                    <i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">POS System</span>
+                </a>
+            </li>
+
             <li class="sidebar-header">
                 Catalog
             </li>
@@ -65,6 +71,12 @@
             <li class="sidebar-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('admin.products.index') }}">
                     <i class="align-middle" data-feather="box"></i> <span class="align-middle">Products</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item {{ request()->routeIs('admin.in-house-products.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.in-house-products.index') }}">
+                    <i class="align-middle" data-feather="home"></i> <span class="align-middle">In-House Products</span>
                 </a>
             </li>
 
@@ -122,9 +134,21 @@
                 Sales
             </li>
 
+            <li class="sidebar-item {{ request()->routeIs('admin.pos.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.pos.index') }}">
+                    <i class="align-middle" data-feather="monitor"></i> <span class="align-middle">POS System</span>
+                </a>
+            </li>
+
             <li class="sidebar-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('admin.orders.index') }}">
                     <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">Orders</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item {{ request()->routeIs('admin.in-house-sales.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.in-house-sales.index') }}">
+                    <i class="align-middle" data-feather="dollar-sign"></i> <span class="align-middle">In-House Sales</span>
                 </a>
             </li>
 
@@ -154,9 +178,15 @@
                 Reports
             </li>
 
+            <li class="sidebar-item {{ request()->routeIs('admin.in-house-sales.reports') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.in-house-sales.reports') }}">
+                    <i class="align-middle" data-feather="home"></i> <span class="align-middle">In-House Sales Report</span>
+                </a>
+            </li>
+
             <li class="sidebar-item {{ request()->routeIs('admin.reports.sales') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('admin.reports.sales') }}">
-                    <i class="align-middle" data-feather="dollar-sign"></i> <span class="align-middle">Sales Report</span>
+                    <span class="rs-icon align-middle">Rs</span> <span class="align-middle">Sales Report</span>
                 </a>
             </li>
 

@@ -13,9 +13,35 @@ class SaasFlashDealController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $flashDeals = SaasFlashDeal::latest()->paginate(10);
+        $query = SaasFlashDeal::query();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('title', 'like', "%{$search}%");
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            switch ($request->status) {
+                case 'upcoming':
+                    $query->where('start_time', '>', now());
+                    break;
+                case 'expired':
+                    $query->where('end_time', '<', now());
+                    break;
+                case 'active':
+                    $query->where('start_time', '<=', now())
+                          ->where('end_time', '>=', now());
+                    break;
+            }
+        }
+
+        $flashDeals = $query->latest('created_at')
+                           ->paginate(15);
+
         return view('saas_admin.saas_flash_deal.saas_index', compact('flashDeals'));
     }
 
@@ -34,7 +60,7 @@ class SaasFlashDealController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'start_time' => 'required|date',
+            'start_time' => 'required|date|after_or_equal:now',
             'end_time' => 'required|date|after:start_time',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -100,15 +126,49 @@ class SaasFlashDealController extends Controller
      */
     public function destroy(SaasFlashDeal $flashDeal)
     {
-        // Delete banner image if exists
-        if ($flashDeal->banner_image) {
-            Storage::disk('public')->delete($flashDeal->banner_image);
+        try {
+            // Delete banner image if exists
+            if ($flashDeal->banner_image) {
+                Storage::disk('public')->delete($flashDeal->banner_image);
+            }
+
+            // This will also delete flash deal products due to cascade
+            $flashDeal->delete();
+
+            toast('Flash deal deleted successfully', 'success');
+        } catch (\Exception $e) {
+            toast('Error deleting flash deal: ' . $e->getMessage(), 'error');
         }
 
-        // This will also delete flash deal products due to cascade
-        $flashDeal->delete();
-
-        toast('Flash deal deleted successfully', 'success');
         return redirect()->route('admin.flash-deals.index');
+    }
+
+
+
+    /**
+     * Duplicate flash deal
+     */
+    public function duplicate(SaasFlashDeal $flashDeal)
+    {
+        $newFlashDeal = $flashDeal->replicate();
+        $newFlashDeal->title = $flashDeal->title . ' (Copy)';
+        $newFlashDeal->start_time = now()->addDay(); // Set start time to tomorrow
+        $newFlashDeal->end_time = now()->addDays(2); // Set end time to day after tomorrow
+        $newFlashDeal->save();
+
+        // Copy banner image if exists
+        if ($flashDeal->banner_image) {
+            $originalPath = $flashDeal->banner_image;
+            $extension = pathinfo($originalPath, PATHINFO_EXTENSION);
+            $newPath = 'flash_deal_images/' . uniqid() . '.' . $extension;
+            
+            if (Storage::disk('public')->exists($originalPath)) {
+                Storage::disk('public')->copy($originalPath, $newPath);
+                $newFlashDeal->update(['banner_image' => $newPath]);
+            }
+        }
+
+        toast('Flash deal duplicated successfully', 'success');
+        return redirect()->route('admin.flash-deals.edit', $newFlashDeal);
     }
 }

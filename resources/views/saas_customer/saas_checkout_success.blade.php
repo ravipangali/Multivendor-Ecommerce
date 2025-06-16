@@ -174,7 +174,7 @@
                                         <div class="d-flex align-items-center">
                                             <div class="product-image me-3">
                                                 @if($item->product && $item->product->images && $item->product->images->count() > 0)
-                                                    <img src="{{ asset('storage/' . $item->product->images->first()->image_url) }}"
+                                                    <img src="{{ $item->product->images->first()->image_url }}"
                                                          alt="{{ $item->product->name }}"
                                                          style="width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-sm);">
                                                 @else

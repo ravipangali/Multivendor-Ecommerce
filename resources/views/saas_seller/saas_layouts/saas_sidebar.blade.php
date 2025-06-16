@@ -92,11 +92,7 @@
                 </a>
             </li>
 
-            <li class="sidebar-item {{ request()->routeIs('seller.flash-deals.*') && !request()->routeIs('seller.flash-deals.products.*') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('seller.flash-deals.index') }}">
-                    <i class="align-middle" data-feather="zap"></i> <span class="align-middle">Flash Deals</span>
-                </a>
-            </li>
+
 
             <li class="sidebar-header">
                 Financial
@@ -110,7 +106,7 @@
 
             <li class="sidebar-item {{ request()->routeIs('seller.withdrawals.index') || request()->routeIs('seller.withdrawals.create') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('seller.withdrawals.index') }}">
-                    <i class="align-middle" data-feather="dollar-sign"></i> <span class="align-middle">Withdraw</span>
+                    <span class="rs-icon align-middle">Rs</span> <span class="align-middle" style="padding-left: 0.5rem;">Withdraw</span>
                 </a>
             </li>
 
@@ -130,14 +126,14 @@
                 </a>
             </li>
 
-            <li class="sidebar-item {{ request()->routeIs('seller.reports.products') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('seller.reports.products') }}">
+            <li class="sidebar-item {{ request()->routeIs('seller.reports.product') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('seller.reports.product') }}">
                     <i class="align-middle" data-feather="pie-chart"></i> <span class="align-middle">Product Report</span>
                 </a>
             </li>
 
-            <li class="sidebar-item {{ request()->routeIs('seller.reports.customers') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('seller.reports.customers') }}">
+            <li class="sidebar-item {{ request()->routeIs('seller.reports.customer') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('seller.reports.customer') }}">
                     <i class="align-middle" data-feather="users"></i> <span class="align-middle">Customer Report</span>
                 </a>
             </li>

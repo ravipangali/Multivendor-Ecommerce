@@ -200,7 +200,7 @@
                             @endif
                             @if(request('min_price') || request('max_price'))
                                 <div class="filter-tag">
-                                    <span class="tag-icon"><i class="fas fa-dollar-sign"></i></span>
+                                    <span class="tag-icon"><span class="rs-icon">Rs</span></span>
                                     <span class="tag-text">Price: Rs. {{ request('min_price', 0) }} - Rs. {{ request('max_price', '∞') }}</span>
                                     <a href="{{ request()->fullUrlWithQuery(['min_price' => null, 'max_price' => null]) }}" class="tag-remove">
                                         <i class="fas fa-times"></i>

@@ -140,7 +140,7 @@ class SettingsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'site_currency_code.regex' => 'Currency code must be a valid 3-letter ISO code (e.g., USD, NPR, EUR).',
+            'site_currency_code.regex' => 'Currency code must be a valid 3-letter ISO code (e.g., NPR, USD, EUR).',
             'site_phone.regex' => 'Phone number format is invalid. Please use a valid phone number format.',
             'mail_port.between' => 'Mail port must be between 1 and 65535.',
             'gateway_transaction_fee.max' => 'Transaction fee cannot exceed 100%.',

@@ -53,16 +53,22 @@ class SaasWithdrawalController extends Controller
                 ->with('info', 'You already have a pending withdrawal request. Please wait for it to be processed before requesting another withdrawal.');
         }
 
-        // Get available payment methods
-        $paymentMethods = [
-            'bank_transfer' => 'Bank Transfer',
-            'paypal' => 'PayPal',
-            'stripe' => 'Stripe'
-        ];
+        // Get seller's payment methods if they exist
+        $paymentMethods = \App\Models\SaasPaymentMethod::where('user_id', $sellerId)->get();
+
+        // Calculate available balance and minimum withdrawal
+        $walletBalance = $wallet->available_for_withdrawal ?? 0;
+        $minimumWithdrawal = 100; // Set minimum withdrawal amount
+        $pendingWithdrawals = SaasWithdrawal::where('user_id', $sellerId)
+            ->where('status', 'pending')
+            ->sum('amount');
 
         return view('saas_seller.saas_withdrawal.saas_create', compact(
             'wallet',
-            'paymentMethods'
+            'paymentMethods',
+            'walletBalance',
+            'minimumWithdrawal',
+            'pendingWithdrawals'
         ));
     }
 

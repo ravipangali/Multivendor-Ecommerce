@@ -159,7 +159,7 @@
                             @forelse($topRatedProducts as $product)
                                 <div class="d-flex align-items-center mb-3">
                                     @if($product->images && $product->images->count() > 0)
-                                        <img src="{{ asset($product->images->first()->image_url) }}"
+                                        <img src="{{ $product->images->first()->image_url }}"
                                              alt="{{ $product->name }}"
                                              class="rounded me-3"
                                              style="width: 50px; height: 50px; object-fit: cover;">
@@ -196,7 +196,7 @@
                             @forelse($mostReviewedProducts as $product)
                                 <div class="d-flex align-items-center mb-3">
                                     @if($product->images && $product->images->count() > 0)
-                                        <img src="{{ asset($product->images->first()->image_url) }}"
+                                        <img src="{{ $product->images->first()->image_url }}"
                                              alt="{{ $product->name }}"
                                              class="rounded me-3"
                                              style="width: 50px; height: 50px; object-fit: cover;">

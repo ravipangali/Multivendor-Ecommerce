@@ -200,6 +200,41 @@
       color: var(--secondary-color) !important;
     }
 
+    /* Custom Rs currency icon */
+    .rs-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      font-weight: bold;
+      font-size: 11px;
+      font-family: var(--font-primary);
+      color: inherit;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .rs-icon-sm {
+      width: 14px;
+      height: 14px;
+      font-size: 9px;
+    }
+
+    .rs-icon-lg {
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+    }
+
+    .rs-icon-xl {
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+    }
+
     .text-muted {
       color: var(--text-muted) !important;
     }

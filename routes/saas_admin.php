@@ -27,11 +27,36 @@ use App\Http\Controllers\SaasAdmin\SaasUserController;
 use App\Http\Controllers\SaasAdmin\SaasPageController;
 use App\Http\Controllers\SaasAdmin\SaasBlogCategoryController;
 use App\Http\Controllers\SaasAdmin\SaasBlogPostController;
+use App\Http\Controllers\SaasAdmin\SaasPosController;
+use App\Http\Controllers\SaasAdmin\SaasInHouseSaleController;
+use App\Http\Controllers\SaasAdmin\SaasInHouseProductController;
 use App\Http\Controllers\SaasAdmin\TinyMCEController;
 
 Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/dashboard', [SaasAdminDashboardController::class, 'index'])->name('dashboard');
+
+    // POS System
+    Route::prefix('pos')->name('pos.')->group(function () {
+        Route::get('/', [SaasPosController::class, 'index'])->name('index');
+        Route::get('/search-products', [SaasPosController::class, 'searchProducts'])->name('search-products');
+        Route::get('/product/{id}', [SaasPosController::class, 'getProduct'])->name('get-product');
+        Route::post('/process-sale', [SaasPosController::class, 'processSale'])->name('process-sale');
+        Route::get('/receipt/{saleNumber}', [SaasPosController::class, 'printReceipt'])->name('receipt');
+    });
+
+    // In-House Sales Management
+    Route::prefix('in-house-sales')->name('in-house-sales.')->group(function () {
+        Route::get('/', [SaasInHouseSaleController::class, 'index'])->name('index');
+        Route::get('/reports', [SaasInHouseSaleController::class, 'report'])->name('reports');
+        Route::get('/{sale}', [SaasInHouseSaleController::class, 'show'])->name('show');
+        Route::delete('/{sale}', [SaasInHouseSaleController::class, 'destroy'])->name('destroy');
+        Route::patch('/{sale}/payment-status', [SaasInHouseSaleController::class, 'updatePaymentStatus'])->name('update-payment-status');
+        Route::get('/{sale}/receipt', [SaasInHouseSaleController::class, 'printReceipt'])->name('receipt');
+    });
+
+    // In-House Products Management
+    Route::resource('in-house-products', SaasInHouseProductController::class);
 
     // Category Management
     Route::resource('categories', SaasCategoryController::class);
@@ -48,6 +73,9 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
     Route::resource('attribute-values', SaasAttributeValueController::class);
     Route::resource('units', SaasUnitController::class);
     Route::resource('products', SaasProductController::class);
+    // Digital Product File Access Routes
+    Route::get('/products/{product}/file/preview', [SaasProductController::class, 'previewFile'])->name('products.file.preview');
+    Route::get('/products/{product}/file/download', [SaasProductController::class, 'downloadFile'])->name('products.file.download');
     Route::resource('product-reviews', SaasProductReviewController::class);
     Route::patch('product-reviews/{productReview}/toggle-approval', [SaasProductReviewController::class, 'toggleApproval'])->name('product-reviews.toggle-approval');
     Route::patch('product-reviews/{productReview}/clear-report', [SaasProductReviewController::class, 'clearReport'])->name('product-reviews.clear-report');
@@ -55,6 +83,7 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
     // Marketing
     Route::resource('banners', SaasBannerController::class);
     Route::resource('flash-deals', SaasFlashDealController::class);
+    Route::post('flash-deals/{flash_deal}/duplicate', [SaasFlashDealController::class, 'duplicate'])->name('flash-deals.duplicate');
     Route::resource('flash-deal-products', SaasFlashDealProductController::class);
     Route::resource('coupons', SaasCouponController::class);
 

@@ -17,6 +17,8 @@
     <title>Seller Dashboard</title>
 
     @livewireStyles
+    @stack('styles')
+    @yield('styles')
 
     <link href="{{ asset('saas_admin/css/my.css') }}" rel="stylesheet">
     <link href="{{ asset('saas_admin/css/app.css') }}" rel="stylesheet">
@@ -242,11 +244,157 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 11055;">
+        <!-- Toast notifications will be dynamically added here -->
+    </div>
+
     <script src="{{ asset('saas_admin/js/app.js') }}"></script>
     @livewireScripts
 
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        // Initialize Feather icons
+        feather.replace();
+    </script>
+
+    @stack('scripts')
+    @yield('scripts')
+
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Toast Notifications Script -->
+    <script>
+        // Configure SweetAlert2 default settings
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            },
+            customClass: {
+                popup: 'colored-toast'
+            }
+        });
+
+        // Show toast notifications from Laravel session
+        @if(session('success'))
+            Toast.fire({
+                icon: 'success',
+                title: '{{ session('success') }}',
+                background: '#28a745',
+                color: 'white'
+            });
+        @endif
+
+        @if(session('error'))
+            Toast.fire({
+                icon: 'error',
+                title: '{{ session('error') }}',
+                background: '#dc3545',
+                color: 'white'
+            });
+        @endif
+
+        @if(session('warning'))
+            Toast.fire({
+                icon: 'warning',
+                title: '{{ session('warning') }}',
+                background: '#ffc107',
+                color: 'black'
+            });
+        @endif
+
+        @if(session('info'))
+            Toast.fire({
+                icon: 'info',
+                title: '{{ session('info') }}',
+                background: '#17a2b8',
+                color: 'white'
+            });
+        @endif
+
+        // Function to show toast programmatically
+        window.showToast = function(type, message) {
+            const colors = {
+                success: { background: '#28a745', color: 'white' },
+                error: { background: '#dc3545', color: 'white' },
+                warning: { background: '#ffc107', color: 'black' },
+                info: { background: '#17a2b8', color: 'white' }
+            };
+
+            Toast.fire({
+                icon: type,
+                title: message,
+                ...colors[type]
+            });
+        };
+    </script>
+
+    <!-- Custom Toast Styles -->
+    <style>
+        .colored-toast.swal2-icon-success {
+            background-color: #28a745 !important;
+        }
+
+        .colored-toast.swal2-icon-error {
+            background-color: #dc3545 !important;
+        }
+
+        .colored-toast.swal2-icon-warning {
+            background-color: #ffc107 !important;
+        }
+
+        .colored-toast.swal2-icon-info {
+            background-color: #17a2b8 !important;
+        }
+
+        .colored-toast .swal2-title {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .colored-toast.swal2-icon-warning .swal2-title {
+            color: black;
+        }
+
+        .colored-toast .swal2-timer-progress-bar {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .colored-toast .swal2-icon {
+            border-color: transparent !important;
+            color: white !important;
+        }
+
+        .colored-toast.swal2-icon-warning .swal2-icon {
+            color: black !important;
+        }
+
+        /* Custom animation */
+        .colored-toast {
+            animation: slideInFromRight 0.3s ease-out;
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+
     @include('sweetalert::alert')
     <script src="{{ asset('saas_admin/js/delete-confirm.js') }}"></script>
 </body>

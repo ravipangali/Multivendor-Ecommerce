@@ -15,3 +15,60 @@
 .alert-danger .alert-link {
     color: #6a1a21;
 }
+
+/* Custom Rs currency icon */
+.rs-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0.25rem;
+    font-weight: bold;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    color: inherit;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    text-align: center;
+    line-height: 1;
+}
+
+.rs-icon-sm {
+    width: 14px;
+    height: 14px;
+    font-size: 9px;
+}
+
+.rs-icon-lg {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+}
+
+.rs-icon-xl {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+}
+
+/* For colored backgrounds */
+.text-primary .rs-icon {
+    background: rgba(59, 125, 221, 0.2);
+}
+
+.text-success .rs-icon {
+    background: rgba(40, 167, 69, 0.2);
+}
+
+.text-warning .rs-icon {
+    background: rgba(255, 193, 7, 0.2);
+}
+
+.text-info .rs-icon {
+    background: rgba(23, 162, 184, 0.2);
+}
+
+.text-secondary .rs-icon {
+    background: rgba(108, 117, 125, 0.2);
+}

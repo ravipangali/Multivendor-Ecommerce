@@ -229,7 +229,7 @@
                 <!-- Currency Settings -->
                 <div class="mb-4">
                     <h6 class="text-primary border-bottom pb-2 mb-3">
-                        <i class="align-middle" data-feather="dollar-sign"></i> Currency Settings
+                        <span class="rs-icon align-middle">Rs</span> Currency Settings
                     </h6>
 
                     <div class="row">
@@ -238,10 +238,10 @@
                                 <label for="site_currency_code" class="form-label">Currency Code <span class="text-danger">*</span></label>
                                 <select class="form-select" id="site_currency_code" name="site_currency_code" required>
                                     <option value="">Select Currency</option>
+                                    <option value="NPR" {{ old('site_currency_code', $settings->site_currency_code) == 'NPR' ? 'selected' : '' }}>NPR - Nepali Rupees</option>
+                                    <option value="INR" {{ old('site_currency_code', $settings->site_currency_code) == 'INR' ? 'selected' : '' }}>INR - Indian Rupee</option>
                                     <option value="USD" {{ old('site_currency_code', $settings->site_currency_code) == 'USD' ? 'selected' : '' }}>USD - US Dollar</option>
                                     <option value="EUR" {{ old('site_currency_code', $settings->site_currency_code) == 'EUR' ? 'selected' : '' }}>EUR - Euro</option>
-                                    <option value="NPR" {{ old('site_currency_code', $settings->site_currency_code) == 'NPR' ? 'selected' : '' }}>NPR - Nepalese Rupee</option>
-                                    <option value="INR" {{ old('site_currency_code', $settings->site_currency_code) == 'INR' ? 'selected' : '' }}>INR - Indian Rupee</option>
                                     <option value="GBP" {{ old('site_currency_code', $settings->site_currency_code) == 'GBP' ? 'selected' : '' }}>GBP - British Pound</option>
                                     <option value="JPY" {{ old('site_currency_code', $settings->site_currency_code) == 'JPY' ? 'selected' : '' }}>JPY - Japanese Yen</option>
                                 </select>
@@ -345,10 +345,10 @@
     // Auto-fill currency symbol based on currency code selection
     document.getElementById('site_currency_code').addEventListener('change', function() {
         const symbols = {
+            'NPR': 'Rs ',
+            'INR': '₹',
             'USD': '$',
             'EUR': '€',
-            'NPR': 'रू',
-            'INR': '₹',
             'GBP': '£',
             'JPY': '¥'
         };

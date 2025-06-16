@@ -73,7 +73,7 @@
                                                 <i data-feather="smartphone" class="text-purple me-2" style="width: 18px; height: 18px;"></i>
                                                 <span class="badge bg-purple">Khalti</span>
                                             @elseif($paymentMethod->type == 'cash')
-                                                <i data-feather="dollar-sign" class="text-warning me-2" style="width: 18px; height: 18px;"></i>
+                                                <span class="rs-icon text-warning me-2">Rs</span>
                                                 <span class="badge bg-warning">Cash</span>
                                             @else
                                                 <i data-feather="credit-card" class="text-secondary me-2" style="width: 18px; height: 18px;"></i>

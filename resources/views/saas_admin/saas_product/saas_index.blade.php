@@ -52,10 +52,10 @@
                                 <td>{{ $product->brand->name ?? 'N/A' }}</td>
                                 <td>
                                     @if($product->discount > 0)
-                                        <span class="text-decoration-line-through text-muted">${{ $product->price }}</span>
-                                        <span class="text-danger">${{ $product->final_price }}</span>
+                                                                        <span class="text-decoration-line-through text-muted">Rs {{ $product->price }}</span>
+                                <span class="text-danger">Rs {{ $product->final_price }}</span>
                                     @else
-                                        <span>${{ $product->price }}</span>
+                                        <span>Rs {{ $product->price }}</span>
                                     @endif
                                 </td>
                                 <td>

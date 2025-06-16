@@ -19,7 +19,7 @@
                         <div class="col-md-4">
                             <div class="text-center mb-4">
                                 @if($sellerProfile->store_logo)
-                                    <img src="{{ Storage::url($sellerProfile->store_logo) }}"
+                                    <img src="{{ asset('storage/' . $sellerProfile->store_logo) }}"
                                          alt="Store Logo"
                                          class="img-fluid rounded-circle mb-3"
                                          style="max-width: 200px; height: 200px; object-fit: cover;">
@@ -56,7 +56,7 @@
 
                             @if($sellerProfile->store_banner)
                                 <div class="mb-4">
-                                    <img src="{{ Storage::url($sellerProfile->store_banner) }}"
+                                    <img src="{{ asset('storage/' . $sellerProfile->store_banner) }}"
                                          alt="Store Banner"
                                          class="img-fluid rounded"
                                          style="width: 100%; height: 150px; object-fit: cover;">

@@ -47,7 +47,7 @@
                     @if($flashDealProduct->product)
                         <div class="d-flex mb-3">
                             @if($flashDealProduct->product->images && $flashDealProduct->product->images->count() > 0)
-                                <img src="{{ asset('storage/'.$flashDealProduct->product->images->first()->image_url) }}"
+                                <img src="{{ $flashDealProduct->product->images->first()->image_url }}"
                                     alt="{{ $flashDealProduct->product->name }}" class="img-thumbnail me-3" style="width: 100px; height: 100px; object-fit: cover;">
                             @endif
                             <div>

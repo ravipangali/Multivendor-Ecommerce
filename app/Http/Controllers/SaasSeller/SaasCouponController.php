@@ -56,8 +56,7 @@ class SaasCouponController extends Controller
         $coupon->seller_id = $sellerId;
         $coupon->save();
 
-        toast('Coupon created successfully', 'success');
-        return redirect()->route('seller.coupons.index');
+        return redirect()->route('seller.coupons.index')->with('success', 'Coupon created successfully');
     }
 
     /**
@@ -67,8 +66,7 @@ class SaasCouponController extends Controller
     {
         // Check if the coupon belongs to the authenticated seller
         if ($coupon->seller_id !== Auth::id()) {
-            toast('You are not authorized to view this coupon.', 'error');
-            return redirect()->route('seller.coupons.index');
+            return redirect()->route('seller.coupons.index')->with('error', 'You are not authorized to view this coupon.');
         }
 
         return view('saas_seller.saas_coupon.saas_show', compact('coupon'));
@@ -81,8 +79,7 @@ class SaasCouponController extends Controller
     {
         // Check if the coupon belongs to the authenticated seller
         if ($coupon->seller_id !== Auth::id()) {
-            toast('You are not authorized to edit this coupon.', 'error');
-            return redirect()->route('seller.coupons.index');
+            return redirect()->route('seller.coupons.index')->with('error', 'You are not authorized to edit this coupon.');
         }
 
         $discountTypes = ['flat', 'percentage'];
@@ -96,8 +93,7 @@ class SaasCouponController extends Controller
     {
         // Check if the coupon belongs to the authenticated seller
         if ($coupon->seller_id !== Auth::id()) {
-            toast('You are not authorized to update this coupon.', 'error');
-            return redirect()->route('seller.coupons.index');
+            return redirect()->route('seller.coupons.index')->with('error', 'You are not authorized to update this coupon.');
         }
 
         $request->validate([
@@ -119,8 +115,7 @@ class SaasCouponController extends Controller
         $coupon->usage_limit = $request->usage_limit;
         $coupon->save();
 
-        toast('Coupon updated successfully', 'success');
-        return redirect()->route('seller.coupons.index');
+        return redirect()->route('seller.coupons.index')->with('success', 'Coupon updated successfully');
     }
 
     /**
@@ -130,19 +125,16 @@ class SaasCouponController extends Controller
     {
         // Check if the coupon belongs to the authenticated seller
         if ($coupon->seller_id !== Auth::id()) {
-            toast('You are not authorized to delete this coupon.', 'error');
-            return redirect()->route('seller.coupons.index');
+            return redirect()->route('seller.coupons.index')->with('error', 'You are not authorized to delete this coupon.');
         }
 
         // Check if coupon has been used
         if ($coupon->usage_count > 0) {
-            toast('Cannot delete coupon because it has been used by customers', 'error');
-            return redirect()->route('seller.coupons.index');
+            return redirect()->route('seller.coupons.index')->with('error', 'Cannot delete coupon because it has been used by customers');
         }
 
         $coupon->delete();
 
-        toast('Coupon deleted successfully', 'success');
-        return redirect()->route('seller.coupons.index');
+        return redirect()->route('seller.coupons.index')->with('success', 'Coupon deleted successfully');
     }
 }

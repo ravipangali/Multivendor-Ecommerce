@@ -34,10 +34,10 @@
                                     <h5 class="card-title mb-0">Basic Information</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="mb-3">
+                                    <div class="mb-3" id="seller_selection">
                                         <label for="seller_id" class="form-label">Seller <span
-                                                class="text-danger">*</span></label>
-                                        <select class="form-select" id="seller_id" name="seller_id" required>
+                                                class="text-danger" id="seller_required">*</span></label>
+                                        <select class="form-select" id="seller_id" name="seller_id">
                                             <option value="">Select Seller</option>
                                             @foreach ($sellers as $seller)
                                                 <option value="{{ $seller->id }}"
@@ -46,6 +46,7 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        <small class="text-muted">Leave empty for in-house products</small>
                                     </div>
 
                                     <div class="mb-3">
@@ -53,6 +54,43 @@
                                                 class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="name" name="name"
                                             value="{{ old('name') }}" required>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="product_type" class="form-label">Product Type <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" id="product_type" name="product_type" required>
+                                                    <option value="">Select Product Type</option>
+                                                    <option value="Digital" {{ old('product_type') == 'Digital' ? 'selected' : '' }}>
+                                                        Digital Product
+                                                    </option>
+                                                    <option value="Physical" {{ old('product_type', 'Physical') == 'Physical' ? 'selected' : '' }}>
+                                                        Physical Product
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <div class="form-check form-switch mt-4">
+                                                    <input class="form-check-input" type="checkbox" id="is_in_house_product"
+                                                        name="is_in_house_product" value="1"
+                                                        {{ old('is_in_house_product') == '1' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="is_in_house_product">In-House Product</label>
+                                                </div>
+                                                <small class="text-muted">Check if this product is sold by the platform directly</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3" id="digital_file_section" style="display: none;">
+                                        <label for="file" class="form-label">Digital Product File <span
+                                                class="text-danger">*</span></label>
+                                        <input type="file" class="form-control" id="file" name="file"
+                                            accept=".pdf,.doc,.docx,.zip,.rar,.txt,.mp3,.mp4,.avi,.mov">
+                                        <small class="text-muted">Supported formats: PDF, DOC, DOCX, ZIP, RAR, TXT, MP3, MP4, AVI, MOV (Max: 50MB)</small>
                                     </div>
 
                                     <div class="mb-3">
@@ -165,11 +203,12 @@
                                         </div>
 
                                         <div class="col-md-6">
-                                            <div class="mb-3">
+                                            <div class="mb-3" id="stock_section">
                                                 <label for="stock" class="form-label">Stock Quantity <span
                                                         class="text-danger">*</span></label>
                                                 <input type="number" class="form-control" id="stock" name="stock"
                                                     value="{{ old('stock', 0) }}" min="0">
+                                                <small class="text-muted">Leave blank for digital products (unlimited stock)</small>
                                             </div>
                                         </div>
                                     </div>
@@ -248,6 +287,69 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Handle product type changes
+            const productTypeSelect = document.getElementById('product_type');
+            const digitalFileSection = document.getElementById('digital_file_section');
+            const stockSection = document.getElementById('stock_section');
+            const stockInput = document.getElementById('stock');
+            const fileInput = document.getElementById('file');
+
+            // Handle in-house product checkbox
+            const inHouseCheckbox = document.getElementById('is_in_house_product');
+            const sellerSelection = document.getElementById('seller_selection');
+            const sellerSelect = document.getElementById('seller_id');
+            const sellerRequired = document.getElementById('seller_required');
+
+            function toggleProductTypeFields() {
+                const selectedType = productTypeSelect.value;
+
+                if (selectedType === 'Digital') {
+                    digitalFileSection.style.display = 'block';
+                    stockSection.style.display = 'none';
+                    fileInput.required = true;
+                    stockInput.required = false;
+                    stockInput.value = '';
+                } else if (selectedType === 'Physical') {
+                    digitalFileSection.style.display = 'none';
+                    stockSection.style.display = 'block';
+                    fileInput.required = false;
+                    stockInput.required = true;
+                    fileInput.value = '';
+                } else {
+                    digitalFileSection.style.display = 'none';
+                    stockSection.style.display = 'block';
+                    fileInput.required = false;
+                    stockInput.required = true;
+                }
+            }
+
+            // Initial check
+            toggleProductTypeFields();
+
+            // Listen for changes
+            productTypeSelect.addEventListener('change', toggleProductTypeFields);
+
+            function toggleSellerField() {
+                if (inHouseCheckbox.checked) {
+                    sellerSelect.removeAttribute('required');
+                    sellerSelect.value = '';
+                    sellerRequired.style.display = 'none';
+                    sellerSelection.style.opacity = '0.6';
+                    sellerSelect.disabled = true;
+                } else {
+                    sellerSelect.setAttribute('required', 'required');
+                    sellerRequired.style.display = 'inline';
+                    sellerSelection.style.opacity = '1';
+                    sellerSelect.disabled = false;
+                }
+            }
+
+            // Initial check
+            toggleSellerField();
+
+            // Listen for in-house checkbox changes
+            inHouseCheckbox.addEventListener('change', toggleSellerField);
+
             // Don't hide regular pricing and inventory when variations are enabled
             Livewire.on('hasVariationsChanged', hasVariations => {
                 // No need to hide regular pricing now

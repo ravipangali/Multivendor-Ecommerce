@@ -64,8 +64,7 @@ class SaasOrderController extends Controller
     {
         // Check if the order belongs to the authenticated seller
         if ($order->seller_id !== Auth::id()) {
-            toast('You are not authorized to view this order.', 'error');
-            return redirect()->route('seller.orders.index');
+            return redirect()->route('seller.orders.index')->with('error', 'You are not authorized to view this order.');
         }
 
         $order->load(['customer', 'items.product']);
@@ -80,8 +79,7 @@ class SaasOrderController extends Controller
     {
         // Check if the order belongs to the authenticated seller
         if ($order->seller_id !== Auth::id()) {
-            toast('You are not authorized to edit this order.', 'error');
-            return redirect()->route('seller.orders.index');
+            return redirect()->route('seller.orders.index')->with('error', 'You are not authorized to edit this order.');
         }
 
         $order->load(['customer', 'items.product']);
@@ -105,8 +103,7 @@ class SaasOrderController extends Controller
     {
         // Check if the order belongs to the authenticated seller
         if ($order->seller_id !== Auth::id()) {
-            toast('You are not authorized to update this order.', 'error');
-            return redirect()->route('seller.orders.index');
+            return redirect()->route('seller.orders.index')->with('error', 'You are not authorized to update this order.');
         }
 
         $request->validate([
@@ -115,13 +112,11 @@ class SaasOrderController extends Controller
 
         // Prevent certain status changes based on business rules
         if ($order->order_status === 'delivered' && $request->order_status !== 'refunded') {
-            toast('Cannot change status of a delivered order except to refunded.', 'error');
-            return redirect()->back();
+            return redirect()->back()->with('error', 'Cannot change status of a delivered order except to refunded.');
         }
 
         if ($order->order_status === 'refunded') {
-            toast('Cannot change status of a refunded order.', 'error');
-            return redirect()->back();
+            return redirect()->back()->with('error', 'Cannot change status of a refunded order.');
         }
 
         // Load necessary relationships for email notifications
@@ -163,8 +158,7 @@ class SaasOrderController extends Controller
             ]);
         }
 
-        toast('Order status updated successfully', 'success');
-        return redirect()->route('seller.orders.show', $order->id);
+        return redirect()->route('seller.orders.show', $order->id)->with('success', 'Order status updated successfully');
     }
 
     /**
@@ -231,8 +225,7 @@ class SaasOrderController extends Controller
     {
         // Check if the order belongs to the authenticated seller
         if ($order->seller_id !== Auth::id()) {
-            toast('You are not authorized to access this order invoice.', 'error');
-            return redirect()->route('seller.orders.index');
+            return redirect()->route('seller.orders.index')->with('error', 'You are not authorized to access this order invoice.');
         }
 
         $order->load(['customer', 'items.product']);

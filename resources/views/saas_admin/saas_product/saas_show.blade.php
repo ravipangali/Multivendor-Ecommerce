@@ -33,7 +33,7 @@
                         <div class="card-body">
                             @if($product->images->count() > 0)
                                 <div class="mb-4">
-                                    <img src="{{ asset($product->images->first()->image_url) }}"
+                                    <img src="{{ $product->images->first()->image_url }}"
                                          class="img-fluid rounded"
                                          alt="{{ $product->name }}"
                                          id="main-product-image">
@@ -42,10 +42,10 @@
                                 @if($product->images->count() > 1)
                                     <div class="d-flex flex-wrap gap-2 justify-content-center">
                                         @foreach($product->images as $image)
-                                            <img src="{{ asset($image->image_url) }}"
+                                            <img src="{{ $image->image_url }}"
                                                  class="img-thumbnail"
                                                  style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
-                                                 onclick="document.getElementById('main-product-image').src='{{ asset($image->image_url) }}'"
+                                                 onclick="document.getElementById('main-product-image').src='{{ $image->image_url }}'"
                                                  alt="{{ $product->name }}">
                                         @endforeach
                                     </div>
@@ -74,23 +74,31 @@
                                 @if($product->is_featured)
                                     <span class="badge bg-warning">Featured</span>
                                 @endif
+
+                                @if($product->is_in_house_product)
+                                    <span class="badge bg-info">In-House Product</span>
+                                @endif
+
+                                <span class="badge bg-{{ $product->product_type == 'Digital' ? 'primary' : 'secondary' }}">
+                                    {{ $product->product_type }} Product
+                                </span>
                             </div>
 
                             <div class="mb-3">
                                 <h5>Price:</h5>
                                 @if($product->discount > 0)
                                     <p class="mb-1">
-                                        <span class="text-decoration-line-through text-muted fs-5">Rs{{ number_format($product->price, 2) }}</span>
-                                        <span class="text-danger fs-4 fw-bold">Rs{{ number_format($product->final_price, 2) }}</span>
+                                                                    <span class="text-decoration-line-through text-muted fs-5">Rs {{ number_format($product->price, 2) }}</span>
+                            <span class="text-danger fs-4 fw-bold">Rs {{ number_format($product->final_price, 2) }}</span>
 
                                         @if($product->discount_type == 'percentage')
                                             <span class="badge bg-danger">{{ $product->discount }}% OFF</span>
                                         @else
-                                            <span class="badge bg-danger">Rs{{ number_format($product->discount, 2) }} OFF</span>
+                                            <span class="badge bg-danger">Rs {{ number_format($product->discount, 2) }} OFF</span>
                                         @endif
                                     </p>
                                 @else
-                                    <p class="mb-1 fs-4 fw-bold">Rs{{ number_format($product->price, 2) }}</p>
+                                    <p class="mb-1 fs-4 fw-bold">Rs {{ number_format($product->price, 2) }}</p>
                                 @endif
                             </div>
 
@@ -101,7 +109,11 @@
 
                             <div class="mb-3">
                                 <h5>Stock:</h5>
-                                @if($product->stock > 0)
+                                @if($product->product_type == 'Digital')
+                                    <p class="mb-1 text-info">
+                                        <i class="align-middle" data-feather="infinity"></i> Unlimited (Digital Product)
+                                    </p>
+                                @elseif($product->stock > 0)
                                     <p class="mb-1 text-success">{{ $product->stock }} in stock</p>
                                 @else
                                     <p class="mb-1 text-danger">Out of stock</p>
@@ -112,6 +124,39 @@
                                 <h5>Short Description:</h5>
                                 <p class="mb-1">{{ $product->short_description }}</p>
                             </div>
+
+                            @if($product->product_type == 'Digital')
+                                <div class="mb-3">
+                                    <h6>Digital File:</h6>
+                                    @if($product->file)
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="align-middle text-success me-2" data-feather="file"></i>
+                                            <span class="text-success">File Available</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">
+                                                File: {{ basename($product->file) }}
+                                            </small>
+                                        </div>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('admin.products.file.preview', $product) }}"
+                                               class="btn btn-sm btn-outline-primary"
+                                               target="_blank">
+                                                <i class="align-middle" data-feather="eye"></i> Preview
+                                            </a>
+                                            <a href="{{ route('admin.products.file.download', $product) }}"
+                                               class="btn btn-sm btn-primary">
+                                                <i class="align-middle" data-feather="download"></i> Download
+                                            </a>
+                                        </div>
+                                    @else
+                                        <div class="d-flex align-items-center text-warning">
+                                            <i class="align-middle me-2" data-feather="alert-triangle"></i>
+                                            <span>No file uploaded</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     </div>
 
@@ -197,7 +242,7 @@
                                             <td>{{ $variation->attribute->name }}</td>
                                             <td>{{ $variation->attributeValue->value }}</td>
                                             <td>{{ $variation->sku }}</td>
-                                            <td>Rs{{ number_format($variation->price, 2) }}</td>
+                                            <td>Rs {{ number_format($variation->price, 2) }}</td>
                                             <td class="{{ $variation->stock > 0 ? 'text-success' : 'text-danger' }}">
                                                 {{ $variation->stock }}
                                             </td>
