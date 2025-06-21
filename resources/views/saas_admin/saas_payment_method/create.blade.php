@@ -356,14 +356,25 @@
             if (selectedType === 'bank_transfer') {
                 if (!bankNameInput.value || !bankBranchInput.value || !accountNumberInput.value) {
                     e.preventDefault();
-                    alert('Please fill in all required bank details.');
+                    Swal.fire({
+                        title: 'Missing Information',
+                        text: 'Please fill in all required bank details.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
                     return false;
                 }
             } else if (selectedType === 'esewa' || selectedType === 'khalti') {
                 if (!mobileNumberInput.value || mobileNumberInput.value.length !== 10) {
                     e.preventDefault();
-                    alert('Please enter a valid 10-digit mobile number.');
-                    mobileNumberInput.focus();
+                    Swal.fire({
+                        title: 'Invalid Mobile Number',
+                        text: 'Please enter a valid 10-digit mobile number.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        mobileNumberInput.focus();
+                    });
                     return false;
                 }
             }

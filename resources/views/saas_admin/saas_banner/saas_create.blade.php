@@ -44,9 +44,9 @@
                             <label for="position" class="form-label">Position <span class="text-danger">*</span></label>
                             <select class="form-select" id="position" name="position" required>
                                 <option value="">Select Position</option>
-                                @foreach($positions as $position)
-                                    <option value="{{ $position }}" {{ old('position') == $position ? 'selected' : '' }}>
-                                        {{ ucfirst($position) }}
+                                @foreach($positions as $key => $label)
+                                    <option value="{{ $key }}" {{ old('position') == $key ? 'selected' : '' }}>
+                                        {{ $label }}
                                     </option>
                                 @endforeach
                             </select>
@@ -72,9 +72,9 @@
                             <label for="image" class="form-label">Banner Image <span class="text-danger">*</span></label>
                             <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
                             <small class="text-muted">Recommended size depends on position:
-                                <br>Homepage: 1200×400px
-                                <br>Top: 1200×150px
-                                <br>Sidebar: 300×600px
+                                <br>Popup Banner: 800×600px or 1000×750px
+                                <br>Footer Banner: 1200×200px
+                                <br>Main Section Banner: 1200×400px
                             </small>
                         </div>
 

@@ -4,9 +4,9 @@
 <style>
 /* Modern Category Page Styles */
 .breadcrumb-modern {
-    background: linear-gradient(135deg, var(--white), var(--accent-color));
-    padding: 1.5rem 0;
-    border-bottom: 1px solid var(--border-light);
+    background: #f8f9fa;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
 }
 
 .breadcrumb-modern .breadcrumb {
@@ -16,33 +16,33 @@
 }
 
 .breadcrumb-modern .breadcrumb-item a {
-    color: var(--secondary-color);
+    color: #6c757d;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s ease;
 }
 
 .breadcrumb-modern .breadcrumb-item a:hover {
-    color: var(--primary-color);
+    color: #var(--primary-color);
 }
 
 .breadcrumb-modern .breadcrumb-item.active {
-    color: var(--text-dark);
+    color: #212529;
     font-weight: 600;
 }
 
 /* Category Header Modern */
 .category-header-modern {
-    background: linear-gradient(135deg, var(--accent-color) 0%, #f1f5f9 100%);
-    padding: 3rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 2rem 0;
 }
 
 .category-hero-card {
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    padding: 3rem;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border-light);
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
     position: relative;
     overflow: hidden;
 }
@@ -152,175 +152,325 @@
     z-index: 1;
 }
 
-/* Clean Container */
-.clean-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-/* Simple Layout */
+/* Enhanced Filters - Dashboard Theme */
 .filter-sidebar {
-    padding: 20px 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .filter-section {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.filter-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
+.filter-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
 }
 
 .filter-title {
     font-size: 14px;
     font-weight: 600;
-    color: var(--secondary-color);
-    margin-bottom: 12px;
+    color: var(--white);
+    margin: 0;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.filter-checkbox {
+    letter-spacing: 0.5px;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #64748b, #475569);
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
-    padding: 5px 0;
+    gap: 0.5rem;
 }
 
-.filter-checkbox input[type="checkbox"] {
-    margin-right: 10px;
+.filter-content {
+    padding: 1.5rem;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    transition: all 0.2s ease;
+}
+
+.filter-item:hover {
+    padding-left: 5px;
+}
+
+.filter-item input[type="checkbox"],
+.filter-item input[type="radio"] {
+    margin-right: 12px;
     width: 16px;
     height: 16px;
     accent-color: var(--primary-color);
 }
 
-.filter-checkbox label {
-    font-size: 13px;
+.filter-item label {
+    font-size: 14px;
     color: var(--text-light);
     cursor: pointer;
     margin: 0;
     flex: 1;
-    transition: color 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.filter-checkbox:hover label {
+.filter-item:hover label {
     color: var(--text-dark);
 }
 
-/* Plain Product Grid */
-.product-item {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
+.count {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: normal;
 }
 
-.product-item:last-child {
-    border-bottom: none;
+/* Color Filters */
+.color-item {
+    align-items: center;
+}
+
+.color-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border-light);
+    display: inline-block;
+}
+
+/* Size Filters */
+.size-item {
+    align-items: center;
+}
+
+.size-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.size-box {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-medium);
+    transition: all 0.2s ease;
+}
+
+.size-filter:checked + .size-label .size-box {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Price Range */
+.price-inputs {
+    margin-bottom: 1rem;
+}
+
+.price-range-info {
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+/* Enhanced Buttons */
+.btn-apply-filter,
+.btn-clear-filter {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-apply-filter {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    box-shadow: 0 4px 12px rgba(171, 207, 55, 0.3);
+}
+
+.btn-apply-filter:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(171, 207, 55, 0.4);
+}
+
+.btn-clear-filter {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-clear-filter:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* Modern Product Grid */
+.product-item {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-item:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    border-color: #var(--primary-color);
 }
 
 .product-image-container {
     position: relative;
-    margin-bottom: 12px;
     overflow: hidden;
+    aspect-ratio: 1;
+    background: #f8f9fa;
 }
 
 .product-image {
     width: 100%;
-    height: 220px;
+    height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
-    border: none;
 }
 
-.product-image:hover {
-    transform: scale(1.03);
+.product-item:hover .product-image {
+    transform: scale(1.05);
 }
 
 .discount-badge {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    padding: 4px 8px;
-    font-size: 10px;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: white;
+    border-radius: 4px;
     text-transform: uppercase;
+    z-index: 2;
 }
 
 .discount-flat {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, #28a745, #20c997);
 }
 
 .discount-percent {
-    background: var(--secondary-color);
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
 }
 
 .product-actions {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 0.75rem;
+    right: 0.75rem;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0.5rem;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+}
+
+.product-item:hover .product-actions {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .action-btn {
-    width: 32px;
-    height: 32px;
-    background: rgba(255,255,255,0.9);
-    color: var(--text-light);
-    border: 1px solid var(--border-color);
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.95);
+    color: #495057;
+    border: 1px solid #e9ecef;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 12px;
+    font-size: 14px;
+    text-decoration: none;
+    backdrop-filter: blur(10px);
 }
 
 .action-btn:hover {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
+    transform: scale(1.1);
 }
 
 .product-info {
-    text-align: left;
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .product-meta {
-    margin-bottom: 8px;
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
 }
 
 .product-category {
-    font-size: 11px;
-    color: var(--text-muted);
+    font-size: 0.75rem;
+    color: #6c757d;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-bottom: 3px;
+    letter-spacing: 0.5px;
+    font-weight: 500;
 }
 
 .product-brand {
-    font-size: 11px;
-    color: var(--primary-color);
-    font-weight: 500;
+    font-size: 0.8rem;
+    color: #var(--primary-color);
+    font-weight: 600;
     text-transform: uppercase;
 }
 
 .product-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-dark);
-    margin-bottom: 8px;
-    line-height: 1.3;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    flex: 1;
 }
 
 .product-title a {
@@ -330,68 +480,84 @@
 }
 
 .product-title a:hover {
-    color: var(--secondary-color);
+    color: var(--primary-color);
 }
 
 .product-price {
-    margin-bottom: 12px;
+    margin-bottom: 1rem;
 }
 
 .current-price {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--secondary-color);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #28a745;
 }
 
 .original-price {
-    font-size: 12px;
-    color: var(--text-muted);
+    font-size: 0.9rem;
+    color: #6c757d;
     text-decoration: line-through;
-    margin-left: 8px;
+    margin-left: 0.5rem;
+}
+
+.product-stock {
+    margin: 0.75rem 0;
+    font-size: 0.8rem;
 }
 
 .product-actions-bottom {
     display: flex;
-    gap: 8px;
+    gap: 0.75rem;
     align-items: center;
+    margin-top: auto;
 }
 
 .btn-cart {
     flex: 1;
-    padding: 8px 16px;
+    padding: 0.75rem 1rem;
     background: var(--primary-color);
     color: white;
     border: none;
-    font-size: 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
     cursor: pointer;
-    text-transform: uppercase;
-    font-weight: 500;
-    transition: background 0.2s ease;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-transform: none;
 }
 
 .btn-cart:hover {
-    background: #9ab832;
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+.btn-cart:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .btn-wishlist {
-    padding: 8px;
+    padding: 0.75rem;
     background: transparent;
-    color: var(--text-light);
-    border: 1px solid var(--border-color);
+    color: #6c757d;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    width: 32px;
-    height: 32px;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 .btn-wishlist:hover {
-    background: var(--secondary-color);
+    background: #dc3545;
     color: white;
-    border-color: var(--secondary-color);
+    border-color: #dc3545;
+    transform: scale(1.05);
 }
 
 /* Widget Styling */
@@ -456,75 +622,76 @@
     font-size: 11px;
 }
 
+/* Modern Headers */
 .listing-header {
-    background: transparent;
-    padding: 15px 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
 }
 
-/* Category Header */
-.category-header {
-    background: transparent;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.category-info h2 {
-    color: var(--secondary-color);
+.results-info h5 {
+    font-size: 1.25rem;
     font-weight: 600;
-    font-size: 24px;
+    color: #212529;
+    margin-bottom: 0.5rem;
 }
 
-.category-info p {
-    color: var(--text-light);
-    font-size: 14px;
-}
-
-.category-image img {
-    border: 2px solid var(--primary-color);
+.results-info p {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0;
 }
 
 /* Form Controls */
 .form-control, .form-select {
-    border: 1px solid var(--border-color);
-    border-radius: 0;
-    padding: 6px 10px;
-    font-size: 13px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
 }
 
 .form-control:focus, .form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: none;
+    border-color: #var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
 }
 
 .btn-thm {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
+    background: #var(--primary-color);
+    border-color: #var(--primary-color);
     color: white;
-    text-transform: uppercase;
-    font-weight: 500;
-    font-size: 12px;
-    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
 .btn-thm:hover {
-    background: #9ab832;
-    border-color: #9ab832;
+    background: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-1px);
 }
 
 .btn-secondary {
-    background: var(--secondary-color);
-    border-color: var(--secondary-color);
+    background: #6c757d;
+    border-color: #6c757d;
     color: white;
-    text-transform: uppercase;
-    font-weight: 500;
-    font-size: 12px;
-    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-    background: #076a75;
-    border-color: #076a75;
+    background: #5a6268;
+    border-color: #5a6268;
+    transform: translateY(-1px);
 }
 
 /* Results Info */
@@ -543,47 +710,83 @@
 /* No Products */
 .no-products {
     text-align: center;
-    padding: 60px 20px;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+.no-results-icon {
+    width: 80px;
+    height: 80px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    color: #6c757d;
 }
 
 .no-products h4 {
-    font-size: 18px;
-    color: var(--text-dark);
-    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #212529;
+    margin-bottom: 1rem;
+    font-weight: 600;
 }
 
 .no-products p {
-    font-size: 14px;
-    color: var(--text-light);
-    margin-bottom: 20px;
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 991px) {
+    .filter-sidebar {
+        position: static;
+        margin-bottom: 2rem;
+    }
 }
 
 @media (max-width: 768px) {
-    .filter-sidebar {
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--border-color);
+    .category-hero-card {
+        padding: 1.5rem;
+        text-align: center;
     }
 
-    .product-item {
-        margin-bottom: 25px;
-        padding-bottom: 15px;
+    .category-title {
+        font-size: 2rem;
     }
 
-    .product-image {
-        height: 180px;
+    .listing-header {
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .product-info {
+        padding: 1rem;
     }
 
     .product-title {
-        font-size: 13px;
+        font-size: 0.9rem;
     }
 
     .current-price {
-        font-size: 15px;
+        font-size: 1.1rem;
     }
 
-    .category-info h2 {
-        font-size: 20px;
+    .btn-cart {
+        font-size: 0.8rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .btn-wishlist {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
     }
 }
 </style>
@@ -651,150 +854,156 @@
 <section class="category-products pt0 pb90">
     <div class="container">
         <div class="row">
-            <!-- Sidebar Filters -->
+            <!-- Enhanced Sidebar Filters -->
             <div class="col-lg-3">
                 <div class="filter-sidebar">
-                    <!-- Subcategory Filter -->
+                    <!-- Subcategories -->
                     @if($category->subcategories->count() > 0)
-                        <div class="widget">
-                            <h6 class="title">Subcategories</h6>
-                            <ul class="subcategory-list">
-                                <li>
-                                    <div class="form-check">
-                                        <input class="form-check-input subcategory-filter"
-                                               type="radio"
-                                               name="subcategory"
-                                               value=""
-                                               id="subcategory_all"
-                                               {{ !request('subcategory') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="subcategory_all">
-                                            All {{ $category->name }}
+                        <div class="filter-section">
+                            <h6 class="filter-title">
+                                <i class="fas fa-sitemap"></i>
+                                Subcategories
+                            </h6>
+                            <div class="filter-content">
+                                <div class="filter-item">
+                                    <input type="radio" id="subcat_all" value="" class="subcategory-filter" name="subcategory" {{ !request('subcategory') ? 'checked' : '' }}>
+                                    <label for="subcat_all">
+                                        All {{ $category->name }}
+                                    </label>
+                                </div>
+                                @foreach($category->subcategories as $subcategory)
+                                    <div class="filter-item">
+                                        <input type="radio" id="subcat_{{ $subcategory->id }}" value="{{ $subcategory->slug }}" class="subcategory-filter" name="subcategory" {{ request('subcategory') == $subcategory->slug ? 'checked' : '' }}>
+                                        <label for="subcat_{{ $subcategory->id }}">
+                                            {{ $subcategory->name }}
+                                            <span class="count">({{ $subcategory->products_count ?? 0 }})</span>
                                         </label>
                                     </div>
-                                </li>
-                                @foreach($category->subcategories as $subcategory)
-                                    <li>
-                                        <div class="form-check">
-                                            <input class="form-check-input subcategory-filter"
-                                                   type="radio"
-                                                   name="subcategory"
-                                                   value="{{ $subcategory->slug }}"
-                                                   id="subcategory_{{ $subcategory->id }}"
-                                                   {{ request('subcategory') == $subcategory->slug ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="subcategory_{{ $subcategory->id }}">
-                                                {{ $subcategory->name }}
-                                                <span class="count">({{ $subcategory->products_count ?? 0 }})</span>
-                                            </label>
-                                        </div>
-                                    </li>
                                 @endforeach
-                            </ul>
+                            </div>
                         </div>
                     @endif
 
-                    <!-- Brand Filter -->
-                    <div class="widget">
-                        <h6 class="title">Brands</h6>
-                        <ul class="brand-list">
-                            @foreach($brands as $brand)
-                                <li>
-                                    <div class="form-check">
-                                        <input class="form-check-input brand-filter"
-                                               type="checkbox"
-                                               value="{{ $brand->slug }}"
-                                               id="brand_{{ $brand->id }}"
-                                               {{ request('brand') == $brand->slug ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="brand_{{ $brand->id }}">
-                                            {{ $brand->name }}
-                                            <span class="count">({{ $brand->products_count }})</span>
-                                        </label>
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
+                    <!-- Brands -->
+                    <div class="filter-section">
+                        <h6 class="filter-title">
+                            <i class="fas fa-star"></i>
+                            Brands
+                        </h6>
+                        <div class="filter-content">
+                            @forelse($brands ?? [] as $brand)
+                                <div class="filter-item">
+                                    <input type="checkbox" id="brand_{{ $brand->id }}" value="{{ $brand->slug }}" class="brand-filter">
+                                    <label for="brand_{{ $brand->id }}">
+                                        {{ $brand->name }}
+                                        <span class="count">({{ $brand->products_count }})</span>
+                                    </label>
+                                </div>
+                            @empty
+                                <div class="filter-item">
+                                    <label>No brands available</label>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
 
-                    <!-- Price Range Filter -->
-                    <div class="widget">
-                        <h6 class="title">Price Range</h6>
-                        <form action="{{ route('customer.category', $category->slug) }}" method="GET" id="priceFilterForm">
-                            @if(request('subcategory'))
-                                <input type="hidden" name="subcategory" value="{{ request('subcategory') }}">
-                            @endif
-                            <div class="price-range mb-3">
+                    <!-- Colors -->
+                    @if(isset($availableColors) && $availableColors->count() > 0)
+                        <div class="filter-section">
+                            <h6 class="filter-title">
+                                <i class="fas fa-palette"></i>
+                                Colors
+                            </h6>
+                            <div class="filter-content">
+                                @foreach($availableColors as $color)
+                                    <div class="filter-item color-item">
+                                        <input type="checkbox" id="color_{{ $loop->index }}" value="{{ $color }}" class="color-filter">
+                                        <label for="color_{{ $loop->index }}" class="color-label">
+                                            @php
+                                                $colorMap = [
+                                                    'red' => '#ff0000', 'blue' => '#0000ff', 'green' => '#008000',
+                                                    'black' => '#000000', 'white' => '#ffffff', 'yellow' => '#ffff00',
+                                                    'orange' => '#ffa500', 'purple' => '#800080', 'pink' => '#ffc0cb',
+                                                    'brown' => '#8b4513', 'gray' => '#808080', 'grey' => '#808080',
+                                                    'navy' => '#000080', 'maroon' => '#800000', 'lime' => '#00ff00',
+                                                    'olive' => '#808000', 'aqua' => '#00ffff', 'teal' => '#008080',
+                                                    'silver' => '#c0c0c0', 'gold' => '#ffd700'
+                                                ];
+                                                $colorCode = $colorMap[strtolower($color)] ?? strtolower($color);
+                                                $borderColor = strtolower($color) === 'white' ? '#ddd' : 'transparent';
+                                            @endphp
+                                            <span class="color-swatch" style="background-color: {{ $colorCode }}; border: 2px solid {{ $borderColor }};"></span>
+                                            {{ $color }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Sizes -->
+                    @if(isset($availableSizes) && $availableSizes->count() > 0)
+                        <div class="filter-section">
+                            <h6 class="filter-title">
+                                <i class="fas fa-expand-arrows-alt"></i>
+                                Sizes
+                            </h6>
+                            <div class="filter-content">
+                                @foreach($availableSizes as $size)
+                                    <div class="filter-item size-item">
+                                        <input type="checkbox" id="size_{{ $loop->index }}" value="{{ $size }}" class="size-filter">
+                                        <label for="size_{{ $loop->index }}" class="size-label">
+                                            <span class="size-box">{{ $size }}</span>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Price Range -->
+                    <div class="filter-section">
+                        <h6 class="filter-title">
+                            <span class="rs-icon">Rs</span>
+                            Price Range
+                        </h6>
+                        <div class="filter-content">
+                            <div class="price-inputs">
                                 <div class="row">
                                     <div class="col-6">
-                                        <input type="number" name="min_price" class="form-control form-control-sm"
-                                               placeholder="Min" value="{{ request('min_price') }}"
-                                               min="0">
+                                        <input type="number" class="form-control" placeholder="Min" id="min_price"
+                                               min="{{ $priceRange->min_price ?? 0 }}"
+                                               max="{{ $priceRange->max_price ?? 10000 }}">
                                     </div>
                                     <div class="col-6">
-                                        <input type="number" name="max_price" class="form-control form-control-sm"
-                                               placeholder="Max" value="{{ request('max_price') }}"
-                                               min="0">
+                                        <input type="number" class="form-control" placeholder="Max" id="max_price"
+                                               min="{{ $priceRange->min_price ?? 0 }}"
+                                               max="{{ $priceRange->max_price ?? 10000 }}">
                                     </div>
                                 </div>
-                                <div class="price-range-info mt-2">
-                                    <small class="text-muted" style="font-size: 11px;">
-                                        Range: Rs. {{ number_format($priceRange->min_price ?? 0) }} - Rs. {{ number_format($priceRange->max_price ?? 100000) }}
+                                <div class="price-range-info">
+                                    <small class="text-muted">
+                                        Range: Rs {{ number_format($priceRange->min_price ?? 0) }} - Rs {{ number_format($priceRange->max_price ?? 10000) }}
                                     </small>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-sm btn-thm w-100">Apply Filter</button>
-                        </form>
+                            <button type="button" class="btn-apply-filter w-100" id="applyPriceFilter">
+                                <i class="fas fa-filter"></i> Apply Filter
+                            </button>
+                        </div>
                     </div>
-
-                    <!-- Size Filter -->
-                    @if($availableSizes->count() > 0)
-                    <div class="widget">
-                        <h6 class="title">Size</h6>
-                        <ul class="size-list">
-                            @foreach($availableSizes as $size)
-                                <li>
-                                    <div class="form-check">
-                                        <input class="form-check-input size-filter"
-                                               type="checkbox"
-                                               value="{{ $size }}"
-                                               id="size_{{ $loop->index }}"
-                                               {{ in_array($size, (array)request('size', [])) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="size_{{ $loop->index }}">
-                                            {{ $size }}
-                                        </label>
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    @endif
-
-                    <!-- Color Filter -->
-                    @if($availableColors->count() > 0)
-                    <div class="widget">
-                        <h6 class="title">Color</h6>
-                        <ul class="color-list">
-                            @foreach($availableColors as $color)
-                                <li>
-                                    <div class="form-check">
-                                        <input class="form-check-input color-filter"
-                                               type="checkbox"
-                                               value="{{ $color }}"
-                                               id="color_{{ $loop->index }}"
-                                               {{ in_array($color, (array)request('color', [])) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="color_{{ $loop->index }}">
-                                            {{ ucfirst($color) }}
-                                        </label>
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    @endif
 
                     <!-- Clear Filters -->
-                    <div class="widget">
-                        <a href="{{ route('customer.category', $category->slug) }}" class="btn btn-secondary w-100">
-                            Clear All Filters
-                        </a>
+                    <div class="filter-section">
+                        <h6 class="filter-title">
+                            <i class="fas fa-eraser"></i>
+                            Reset Filters
+                        </h6>
+                        <div class="filter-content">
+                            <button type="button" class="btn-clear-filter w-100" id="clearFilters">
+                                <i class="fas fa-undo"></i> Clear All Filters
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -866,7 +1075,7 @@
                                                 <i class="flaticon-heart"></i>
                                             </button>
                                             <a href="{{ route('customer.product.detail', $product->slug) }}" class="action-btn">
-                                                <i class="flaticon-eye"></i>
+                                                <i class="fas fa-eye"></i>
                                             </a>
                                         </div>
                                     </div>
@@ -947,43 +1156,328 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    // Handle sorting
-    $('#sortBy').on('change', function() {
-        let currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set('sort_by', this.value);
-        window.location.href = currentUrl.toString();
-    });
-
-    // Handle filter changes
-    $('.subcategory-filter, .brand-filter').on('change', function() {
+    // Filter functionality
+    $('.subcategory-filter, .brand-filter, .color-filter, .size-filter').on('change', function() {
         applyFilters();
     });
 
+    $('#applyPriceFilter').on('click', function() {
+        applyFilters();
+    });
+
+    $('#clearFilters, #clearAllFilters').on('click', function() {
+        // Clear all filter inputs
+        $('.subcategory-filter, .brand-filter, .color-filter, .size-filter').prop('checked', false);
+        $('#min_price, #max_price').val('');
+
+        applyFilters();
+    });
+
+    $('#sortBy').on('change', function() {
+        applyFilters();
+    });
+
+    // Add to cart functionality
+    $('.add-to-cart').on('click', function() {
+        const productId = $(this).data('product-id');
+        const button = $(this);
+
+        @guest
+        showNotification('Please login to add items to cart', 'warning');
+        setTimeout(() => {
+            window.location.href = '{{ route("login") }}';
+        }, 1500);
+        return;
+        @endguest
+
+        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+
+        $.ajax({
+            url: '{{ route("customer.cart.add") }}',
+            method: 'POST',
+            data: {
+                product_id: productId,
+                quantity: 1,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    button.html('<i class="fas fa-check"></i> Added');
+
+                    // Show success notification
+                    showNotification('Product added to cart!', 'success');
+
+                    // Update cart count if exists
+                    updateCartCount();
+
+                    setTimeout(() => {
+                        button.prop('disabled', false).html('Add to Cart');
+                    }, 2000);
+                } else {
+                    button.prop('disabled', false).html('Add to Cart');
+                    showNotification(response.message || 'Error adding to cart', 'error');
+                }
+            },
+            error: function(xhr) {
+                button.prop('disabled', false).html('Add to Cart');
+                if (xhr.status === 401) {
+                    showNotification('Please login to add items to cart', 'warning');
+                    setTimeout(() => {
+                        window.location.href = '{{ route("login") }}';
+                    }, 1500);
+                } else {
+                    showNotification('Error adding to cart', 'error');
+                }
+            }
+        });
+    });
+
+    // Add to wishlist functionality
+    $('.add-to-wishlist').on('click', function() {
+        const productId = $(this).data('product-id');
+        const button = $(this);
+
+        @guest
+        showNotification('Please login to manage your wishlist', 'warning');
+        setTimeout(() => {
+            window.location.href = '{{ route("login") }}';
+        }, 1500);
+        return;
+        @endguest
+
+        $.ajax({
+            url: '{{ route("customer.wishlist.toggle") }}',
+            method: 'POST',
+            data: {
+                product_id: productId,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    if (response.in_wishlist) {
+                        button.addClass('active').html('<i class="fas fa-heart"></i>');
+                        showNotification('Added to wishlist!', 'success');
+                    } else {
+                        button.removeClass('active').html('<i class="far fa-heart"></i>');
+                        showNotification('Removed from wishlist!', 'info');
+                    }
+                } else {
+                    showNotification(response.message || 'Error updating wishlist', 'error');
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    showNotification('Please login to manage your wishlist', 'warning');
+                    setTimeout(() => {
+                        window.location.href = '{{ route("login") }}';
+                    }, 1500);
+                } else {
+                    showNotification('Error updating wishlist', 'error');
+                }
+            }
+        });
+    });
+
     function applyFilters() {
-        let currentUrl = new URL(window.location.href);
-
-        // Subcategory filter
-        let selectedSubcategory = $('.subcategory-filter:checked').val();
-        if (selectedSubcategory) {
-            currentUrl.searchParams.set('subcategory', selectedSubcategory);
-        } else {
-            currentUrl.searchParams.delete('subcategory');
-        }
-
-        // Brand filters
-        let selectedBrands = [];
-        $('.brand-filter:checked').each(function() {
-            selectedBrands.push($(this).val());
+        // Collect filter data
+        let subcategories = [];
+        $('.subcategory-filter:checked').each(function() {
+            subcategories.push($(this).val());
         });
 
-        if (selectedBrands.length > 0) {
-            currentUrl.searchParams.set('brand', selectedBrands[0]);
-        } else {
-            currentUrl.searchParams.delete('brand');
+        let brands = [];
+        $('.brand-filter:checked').each(function() {
+            brands.push($(this).val());
+        });
+
+        let colors = [];
+        $('.color-filter:checked').each(function() {
+            colors.push($(this).val());
+        });
+
+        let sizes = [];
+        $('.size-filter:checked').each(function() {
+            sizes.push($(this).val());
+        });
+
+        let minPrice = $('#min_price').val();
+        let maxPrice = $('#max_price').val();
+        let sortBy = $('#sortBy').val();
+
+        // Build URL with filters
+        let url = new URL(window.location.href);
+        url.search = '';
+
+        if (subcategories.length > 0) {
+            url.searchParams.set('subcategory', subcategories.join(','));
+        }
+        if (brands.length > 0) {
+            url.searchParams.set('brand', brands.join(','));
+        }
+        if (colors.length > 0) {
+            url.searchParams.set('colors', colors.join(','));
+        }
+        if (sizes.length > 0) {
+            url.searchParams.set('sizes', sizes.join(','));
+        }
+        if (minPrice) {
+            url.searchParams.set('min_price', minPrice);
+        }
+        if (maxPrice) {
+            url.searchParams.set('max_price', maxPrice);
+        }
+        if (sortBy) {
+            url.searchParams.set('sort_by', sortBy);
         }
 
-        window.location.href = currentUrl.toString();
+        // Redirect to filtered URL
+        window.location.href = url.toString();
     }
+
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = $(`
+            <div class="notification notification-${type}">
+                <div class="notification-content">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            </div>
+        `);
+
+        // Add to page
+        $('body').append(notification);
+
+        // Show notification
+        notification.addClass('show');
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.removeClass('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    function updateCartCount() {
+        // Update cart count if cart counter exists
+        @auth
+        $.get('{{ route("customer.ajax.cart.count") }}', function(response) {
+            if (response.cart_count !== undefined) {
+                $('.cart-count').text(response.cart_count);
+            }
+        });
+        @endauth
+    }
+
+    // Initialize filters based on URL parameters
+    function initializeFilters() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Set subcategory filters
+        if (urlParams.has('subcategory')) {
+            const subcategories = urlParams.get('subcategory').split(',');
+            subcategories.forEach(subcategory => {
+                $(`.subcategory-filter[value="${subcategory}"]`).prop('checked', true);
+            });
+        }
+
+        // Set brand filters
+        if (urlParams.has('brand')) {
+            const brands = urlParams.get('brand').split(',');
+            brands.forEach(brand => {
+                $(`.brand-filter[value="${brand}"]`).prop('checked', true);
+            });
+        }
+
+        // Set color filters
+        if (urlParams.has('colors')) {
+            const colors = urlParams.get('colors').split(',');
+            colors.forEach(color => {
+                $(`.color-filter[value="${color}"]`).prop('checked', true);
+            });
+        }
+
+        // Set size filters
+        if (urlParams.has('sizes')) {
+            const sizes = urlParams.get('sizes').split(',');
+            sizes.forEach(size => {
+                $(`.size-filter[value="${size}"]`).prop('checked', true);
+            });
+        }
+
+        // Set price range
+        if (urlParams.has('min_price')) {
+            $('#min_price').val(urlParams.get('min_price'));
+        }
+        if (urlParams.has('max_price')) {
+            $('#max_price').val(urlParams.get('max_price'));
+        }
+
+        // Set sort
+        if (urlParams.has('sort_by')) {
+            $('#sortBy').val(urlParams.get('sort_by'));
+        }
+    }
+
+    // Initialize filters on page load
+    initializeFilters();
 });
 </script>
+
+<!-- Notification Styles -->
+<style>
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-content {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-left: 4px solid;
+}
+
+.notification-success .notification-content {
+    border-left-color: var(--success);
+}
+
+.notification-error .notification-content {
+    border-left-color: var(--danger);
+}
+
+.notification-info .notification-content {
+    border-left-color: var(--primary-color);
+}
+
+.notification i {
+    font-size: 1.25rem;
+}
+
+.notification-success i {
+    color: var(--success);
+}
+
+.notification-error i {
+    color: var(--danger);
+}
+
+.notification-info i {
+    color: var(--primary-color);
+}
+</style>
 @endpush

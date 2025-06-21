@@ -184,6 +184,14 @@
                         <label for="site_footer" class="form-label">Footer Text</label>
                         <textarea class="form-control" id="site_footer" name="site_footer" rows="2">{{ old('site_footer', $settings->site_footer) }}</textarea>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="apply_share_link" class="form-label">Apply Share Link</label>
+                        <input type="url" class="form-control" id="apply_share_link" name="apply_share_link"
+                            value="{{ old('apply_share_link', $settings->apply_share_link) }}"
+                            placeholder="https://example.com/apply">
+                        <small class="text-muted">URL where users will be redirected when they click "Apply Share" in the navigation</small>
+                    </div>
                 </div>
 
                 <!-- Site Branding -->
@@ -323,6 +331,17 @@
                                     <input type="url" class="form-control" id="site_youtube" name="site_youtube"
                                         value="{{ old('site_youtube', $settings->site_youtube) }}"
                                         placeholder="https://youtube.com/channel/yourchannel">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_whatsapp" class="form-label">WhatsApp URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i data-feather="message-circle"></i></span>
+                                    <input type="url" class="form-control" id="site_whatsapp" name="site_whatsapp"
+                                        value="{{ old('site_whatsapp', $settings->site_whatsapp) }}"
+                                        placeholder="https://wa.me/yournumber">
                                 </div>
                             </div>
                         </div>

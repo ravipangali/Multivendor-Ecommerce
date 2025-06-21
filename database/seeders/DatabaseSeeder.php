@@ -44,21 +44,21 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Summer Sale 2024',
                 'image' => 'banners/summer-sale.jpg',
                 'link_url' => '/shop',
-                'position' => 'homepage',
+                'position' => 'main_section',
                 'is_active' => true
             ],
             [
                 'title' => 'Electronics Collection',
                 'image' => 'banners/electronics.jpg',
                 'link_url' => '/category/electronics',
-                'position' => 'sidebar',
+                'position' => 'footer',
                 'is_active' => true
             ],
             [
-                'title' => 'Fashion Week',
+                'title' => 'Fashion Week Popup',
                 'image' => 'banners/fashion.jpg',
                 'link_url' => '/category/fashion',
-                'position' => 'top',
+                'position' => 'popup',
                 'is_active' => true
             ]
         ];

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SaasBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class SaasBannerController extends Controller
 {
@@ -23,7 +24,11 @@ class SaasBannerController extends Controller
      */
     public function create()
     {
-        $positions = ['homepage', 'top', 'sidebar'];
+        $positions = [
+            'popup' => 'Popup Banner',
+            'footer' => 'Footer Banner',
+            'main_section' => 'Main Section Banner'
+        ];
         return view('saas_admin.saas_banner.saas_create', compact('positions'));
     }
 
@@ -36,23 +41,30 @@ class SaasBannerController extends Controller
             'title' => 'required|string|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'link_url' => 'nullable|url',
-            'position' => 'required|in:homepage,top,sidebar',
-            'is_active' => 'required|boolean',
+            'position' => 'required|in:popup,footer,main_section',
+            'is_active' => 'nullable|boolean',
         ]);
 
-        $banner = new SaasBanner();
-        $banner->title = $request->title;
-        $banner->link_url = $request->link_url;
-        $banner->position = $request->position;
-        $banner->is_active = $request->is_active;
-        $banner->save();
+        try {
+            $banner = new SaasBanner();
+            $banner->title = $request->title;
+            $banner->link_url = $request->link_url;
+            $banner->position = $request->position;
+            $banner->is_active = $request->has('is_active') ? (bool) $request->is_active : true;
+            $banner->save();
 
-        if ($request->hasFile('image')) {
-            $banner->saveBannerImage($request->file('image'));
+            if ($request->hasFile('image')) {
+                $banner->saveBannerImage($request->file('image'));
+            }
+
+            toast('Banner created successfully', 'success');
+            return redirect()->route('admin.banners.index');
+
+        } catch (\Exception $e) {
+            Log::error('Banner creation failed: ' . $e->getMessage());
+            toast('Failed to create banner: ' . $e->getMessage(), 'error');
+            return back()->withInput();
         }
-
-        toast('Banner created successfully', 'success');
-        return redirect()->route('admin.banners.index');
     }
 
     /**
@@ -68,7 +80,11 @@ class SaasBannerController extends Controller
      */
     public function edit(SaasBanner $banner)
     {
-        $positions = ['homepage', 'top', 'sidebar'];
+        $positions = [
+            'popup' => 'Popup Banner',
+            'footer' => 'Footer Banner',
+            'main_section' => 'Main Section Banner'
+        ];
         return view('saas_admin.saas_banner.saas_edit', compact('banner', 'positions'));
     }
 
@@ -81,22 +97,29 @@ class SaasBannerController extends Controller
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'link_url' => 'nullable|url',
-            'position' => 'required|in:homepage,top,sidebar',
-            'is_active' => 'required|boolean',
+            'position' => 'required|in:popup,footer,main_section',
+            'is_active' => 'nullable|boolean',
         ]);
 
-        $banner->title = $request->title;
-        $banner->link_url = $request->link_url;
-        $banner->position = $request->position;
-        $banner->is_active = $request->is_active;
-        $banner->save();
+        try {
+            $banner->title = $request->title;
+            $banner->link_url = $request->link_url;
+            $banner->position = $request->position;
+            $banner->is_active = $request->has('is_active') ? (bool) $request->is_active : false;
+            $banner->save();
 
-        if ($request->hasFile('image')) {
-            $banner->saveBannerImage($request->file('image'));
+            if ($request->hasFile('image')) {
+                $banner->saveBannerImage($request->file('image'));
+            }
+
+            toast('Banner updated successfully', 'success');
+            return redirect()->route('admin.banners.index');
+
+        } catch (\Exception $e) {
+            Log::error('Banner update failed: ' . $e->getMessage());
+            toast('Failed to update banner: ' . $e->getMessage(), 'error');
+            return back()->withInput();
         }
-
-        toast('Banner updated successfully', 'success');
-        return redirect()->route('admin.banners.index');
     }
 
     /**

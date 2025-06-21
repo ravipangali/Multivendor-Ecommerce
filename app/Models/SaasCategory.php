@@ -112,4 +112,74 @@ class SaasCategory extends Model
     {
         return $this->image ? Storage::url($this->image) : null;
     }
+
+    /**
+     * Get all products from this category including subcategories and child categories
+     */
+    public function getAllHierarchyProducts($limit = null)
+    {
+        $allProducts = collect();
+
+        // 1. Get products directly from this category
+        $directProducts = $this->products()
+            ->where('is_active', true)
+            ->with(['images', 'brand', 'reviews'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        $allProducts = $allProducts->merge($directProducts);
+
+        // 2. Get products from subcategories
+        $subcategories = $this->subcategories;
+        foreach ($subcategories as $subcategory) {
+            $subcategoryProducts = $subcategory->products()
+                ->where('is_active', true)
+                ->with(['images', 'brand', 'reviews'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+            $allProducts = $allProducts->merge($subcategoryProducts);
+
+            // 3. Get products from child categories under this subcategory
+            $childCategories = $subcategory->childCategories;
+            foreach ($childCategories as $childCategory) {
+                $childProducts = $childCategory->products()
+                    ->where('is_active', true)
+                    ->with(['images', 'brand', 'reviews'])
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+                $allProducts = $allProducts->merge($childProducts);
+            }
+        }
+
+        // Remove duplicates and apply limit if specified
+        $uniqueProducts = $allProducts->unique('id');
+
+        return $limit ? $uniqueProducts->take($limit) : $uniqueProducts;
+    }
+
+    /**
+     * Check if category has any products in its hierarchy
+     */
+    public function hasAnyProducts()
+    {
+        // Check direct products
+        if ($this->products()->where('is_active', true)->exists()) {
+            return true;
+        }
+
+        // Check subcategory products
+        foreach ($this->subcategories as $subcategory) {
+            if ($subcategory->products()->where('is_active', true)->exists()) {
+                return true;
+            }
+
+            // Check child category products
+            foreach ($subcategory->childCategories as $childCategory) {
+                if ($childCategory->products()->where('is_active', true)->exists()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

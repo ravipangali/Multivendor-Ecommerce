@@ -22,10 +22,13 @@ class SaasCustomerController extends Controller
     public function home()
     {
         // Get active banners for slider
-        $sliderBanners = SaasBanner::active()->position('top')->take(5)->get();
+        $sliderBanners = SaasBanner::active()->position('main_section')->take(5)->get();
 
-        // Get promotional banners
-        $promotionalBanners = SaasBanner::active()->position('homepage')->orderBy('id', 'desc')->take(3)->get();
+        // Get promotional banners (footer banners)
+        $promotionalBanners = SaasBanner::active()->position('footer')->orderBy('id', 'desc')->take(3)->get();
+
+        // Get popup banners
+        $popupBanners = SaasBanner::active()->position('popup')->take(1)->get();
 
         // Get featured categories
         $featuredCategories = SaasCategory::where('featured', 1)
@@ -74,18 +77,35 @@ class SaasCustomerController extends Controller
             ->orderBy('wishlists_count', 'desc')
             ->take(6)->get();
 
-
+                // Get categories with products for category-wise products section
+        // This includes products from category, subcategories, and child categories
+        $categoriesWithProducts = SaasCategory::where('status', 1)
+            ->with(['subcategories.childCategories']) // Eager load relationships
+            ->orderBy('name', 'asc')
+            ->get()
+            ->map(function($category) {
+                // Get all products from this category hierarchy using the model method
+                $category->allProducts = $category->getAllHierarchyProducts(8);
+                return $category;
+            })
+            ->filter(function($category) {
+                // Only include categories that have products
+                return $category->allProducts->isNotEmpty();
+            })
+            ->take(6); // Take only 6 categories that have products
 
         return view('saas_customer.saas_home', compact(
             'sliderBanners',
             'promotionalBanners',
+            'popupBanners',
             'featuredCategories',
             'categories',
             'featuredProducts',
             'newArrivals',
             'topSellingProducts',
             'popularBrands',
-            'demandProducts'
+            'demandProducts',
+            'categoriesWithProducts'
         ));
     }
 

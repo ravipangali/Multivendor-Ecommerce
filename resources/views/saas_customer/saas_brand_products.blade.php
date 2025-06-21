@@ -43,7 +43,7 @@
                         <div class="brand-logo-container">
                             <img src="{{ asset('storage/' . $brand->logo) }}"
                                  alt="{{ $brand->name }}"
-                                 class="brand-logo">
+                                 class="brand-logo brand-header-img">
                             <div class="logo-backdrop"></div>
                         </div>
                     @endif
@@ -59,92 +59,152 @@
         <div class="row">
             <!-- Enhanced Sidebar Filters -->
             <div class="col-lg-3">
-                <div class="filters-sidebar">
-                    <div class="sidebar-header">
-                        <h5 class="sidebar-title">
-                            <i class="fas fa-filter me-2"></i>
-                            Filters
-                        </h5>
-                    </div>
-
-                    <!-- Categories Filter -->
-                    <div class="filter-group">
-                        <h6 class="filter-title">Categories</h6>
+                <div class="filter-sidebar">
+                    <!-- Categories with Subcategories -->
+                    <div class="filter-section">
+                        <h6 class="filter-title">
+                            <i class="fas fa-tags"></i>
+                            Categories
+                        </h6>
                         <div class="filter-content">
-                            @foreach($categories as $category)
-                                <div class="filter-option">
-                                    <input class="filter-checkbox category-filter"
-                                           type="checkbox"
-                                           value="{{ $category->slug }}"
-                                           id="category_{{ $category->id }}"
-                                           {{ request('category') == $category->slug ? 'checked' : '' }}>
-                                    <label class="filter-label" for="category_{{ $category->id }}">
-                                        <span class="checkbox-custom"></span>
-                                        <span class="label-text">{{ $category->name }}</span>
-                                        <span class="item-count">({{ $category->products_count ?? 0 }})</span>
-                                    </label>
+                            @forelse($categories ?? [] as $category)
+                                <div class="category-group">
+                                    <div class="filter-item category-main">
+                                        <input type="checkbox" id="cat_{{ $category->id }}" value="{{ $category->slug }}" class="category-filter">
+                                        <label for="cat_{{ $category->id }}">
+                                            {{ $category->name }}
+                                            <span class="count">({{ $category->products_count ?? 0 }})</span>
+                                        </label>
+                                        @if(isset($category->subcategories) && $category->subcategories->count() > 0)
+                                            <button type="button" class="expand-btn" data-target="#subcat_{{ $category->id }}">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+
+                                    @if(isset($category->subcategories) && $category->subcategories->count() > 0)
+                                        <div class="subcategories" id="subcat_{{ $category->id }}">
+                                            @foreach($category->subcategories as $subcategory)
+                                                <div class="filter-item subcategory-item">
+                                                    <input type="checkbox" id="subcat_{{ $subcategory->id }}" value="{{ $subcategory->slug }}" class="subcategory-filter" data-category="{{ $category->slug }}">
+                                                    <label for="subcat_{{ $subcategory->id }}">
+                                                        {{ $subcategory->name }}
+                                                        <span class="count">({{ $subcategory->products_count ?? 0 }})</span>
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
-                            @endforeach
+                            @empty
+                                <div class="filter-item">
+                                    <label>No categories available</label>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
 
-                    <!-- Price Range Filter -->
-                    <div class="filter-group">
-                        <h6 class="filter-title">Price Range</h6>
+                    <!-- Colors -->
+                    <div class="filter-section">
+                        <h6 class="filter-title">
+                            <i class="fas fa-palette"></i>
+                            Colors
+                        </h6>
                         <div class="filter-content">
-                            <form action="{{ route('customer.brand', $brand->slug) }}" method="GET" id="priceFilterForm">
-                                <div class="price-inputs">
-                                    <div class="input-group">
-                                        <span class="input-prefix">Rs.</span>
-                                        <input type="number" name="min_price" class="price-input"
-                                               placeholder="Min" value="{{ request('min_price') }}" min="0">
+                            @forelse($availableColors ?? [] as $color)
+                                <div class="filter-item color-item">
+                                    <input type="checkbox" id="color_{{ $loop->index }}" value="{{ $color }}" class="color-filter">
+                                    <label for="color_{{ $loop->index }}" class="color-label">
+                                        @php
+                                            $colorMap = [
+                                                'red' => '#ff0000', 'blue' => '#0000ff', 'green' => '#008000',
+                                                'black' => '#000000', 'white' => '#ffffff', 'yellow' => '#ffff00',
+                                                'orange' => '#ffa500', 'purple' => '#800080', 'pink' => '#ffc0cb',
+                                                'brown' => '#8b4513', 'gray' => '#808080', 'grey' => '#808080',
+                                                'navy' => '#000080', 'maroon' => '#800000', 'lime' => '#00ff00',
+                                                'olive' => '#808000', 'aqua' => '#00ffff', 'teal' => '#008080',
+                                                'silver' => '#c0c0c0', 'gold' => '#ffd700'
+                                            ];
+                                            $colorCode = $colorMap[strtolower($color)] ?? strtolower($color);
+                                            $borderColor = strtolower($color) === 'white' ? '#ddd' : 'transparent';
+                                        @endphp
+                                        <span class="color-swatch" style="background-color: {{ $colorCode }}; border: 2px solid {{ $borderColor }};"></span>
+                                        {{ $color }}
+                                    </label>
+                                </div>
+                            @empty
+                                <div class="filter-item">
+                                    <label>No colors available</label>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Sizes -->
+                    <div class="filter-section">
+                        <h6 class="filter-title">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            Sizes
+                        </h6>
+                        <div class="filter-content">
+                            @forelse($availableSizes ?? [] as $size)
+                                <div class="filter-item size-item">
+                                    <input type="checkbox" id="size_{{ $loop->index }}" value="{{ $size }}" class="size-filter">
+                                    <label for="size_{{ $loop->index }}" class="size-label">
+                                        <span class="size-box">{{ $size }}</span>
+                                    </label>
+                                </div>
+                            @empty
+                                <div class="filter-item">
+                                    <label>No sizes available</label>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="filter-section">
+                        <h6 class="filter-title">
+                            <span class="rs-icon">Rs</span>
+                            Price Range
+                        </h6>
+                        <div class="filter-content">
+                            <div class="price-inputs">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" placeholder="Min" id="min_price"
+                                               min="{{ $priceRange->min_price ?? 0 }}"
+                                               max="{{ $priceRange->max_price ?? 10000 }}">
                                     </div>
-                                    <div class="price-separator">to</div>
-                                    <div class="input-group">
-                                        <span class="input-prefix">Rs.</span>
-                                        <input type="number" name="max_price" class="price-input"
-                                               placeholder="Max" value="{{ request('max_price') }}" min="0">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" placeholder="Max" id="max_price"
+                                               min="{{ $priceRange->min_price ?? 0 }}"
+                                               max="{{ $priceRange->max_price ?? 10000 }}">
                                     </div>
                                 </div>
                                 <div class="price-range-info">
-                                    <small>Range: Rs. {{ number_format($priceRange->min_price ?? 0) }} - Rs. {{ number_format($priceRange->max_price ?? 100000) }}</small>
+                                    <small class="text-muted">
+                                        Range: Rs {{ number_format($priceRange->min_price ?? 0) }} - Rs {{ number_format($priceRange->max_price ?? 10000) }}
+                                    </small>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100 mt-3">Apply Filter</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Rating Filter -->
-                    <div class="filter-group">
-                        <h6 class="filter-title">Customer Rating</h6>
-                        <div class="filter-content">
-                            @for($i = 5; $i >= 1; $i--)
-                                <div class="filter-option rating-option">
-                                    <input class="filter-radio rating-filter"
-                                           type="radio"
-                                           name="rating"
-                                           value="{{ $i }}"
-                                           id="rating_{{ $i }}"
-                                           {{ request('rating') == $i ? 'checked' : '' }}>
-                                    <label class="filter-label" for="rating_{{ $i }}">
-                                        <span class="radio-custom"></span>
-                                        <div class="rating-stars">
-                                            @for($j = 1; $j <= 5; $j++)
-                                                <i class="fa fa-star {{ $j <= $i ? 'active' : '' }}"></i>
-                                            @endfor
-                                        </div>
-                                        <span class="rating-text">{{ $i }} stars & up</span>
-                                    </label>
-                                </div>
-                            @endfor
+                            </div>
+                            <button type="button" class="btn-apply-filter w-100" id="applyPriceFilter">
+                                <i class="fas fa-filter"></i> Apply Filter
+                            </button>
                         </div>
                     </div>
 
                     <!-- Clear Filters -->
-                    <div class="filter-actions">
-                        <a href="{{ route('customer.brand', $brand->slug) }}" class="btn btn-outline-secondary w-100">
-                            <i class="fas fa-undo me-2"></i>Clear All Filters
-                        </a>
+                    <div class="filter-section">
+                        <h6 class="filter-title">
+                            <i class="fas fa-eraser"></i>
+                            Reset Filters
+                        </h6>
+                        <div class="filter-content">
+                            <button type="button" class="btn-clear-filter w-100" id="clearFilters">
+                                <i class="fas fa-undo"></i> Clear All Filters
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -333,68 +393,354 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    // Handle sorting
-    $('#sortBy').on('change', function() {
-        let currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set('sort_by', this.value);
-        window.location.href = currentUrl.toString();
+    // Category expand/collapse functionality
+    $('.expand-btn').on('click', function() {
+        const target = $(this).data('target');
+        const subcategories = $(target);
+        const icon = $(this).find('i');
+
+        subcategories.toggleClass('show');
+        $(this).toggleClass('expanded');
+
+        if (subcategories.hasClass('show')) {
+            subcategories.slideDown(200);
+        } else {
+            subcategories.slideUp(200);
+        }
     });
 
-    // Handle filter changes
-    $('.category-filter, .rating-filter').on('change', function() {
+    // Filter functionality
+    $('.category-filter, .subcategory-filter, .color-filter, .size-filter').on('change', function() {
         applyFilters();
     });
 
-    function applyFilters() {
-        let currentUrl = new URL(window.location.href);
+    $('#applyPriceFilter').on('click', function() {
+        applyFilters();
+    });
 
-        // Category filters
-        let selectedCategories = [];
-        $('.category-filter:checked').each(function() {
-            selectedCategories.push($(this).val());
-        });
+    $('#clearFilters, #clearAllFilters').on('click', function() {
+        // Clear all filter inputs
+        $('.category-filter, .subcategory-filter, .color-filter, .size-filter').prop('checked', false);
+        $('#min_price, #max_price').val('');
 
-        if (selectedCategories.length > 0) {
-            currentUrl.searchParams.set('category', selectedCategories[0]);
-        } else {
-            currentUrl.searchParams.delete('category');
-        }
+        // Hide all subcategories
+        $('.subcategories').removeClass('show').hide();
+        $('.expand-btn').removeClass('expanded');
 
-        // Rating filter
-        let selectedRating = $('.rating-filter:checked').val();
-        if (selectedRating) {
-            currentUrl.searchParams.set('rating', selectedRating);
-        } else {
-            currentUrl.searchParams.delete('rating');
-        }
+        applyFilters();
+    });
 
-        window.location.href = currentUrl.toString();
-    }
+    $('#sortBy').on('change', function() {
+        applyFilters();
+    });
 
-    // Animation on scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
+    // Add to cart functionality
+    $('.add-to-cart').on('click', function() {
+        const productId = $(this).data('product-id');
+        const button = $(this);
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+        @guest
+        showNotification('Please login to add items to cart', 'warning');
+        setTimeout(() => {
+            window.location.href = '{{ route("login") }}';
+        }, 1500);
+        return;
+        @endguest
+
+        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+
+        $.ajax({
+            url: '{{ route("customer.cart.add") }}',
+            method: 'POST',
+            data: {
+                product_id: productId,
+                quantity: 1,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    button.html('<i class="fas fa-check"></i> Added');
+
+                    // Show success notification
+                    showNotification('Product added to cart!', 'success');
+
+                    // Update cart count if exists
+                    updateCartCount();
+
+                    setTimeout(() => {
+                        button.prop('disabled', false).html('Add to Cart');
+                    }, 2000);
+                } else {
+                    button.prop('disabled', false).html('Add to Cart');
+                    showNotification(response.message || 'Error adding to cart', 'error');
+                }
+            },
+            error: function(xhr) {
+                button.prop('disabled', false).html('Add to Cart');
+                if (xhr.status === 401) {
+                    showNotification('Please login to add items to cart', 'warning');
+                    setTimeout(() => {
+                        window.location.href = '{{ route("login") }}';
+                    }, 1500);
+                } else {
+                    showNotification('Error adding to cart', 'error');
+                }
             }
         });
-    }, observerOptions);
-
-    // Observe product cards
-    document.querySelectorAll('.product-card').forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
-        observer.observe(card);
     });
+
+    // Add to wishlist functionality
+    $('.add-to-wishlist').on('click', function() {
+        const productId = $(this).data('product-id');
+        const button = $(this);
+
+        @guest
+        showNotification('Please login to manage your wishlist', 'warning');
+        setTimeout(() => {
+            window.location.href = '{{ route("login") }}';
+        }, 1500);
+        return;
+        @endguest
+
+        $.ajax({
+            url: '{{ route("customer.wishlist.toggle") }}',
+            method: 'POST',
+            data: {
+                product_id: productId,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    if (response.in_wishlist) {
+                        button.addClass('active').html('<i class="fas fa-heart"></i>');
+                        showNotification('Added to wishlist!', 'success');
+                    } else {
+                        button.removeClass('active').html('<i class="far fa-heart"></i>');
+                        showNotification('Removed from wishlist!', 'info');
+                    }
+                } else {
+                    showNotification(response.message || 'Error updating wishlist', 'error');
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    showNotification('Please login to manage your wishlist', 'warning');
+                    setTimeout(() => {
+                        window.location.href = '{{ route("login") }}';
+                    }, 1500);
+                } else {
+                    showNotification('Error updating wishlist', 'error');
+                }
+            }
+        });
+    });
+
+    function applyFilters() {
+        // Collect filter data
+        let categories = [];
+        $('.category-filter:checked').each(function() {
+            categories.push($(this).val());
+        });
+
+        let subcategories = [];
+        $('.subcategory-filter:checked').each(function() {
+            subcategories.push($(this).val());
+        });
+
+        let colors = [];
+        $('.color-filter:checked').each(function() {
+            colors.push($(this).val());
+        });
+
+        let sizes = [];
+        $('.size-filter:checked').each(function() {
+            sizes.push($(this).val());
+        });
+
+        let minPrice = $('#min_price').val();
+        let maxPrice = $('#max_price').val();
+        let sortBy = $('#sortBy').val();
+
+        // Build URL with filters
+        let url = new URL(window.location.href);
+        url.search = '';
+
+        if (categories.length > 0) {
+            url.searchParams.set('category', categories.join(','));
+        }
+        if (subcategories.length > 0) {
+            url.searchParams.set('subcategory', subcategories.join(','));
+        }
+        if (colors.length > 0) {
+            url.searchParams.set('colors', colors.join(','));
+        }
+        if (sizes.length > 0) {
+            url.searchParams.set('sizes', sizes.join(','));
+        }
+        if (minPrice) {
+            url.searchParams.set('min_price', minPrice);
+        }
+        if (maxPrice) {
+            url.searchParams.set('max_price', maxPrice);
+        }
+        if (sortBy) {
+            url.searchParams.set('sort_by', sortBy);
+        }
+
+        // Redirect to filtered URL
+        window.location.href = url.toString();
+    }
+
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = $(`
+            <div class="notification notification-${type}">
+                <div class="notification-content">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            </div>
+        `);
+
+        // Add to page
+        $('body').append(notification);
+
+        // Show notification
+        notification.addClass('show');
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.removeClass('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    function updateCartCount() {
+        // Update cart count if cart counter exists
+        @auth
+        $.get('{{ route("customer.ajax.cart.count") }}', function(response) {
+            if (response.cart_count !== undefined) {
+                $('.cart-count').text(response.cart_count);
+            }
+        });
+        @endauth
+    }
+
+    // Initialize filters based on URL parameters
+    function initializeFilters() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Set category filters
+        if (urlParams.has('category')) {
+            const categories = urlParams.get('category').split(',');
+            categories.forEach(category => {
+                $(`.category-filter[value="${category}"]`).prop('checked', true);
+            });
+        }
+
+        // Set subcategory filters
+        if (urlParams.has('subcategory')) {
+            const subcategories = urlParams.get('subcategory').split(',');
+            subcategories.forEach(subcategory => {
+                $(`.subcategory-filter[value="${subcategory}"]`).prop('checked', true);
+                // Show parent category
+                const categorySlug = $(`.subcategory-filter[value="${subcategory}"]`).data('category');
+                $(`#subcat_${categorySlug.replace('-', '_')}`).addClass('show').show();
+                $(`.expand-btn[data-target="#subcat_${categorySlug.replace('-', '_')}"]`).addClass('expanded');
+            });
+        }
+
+        // Set color filters
+        if (urlParams.has('colors')) {
+            const colors = urlParams.get('colors').split(',');
+            colors.forEach(color => {
+                $(`.color-filter[value="${color}"]`).prop('checked', true);
+            });
+        }
+
+        // Set size filters
+        if (urlParams.has('sizes')) {
+            const sizes = urlParams.get('sizes').split(',');
+            sizes.forEach(size => {
+                $(`.size-filter[value="${size}"]`).prop('checked', true);
+            });
+        }
+
+        // Set price range
+        if (urlParams.has('min_price')) {
+            $('#min_price').val(urlParams.get('min_price'));
+        }
+        if (urlParams.has('max_price')) {
+            $('#max_price').val(urlParams.get('max_price'));
+        }
+
+        // Set sort
+        if (urlParams.has('sort_by')) {
+            $('#sortBy').val(urlParams.get('sort_by'));
+        }
+    }
+
+    // Initialize filters on page load
+    initializeFilters();
 });
 </script>
+
+<!-- Notification Styles -->
+<style>
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-content {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-left: 4px solid;
+}
+
+.notification-success .notification-content {
+    border-left-color: var(--success);
+}
+
+.notification-error .notification-content {
+    border-left-color: var(--danger);
+}
+
+.notification-info .notification-content {
+    border-left-color: var(--primary-color);
+}
+
+.notification i {
+    font-size: 1.25rem;
+}
+
+.notification-success i {
+    color: var(--success);
+}
+
+.notification-error i {
+    color: var(--danger);
+}
+
+.notification-info i {
+    color: var(--primary-color);
+}
+</style>
 @endpush
 
 @push('styles')
@@ -555,241 +901,255 @@ $(document).ready(function() {
     background: var(--white);
 }
 
-/* Enhanced Filters Sidebar */
-.filters-sidebar {
+/* Enhanced Filters - Dashboard Theme */
+.filter-sidebar {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.filter-section {
     background: var(--white);
     border-radius: var(--radius-lg);
-    padding: 2rem;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     border: 1px solid var(--border-light);
-    position: sticky;
-    top: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.sidebar-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--accent-color);
-}
-
-.sidebar-title {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin: 0;
-}
-
-.filter-group {
-    margin-bottom: 2rem;
+.filter-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
 }
 
 .filter-title {
-    font-size: 1rem;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--secondary-color);
-    margin-bottom: 1rem;
+    color: var(--white);
+    margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #64748b, #475569);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .filter-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    padding: 1.5rem;
 }
 
-.filter-option {
-    position: relative;
-}
-
-.filter-checkbox,
-.filter-radio {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
-
-.filter-label {
+.filter-item {
     display: flex;
     align-items: center;
+    padding: 8px 0;
+    transition: all 0.2s ease;
+}
+
+.filter-item:hover {
+    padding-left: 5px;
+}
+
+.filter-item input[type="checkbox"],
+.filter-item input[type="radio"] {
+    margin-right: 12px;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary-color);
+}
+
+.filter-item label {
+    font-size: 14px;
+    color: var(--text-light);
     cursor: pointer;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-}
-
-.filter-label:hover {
-    background: var(--accent-color);
-    border-color: var(--primary-color);
-}
-
-.checkbox-custom,
-.radio-custom {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--border-medium);
-    margin-right: 0.75rem;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
-
-.checkbox-custom {
-    border-radius: var(--radius-sm);
-}
-
-.radio-custom {
-    border-radius: 50%;
-}
-
-.filter-checkbox:checked ~ .filter-label .checkbox-custom,
-.filter-radio:checked ~ .filter-label .radio-custom {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-.filter-checkbox:checked ~ .filter-label .checkbox-custom::after {
-    content: '\f00c';
-    font-family: 'Font Awesome 5 Free';
-    font-weight: 900;
-    color: var(--white);
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
-.filter-radio:checked ~ .filter-label .radio-custom::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--white);
-    display: block;
-    margin: 4px;
-}
-
-.label-text {
+    margin: 0;
     flex: 1;
-    font-weight: 500;
+}
+
+.filter-item:hover label {
     color: var(--text-dark);
 }
 
-.item-count {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-/* Price Inputs */
-.price-inputs {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+/* Category Groups */
+.category-group {
     margin-bottom: 1rem;
 }
 
-.input-group {
-    position: relative;
-    flex: 1;
+.category-group:last-child {
+    margin-bottom: 0;
 }
 
-.input-prefix {
+.category-main {
+    position: relative;
+    font-weight: 600;
+}
+
+.expand-btn {
     position: absolute;
-    left: 0.75rem;
+    right: 0;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-medium);
-    font-weight: 500;
-    z-index: 1;
-}
-
-.price-input {
-    width: 100%;
-    padding: 0.75rem 0.75rem 0.75rem 2rem;
-    border: 1px solid var(--border-medium);
-    border-radius: var(--radius-md);
-    font-size: 0.875rem;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 12px;
+    cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.price-input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(171, 207, 55, 0.1);
-    outline: none;
+.expand-btn:hover {
+    color: var(--primary-color);
 }
 
-.price-separator {
+.expand-btn.expanded i {
+    transform: rotate(180deg);
+}
+
+.subcategories {
+    margin-left: 20px;
+    margin-top: 8px;
+    padding-left: 15px;
+    border-left: 2px solid var(--border-light);
+    display: none;
+}
+
+.subcategories.show {
+    display: block;
+}
+
+.subcategory-item {
+    font-size: 13px;
+    padding: 4px 0;
+}
+
+.count {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: normal;
+}
+
+/* Color Filters */
+.color-item {
+    align-items: center;
+}
+
+.color-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border-light);
+    display: inline-block;
+}
+
+/* Size Filters */
+.size-item {
+    align-items: center;
+}
+
+.size-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.size-box {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
     color: var(--text-medium);
-    font-weight: 500;
-    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.size-filter:checked + .size-label .size-box {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Price Range */
+.price-inputs {
+    margin-bottom: 1rem;
 }
 
 .price-range-info {
-    color: var(--text-muted);
-    font-size: 0.75rem;
+    text-align: center;
+    margin-top: 0.5rem;
 }
 
-/* Rating Options */
-.rating-option .filter-label {
-    padding: 1rem;
-}
-
-.rating-stars {
+/* Enhanced Buttons */
+.btn-apply-filter,
+.btn-clear-filter {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
     display: flex;
-    gap: 0.25rem;
-    margin-right: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.rating-stars .fa-star {
-    color: var(--border-medium);
-    font-size: 0.875rem;
-    transition: color 0.2s ease;
+.btn-apply-filter {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    box-shadow: 0 4px 12px rgba(171, 207, 55, 0.3);
 }
 
-.rating-stars .fa-star.active {
-    color: var(--warning);
+.btn-apply-filter:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(171, 207, 55, 0.4);
 }
 
-.rating-text {
-    font-size: 0.875rem;
-    color: var(--text-medium);
+.btn-clear-filter {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-/* Filter Actions */
-.filter-actions {
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-light);
+.btn-clear-filter:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
 }
 
 /* Results Header */
 .results-header {
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
     margin-bottom: 2rem;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
 }
 
 .results-title {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 600;
-    color: var(--text-dark);
+    color: #212529;
     margin: 0 0 0.5rem 0;
 }
 
 .results-subtitle {
-    color: var(--text-medium);
+    color: #6c757d;
     margin: 0;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
 }
 
 .sorting-controls {
@@ -805,25 +1165,25 @@ $(document).ready(function() {
 
 .sort-label {
     font-weight: 500;
-    color: var(--text-dark);
+    color: #212529;
     margin: 0;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
 }
 
 .sort-select {
     min-width: 200px;
     padding: 0.75rem 1rem;
-    border: 1px solid var(--border-medium);
-    border-radius: var(--radius-md);
-    font-size: 0.875rem;
-    background: var(--white);
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .sort-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(171, 207, 55, 0.1);
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     outline: none;
 }
 
@@ -895,13 +1255,13 @@ $(document).ready(function() {
     background: rgba(245, 101, 101, 0.1);
 }
 
-/* Enhanced Product Cards */
+/* Modern Product Cards */
 .product-card {
-    background: var(--white);
-    border-radius: var(--radius-lg);
+    background: white;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
     transition: all 0.3s ease;
     height: 100%;
     display: flex;
@@ -909,15 +1269,16 @@ $(document).ready(function() {
 }
 
 .product-card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-4px);
-    border-color: var(--primary-color);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    border-color: #007bff;
 }
 
 .product-image-container {
     position: relative;
     overflow: hidden;
     aspect-ratio: 1;
+    background: #f8f9fa;
 }
 
 .product-link {
@@ -939,8 +1300,8 @@ $(document).ready(function() {
 
 .product-badges {
     position: absolute;
-    top: 1rem;
-    left: 1rem;
+    top: 0.75rem;
+    left: 0.75rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -948,20 +1309,20 @@ $(document).ready(function() {
 }
 
 .badge-discount {
-    background: linear-gradient(135deg, var(--danger), #dc3545);
-    color: var(--white);
-    padding: 0.375rem 0.75rem;
-    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
 }
 
 .badge-stock {
-    background: linear-gradient(135deg, var(--text-muted), #6b7280);
-    color: var(--white);
-    padding: 0.375rem 0.75rem;
-    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -969,13 +1330,13 @@ $(document).ready(function() {
 
 .product-actions {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 0.75rem;
+    right: 0.75rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(10px);
     transition: all 0.3s ease;
     z-index: 2;
 }
@@ -990,8 +1351,8 @@ $(document).ready(function() {
     height: 40px;
     border-radius: 50%;
     border: none;
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--text-dark);
+    background: rgba(255, 255, 255, 0.95);
+    color: #495057;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -999,16 +1360,18 @@ $(document).ready(function() {
     transition: all 0.2s ease;
     text-decoration: none;
     backdrop-filter: blur(10px);
+    border: 1px solid #e9ecef;
 }
 
 .action-btn:hover {
-    background: var(--primary-color);
-    color: var(--white);
+    background: #007bff;
+    color: white;
     transform: scale(1.1);
+    border-color: #007bff;
 }
 
 .product-content {
-    padding: 1.5rem;
+    padding: 1.25rem;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -1022,8 +1385,8 @@ $(document).ready(function() {
 }
 
 .product-brand {
-    color: var(--primary-color);
-    font-size: 0.75rem;
+    color: #007bff;
+    font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1041,18 +1404,18 @@ $(document).ready(function() {
 }
 
 .stars .fa-star {
-    color: var(--border-medium);
+    color: #e9ecef;
     font-size: 0.75rem;
     transition: color 0.2s ease;
 }
 
 .stars .fa-star.active {
-    color: var(--warning);
+    color: #ffc107;
 }
 
 .rating-count {
     font-size: 0.75rem;
-    color: var(--text-muted);
+    color: #6c757d;
 }
 
 .product-title {
@@ -1064,13 +1427,13 @@ $(document).ready(function() {
 }
 
 .product-title a {
-    color: var(--text-dark);
+    color: #212529;
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .product-title a:hover {
-    color: var(--primary-color);
+    color: #007bff;
 }
 
 .product-price {
@@ -1080,12 +1443,12 @@ $(document).ready(function() {
 .current-price {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--secondary-color);
+    color: #28a745;
 }
 
 .original-price {
-    font-size: 0.875rem;
-    color: var(--text-muted);
+    font-size: 0.9rem;
+    color: #6c757d;
     text-decoration: line-through;
     margin-left: 0.5rem;
 }
@@ -1197,6 +1560,295 @@ $(document).ready(function() {
 
     .price-separator {
         text-align: center;
+    }
+}
+
+/* Mobile-Responsive Brand Header Image Styles */
+.brand-header-img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    max-height: 150px;
+    object-fit: contain;
+    object-position: center;
+    padding: 10px;
+}
+
+/* Mobile specific brand header image optimizations */
+@media (max-width: 768px) {
+    .brand-header-img {
+        max-width: 150px;
+        max-height: 120px;
+    }
+    
+    .brand-logo-container {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-header-img {
+        max-width: 120px;
+        max-height: 100px;
+    }
+    
+    .brand-logo-container {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Mobile-Responsive Typography Styles */
+@media (max-width: 768px) {
+    /* Brand page title */
+    .brand-name {
+        font-size: 2rem !important;
+        line-height: 1.2;
+    }
+    
+    .brand-title {
+        font-size: 1.75rem !important;
+        line-height: 1.2;
+    }
+    
+    .brand-description {
+        font-size: 1rem !important;
+        line-height: 1.5;
+    }
+    
+    .products-count {
+        font-size: 0.9rem !important;
+    }
+    
+    /* Product listings */
+    .product-title {
+        font-size: 0.9rem !important;
+        line-height: 1.3;
+    }
+    
+    .product-brand {
+        font-size: 0.75rem !important;
+    }
+    
+    .product-price {
+        font-size: 0.9rem !important;
+    }
+    
+    .current-price {
+        font-size: 1.1rem !important;
+    }
+    
+    .original-price {
+        font-size: 0.8rem !important;
+    }
+    
+    .discount-badge {
+        font-size: 0.75rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+    
+    /* Buttons */
+    .btn {
+        font-size: 0.85rem !important;
+        padding: 0.6rem 1rem !important;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.8rem !important;
+    }
+    
+    /* Filter and sort typography */
+    .filter-label {
+        font-size: 0.85rem !important;
+    }
+    
+    .sort-label {
+        font-size: 0.85rem !important;
+    }
+    
+    .filter-option {
+        font-size: 0.8rem !important;
+    }
+    
+    .filter-tag {
+        font-size: 0.8rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    /* Section headers */
+    .section-title {
+        font-size: 1.75rem !important;
+    }
+    
+    .section-subtitle {
+        font-size: 0.95rem !important;
+    }
+    
+    /* Rating */
+    .rating-score {
+        font-size: 0.9rem !important;
+    }
+    
+    .rating-count {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Breadcrumb */
+    .breadcrumb-item a {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Stock status */
+    .in-stock,
+    .out-of-stock {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Brand stats */
+    .brand-stats-item {
+        font-size: 0.85rem !important;
+    }
+    
+    .brand-stats-label {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Empty state */
+    .empty-title {
+        font-size: 1.3rem !important;
+    }
+    
+    .empty-text {
+        font-size: 0.9rem !important;
+    }
+    
+    /* Results header */
+    .results-count {
+        font-size: 0.9rem !important;
+    }
+    
+    .sort-select {
+        font-size: 0.85rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens */
+    .brand-name {
+        font-size: 1.75rem !important;
+    }
+    
+    .brand-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .brand-description {
+        font-size: 0.9rem !important;
+    }
+    
+    .products-count {
+        font-size: 0.85rem !important;
+    }
+    
+    .product-title {
+        font-size: 0.85rem !important;
+    }
+    
+    .product-brand {
+        font-size: 0.7rem !important;
+    }
+    
+    .product-price {
+        font-size: 0.85rem !important;
+    }
+    
+    .current-price {
+        font-size: 1rem !important;
+    }
+    
+    .original-price {
+        font-size: 0.75rem !important;
+    }
+    
+    .discount-badge {
+        font-size: 0.7rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+    
+    .btn {
+        font-size: 0.8rem !important;
+        padding: 0.5rem 0.8rem !important;
+    }
+    
+    .btn-sm {
+        font-size: 0.7rem !important;
+        padding: 0.4rem 0.6rem !important;
+    }
+    
+    .filter-label {
+        font-size: 0.8rem !important;
+    }
+    
+    .sort-label {
+        font-size: 0.8rem !important;
+    }
+    
+    .filter-option {
+        font-size: 0.75rem !important;
+    }
+    
+    .filter-tag {
+        font-size: 0.75rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+    
+    .section-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .section-subtitle {
+        font-size: 0.9rem !important;
+    }
+    
+    .rating-score {
+        font-size: 0.85rem !important;
+    }
+    
+    .rating-count {
+        font-size: 0.7rem !important;
+    }
+    
+    .breadcrumb-item a {
+        font-size: 0.8rem !important;
+    }
+    
+    .in-stock,
+    .out-of-stock {
+        font-size: 0.75rem !important;
+    }
+    
+    .brand-stats-item {
+        font-size: 0.8rem !important;
+    }
+    
+    .brand-stats-label {
+        font-size: 0.75rem !important;
+    }
+    
+    .empty-title {
+        font-size: 1.2rem !important;
+    }
+    
+    .empty-text {
+        font-size: 0.85rem !important;
+    }
+    
+    .results-count {
+        font-size: 0.85rem !important;
+    }
+    
+    .sort-select {
+        font-size: 0.8rem !important;
     }
 }
 </style>

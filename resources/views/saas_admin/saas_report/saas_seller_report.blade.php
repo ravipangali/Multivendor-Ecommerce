@@ -191,7 +191,7 @@
     </div>
 
     <div class="row">
-        <div class="col-xl-7">
+        <div class="col-xl-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Top Selling Sellers</h5>
@@ -244,9 +244,14 @@
                                     </td>
                                     <td>
                                         @if($seller->seller)
-                                        <a href="{{ route('admin.sellers.show', $seller->seller->id) }}" class="btn btn-sm btn-primary">
-                                            <i data-feather="eye" class="feather-sm"></i>
-                                        </a>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('admin.sellers.show', $seller->seller->id) }}" class="btn btn-sm btn-primary" title="View Profile">
+                                                <i data-feather="eye" class="feather-sm"></i>
+                                            </a>
+                                            <a href="{{ route('admin.reports.individual-seller', $seller->seller->id) }}" class="btn btn-sm btn-info" title="View Report">
+                                                <i data-feather="bar-chart-2" class="feather-sm"></i>
+                                            </a>
+                                        </div>
                                         @else
                                         <button class="btn btn-sm btn-secondary" disabled>
                                             <i data-feather="eye-off" class="feather-sm"></i>
@@ -265,7 +270,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-5">
+        <div class="col-xl-12">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Top Sellers by Product Count</h5>

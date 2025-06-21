@@ -2,7 +2,14 @@
 
 // use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
+Route::get('/clear-config', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('config:cache');
+    return 'Config and cache cleared!';
+});
 // Route::get('/', function () {
 //     return view('welcome');
 // });
@@ -28,6 +35,8 @@ Route::get('/storage-link', function () {
     symlink($targetFolder, $linkFolder);
     echo 'Success';
 });
+
+
 
 require __DIR__.'/auth.php';
 

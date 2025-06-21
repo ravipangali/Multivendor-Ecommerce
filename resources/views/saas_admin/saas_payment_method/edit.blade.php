@@ -335,36 +335,45 @@
 
                 // If type has changed, show a warning about data loss
                 if (previousType && newType !== previousType) {
-                    const confirmChange = confirm(
-                        'Changing the payment method type will clear some fields. Do you want to continue?'
-                        );
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'Changing the payment method type will clear some fields. Do you want to continue?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, continue',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            // Revert to previous value
+                            typeSelect.value = previousType;
+                            typeSelect.dataset.lastValue = previousType;
+                            return;
+                        }
 
-                    if (!confirmChange) {
-                        // Revert to previous value
-                        typeSelect.value = previousType;
-                        typeSelect.dataset.lastValue = previousType;
-                        return;
-                    }
+                        // Continue with clearing fields
+                        if (newType === 'bank_transfer') {
+                            // Clear mobile fields
+                            mobileNumberInput.value = '';
+                        } else if (newType === 'esewa' || newType === 'khalti') {
+                            // Clear bank fields
+                            bankNameInput.value = '';
+                            bankBranchInput.value = '';
+                            accountNumberInput.value = '';
+                        } else {
+                            // For other types, clear all specialized fields
+                            bankNameInput.value = '';
+                            bankBranchInput.value = '';
+                            accountNumberInput.value = '';
+                            mobileNumberInput.value = '';
+                        }
 
-                    // Clear irrelevant fields
-                    if (newType === 'bank_transfer') {
-                        // Clear mobile fields
-                        mobileNumberInput.value = '';
-                    } else if (newType === 'esewa' || newType === 'khalti') {
-                        // Clear bank fields
-                        bankNameInput.value = '';
-                        bankBranchInput.value = '';
-                        accountNumberInput.value = '';
-                    } else {
-                        // For other types, clear all specialized fields
-                        bankNameInput.value = '';
-                        bankBranchInput.value = '';
-                        accountNumberInput.value = '';
-                        mobileNumberInput.value = '';
-                    }
+                        toggleFields();
+                    });
+                } else {
+                    toggleFields();
                 }
-
-                toggleFields();
             });
 
             // Mobile number validation
@@ -389,21 +398,32 @@
                     return false;
                 }
 
-                // Additional validation based on type
-                if (selectedType === 'bank_transfer') {
-                    if (!bankNameInput.value || !bankBranchInput.value || !accountNumberInput.value) {
-                        e.preventDefault();
-                        alert('Please fill in all required bank details.');
-                        return false;
-                    }
-                } else if (selectedType === 'esewa' || selectedType === 'khalti') {
-                    if (!mobileNumberInput.value || mobileNumberInput.value.length !== 10) {
-                        e.preventDefault();
-                        alert('Please enter a valid 10-digit mobile number.');
-                        mobileNumberInput.focus();
-                        return false;
-                    }
+                            // Additional validation based on type
+            if (selectedType === 'bank_transfer') {
+                if (!bankNameInput.value || !bankBranchInput.value || !accountNumberInput.value) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Missing Information',
+                        text: 'Please fill in all required bank details.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
                 }
+            } else if (selectedType === 'esewa' || selectedType === 'khalti') {
+                if (!mobileNumberInput.value || mobileNumberInput.value.length !== 10) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Invalid Mobile Number',
+                        text: 'Please enter a valid 10-digit mobile number.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        mobileNumberInput.focus();
+                    });
+                    return false;
+                }
+            }
             });
         });
     </script>

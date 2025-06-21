@@ -205,6 +205,50 @@
                             </div>
                         </div>
 
+                        <!-- Top Customers Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">Top Customers</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        @if(isset($analytics['top_customers']) && $analytics['top_customers']->count() > 0)
+                                            <div class="table-responsive">
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Customer</th>
+                                                            <th>Sales Count</th>
+                                                            <th>Revenue</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($analytics['top_customers'] as $customer)
+                                                            <tr>
+                                                                <td>{{ $customer->customer_name }}</td>
+                                                                <td>{{ number_format($customer->sales_count) }}</td>
+                                                                <td>Rs {{ number_format($customer->total_revenue, 2) }}</td>
+                                                                <td>
+                                                                    <a href="{{ route('admin.customers.show', $customer->customer_id) }}" class="btn btn-sm btn-outline-info">
+                                                                        <i data-feather="user"></i> View
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                                <small class="text-muted">*Only registered customers are included in this report</small>
+                                        @else
+                                            <p class="text-muted">No registered customer data available for this period.</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Daily Sales Table -->
                         <div class="row">
                             <div class="col-12">
@@ -413,7 +457,12 @@
     function exportToCSV() {
         const table = document.getElementById('dailySalesTable');
         if (!table) {
-            alert('No data available to export');
+            Swal.fire({
+                title: 'No Data',
+                text: 'No data available to export',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
             return;
         }
 

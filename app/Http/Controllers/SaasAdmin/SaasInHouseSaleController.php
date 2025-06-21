@@ -5,7 +5,10 @@ namespace App\Http\Controllers\SaasAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\SaasInHouseSale;
 use App\Models\SaasInHouseSaleItem;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -17,39 +20,42 @@ class SaasInHouseSaleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = SaasInHouseSale::with(['cashier', 'saleItems'])
-            ->orderBy('sale_date', 'desc');
+        $query = SaasInHouseSale::with(['saleItems', 'cashier', 'customer']);
 
-        // Filter by date range
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->dateRange($request->start_date, $request->end_date);
-        }
-
-        // Filter by payment status
-        if ($request->filled('payment_status')) {
-            $query->paymentStatus($request->payment_status);
-        }
-
-        // Search by sale number or customer
+        // Apply filters
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('sale_number', 'like', "%{$search}%")
-                  ->orWhere('customer_name', 'like', "%{$search}%")
-                  ->orWhere('customer_phone', 'like', "%{$search}%")
-                  ->orWhere('customer_email', 'like', "%{$search}%");
-            });
+            $query->where('sale_number', 'like', '%' . $request->search . '%');
         }
 
-        $sales = $query->paginate(20);
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('sale_date', [
+                Carbon::parse($request->start_date)->startOfDay(),
+                Carbon::parse($request->end_date)->endOfDay()
+            ]);
+        }
 
-        // Calculate summary statistics
-        $totalSales = SaasInHouseSale::sum('total_amount');
-        $todaySales = SaasInHouseSale::whereDate('sale_date', today())->sum('total_amount');
-        $pendingPayments = SaasInHouseSale::where('payment_status', 'pending')->sum('due_amount');
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
+
+        // Order by latest
+        $query->latest('sale_date');
+
+        // Paginate
+        $sales = $query->paginate(15);
+
+        // Calculate statistics for dashboard cards
+        $totalSales = SaasInHouseSale::count();
+        $totalRevenue = SaasInHouseSale::sum('total_amount');
+        $pendingPayments = SaasInHouseSale::where('payment_status', 'pending')->count();
+        $todaySales = SaasInHouseSale::whereDate('sale_date', Carbon::today())->count();
 
         return view('saas_admin.saas_in_house_sales.saas_index', compact(
-            'sales', 'totalSales', 'todaySales', 'pendingPayments'
+            'sales',
+            'totalSales',
+            'totalRevenue',
+            'pendingPayments',
+            'todaySales'
         ));
     }
 
@@ -58,7 +64,7 @@ class SaasInHouseSaleController extends Controller
      */
     public function show(SaasInHouseSale $sale)
     {
-        $sale->load(['cashier', 'saleItems.product', 'saleItems.variation']);
+        $sale->load(['saleItems.product', 'cashier', 'customer.customerProfile']);
 
         return view('saas_admin.saas_in_house_sales.saas_show', compact('sale'));
     }
@@ -87,7 +93,7 @@ class SaasInHouseSaleController extends Controller
             ]);
 
             // Get sales with date range
-            $sales = SaasInHouseSale::with(['cashier', 'saleItems.product'])
+            $sales = SaasInHouseSale::with(['cashier', 'saleItems.product', 'customer'])
                 ->whereDate('sale_date', '>=', $startDate)
                 ->whereDate('sale_date', '<=', $endDate)
                 ->orderBy('sale_date', 'desc')
@@ -159,6 +165,19 @@ class SaasInHouseSaleController extends Controller
                 ];
             })->values();
 
+            // Group by customers (only for registered customers)
+            $customerSales = $sales->filter(function($sale) {
+                return $sale->customer_id !== null;
+            })->groupBy('customer_id')->map(function($group) {
+                $firstSale = $group->first();
+                return (object)[
+                    'customer_id' => $firstSale->customer_id,
+                    'customer_name' => $firstSale->customer ? $firstSale->customer->name : 'Unknown Customer',
+                    'sales_count' => $group->count(),
+                    'total_revenue' => $group->sum('total_amount')
+                ];
+            })->sortByDesc('total_revenue')->take(10)->values();
+
             // Prepare analytics array for the view
             $analytics = [
                 'total_sales' => $totalSalesCount,
@@ -170,7 +189,8 @@ class SaasInHouseSaleController extends Controller
                 'top_products' => $topProducts,
                 'sales_by_cashier' => $salesByCashier,
                 'daily_sales' => $dailySales,
-                'payment_methods' => $paymentMethods
+                'payment_methods' => $paymentMethods,
+                'top_customers' => $customerSales
             ];
 
             // Debug: Log analytics summary
@@ -236,26 +256,6 @@ class SaasInHouseSaleController extends Controller
     }
 
     /**
-     * Update payment status
-     */
-    public function updatePaymentStatus(Request $request, SaasInHouseSale $sale)
-    {
-        $request->validate([
-            'payment_status' => 'required|in:paid,pending,partial',
-            'paid_amount' => 'required|numeric|min:0',
-        ]);
-
-        $sale->update([
-            'payment_status' => $request->payment_status,
-            'paid_amount' => $request->paid_amount,
-            'due_amount' => $sale->total_amount - $request->paid_amount,
-        ]);
-
-        toast('Payment status updated successfully', 'success');
-        return redirect()->back();
-    }
-
-    /**
      * Delete a sale
      */
     public function destroy(SaasInHouseSale $sale)
@@ -271,8 +271,9 @@ class SaasInHouseSaleController extends Controller
      */
     public function printReceipt(SaasInHouseSale $sale)
     {
-        $sale->load(['cashier', 'saleItems.product']);
+        $sale->load(['cashier', 'saleItems.product', 'customer']);
+        $showCustomerId = false; // Set to true if you want to show customer ID in receipt
 
-        return view('saas_admin.saas_in_house_sales.saas_receipt', compact('sale'));
+        return view('saas_admin.saas_in_house_sales.saas_receipt', compact('sale', 'showCustomerId'));
     }
 }

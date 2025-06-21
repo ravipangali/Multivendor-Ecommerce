@@ -425,6 +425,214 @@
       flex-direction: column;
     }
   }
+
+  /* Mobile-Responsive Cart Image Styles */
+  .product-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--radius-md);
+    transition: transform 0.3s ease;
+  }
+
+  /* Mobile specific cart image optimizations */
+  @media (max-width: 768px) {
+    .product-image {
+      height: 100px;
+    }
+    
+    .product-image-wrapper {
+      margin-bottom: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-image {
+      height: 80px;
+    }
+    
+    .cart-item-card {
+      padding: 1.5rem;
+    }
+    
+    .product-image-wrapper {
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  /* Mobile-Responsive Typography Styles */
+  @media (max-width: 768px) {
+    /* Cart page title */
+    .cart-header h2 {
+      font-size: 2rem !important;
+      line-height: 1.2;
+    }
+    
+    .cart-header p {
+      font-size: 1rem !important;
+    }
+    
+    /* Product names in cart */
+    .product-name {
+      font-size: 0.9rem !important;
+      line-height: 1.3;
+    }
+    
+    .product-brand {
+      font-size: 0.75rem !important;
+    }
+    
+    /* Price typography */
+    .product-price {
+      font-size: 0.9rem !important;
+    }
+    
+    .total-price {
+      font-size: 1rem !important;
+    }
+    
+    .summary-title {
+      font-size: 1.1rem !important;
+    }
+    
+    .summary-line {
+      font-size: 0.9rem !important;
+    }
+    
+    .summary-line:last-of-type {
+      font-size: 1rem !important;
+    }
+    
+    /* Quantity controls */
+    .quantity-input {
+      font-size: 0.85rem !important;
+    }
+    
+    .quantity-btn {
+      font-size: 0.8rem !important;
+    }
+    
+    /* Buttons */
+    .checkout-btn {
+      font-size: 0.9rem !important;
+      padding: 0.8rem 1.5rem !important;
+    }
+    
+    .remove-btn {
+      font-size: 0.8rem !important;
+      padding: 0.4rem 0.8rem !important;
+    }
+    
+    /* Table headers */
+    th {
+      font-size: 0.8rem !important;
+    }
+    
+    td {
+      font-size: 0.85rem !important;
+    }
+    
+    /* Coupon section */
+    .coupon-section h6 {
+      font-size: 1rem !important;
+    }
+    
+    .coupon-input {
+      font-size: 0.85rem !important;
+    }
+    
+    /* Section titles */
+    .section-title {
+      font-size: 1.3rem !important;
+    }
+    
+    /* Breadcrumb */
+    .breadcrumb-item a {
+      font-size: 0.85rem !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    /* Extra small screens */
+    .cart-header h2 {
+      font-size: 1.75rem !important;
+    }
+    
+    .cart-header p {
+      font-size: 0.9rem !important;
+    }
+    
+    .product-name {
+      font-size: 0.85rem !important;
+    }
+    
+    .product-brand {
+      font-size: 0.7rem !important;
+    }
+    
+    .product-price {
+      font-size: 0.85rem !important;
+    }
+    
+    .total-price {
+      font-size: 0.95rem !important;
+    }
+    
+    .summary-title {
+      font-size: 1rem !important;
+    }
+    
+    .summary-line {
+      font-size: 0.8rem !important;
+    }
+    
+    .summary-line:last-of-type {
+      font-size: 0.9rem !important;
+    }
+    
+    .quantity-input {
+      font-size: 0.8rem !important;
+    }
+    
+    .quantity-btn {
+      font-size: 0.75rem !important;
+    }
+    
+    .checkout-btn {
+      font-size: 0.85rem !important;
+      padding: 0.7rem 1.2rem !important;
+    }
+    
+    .remove-btn {
+      font-size: 0.75rem !important;
+      padding: 0.3rem 0.6rem !important;
+    }
+    
+    th {
+      font-size: 0.75rem !important;
+    }
+    
+    td {
+      font-size: 0.8rem !important;
+    }
+    
+    .coupon-section h6 {
+      font-size: 0.9rem !important;
+    }
+    
+    .coupon-input {
+      font-size: 0.8rem !important;
+    }
+    
+    .section-title {
+      font-size: 1.2rem !important;
+    }
+    
+    .breadcrumb-item a {
+      font-size: 0.8rem !important;
+    }
+  }
 </style>
 @endpush
 

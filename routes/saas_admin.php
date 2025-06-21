@@ -40,6 +40,7 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
     Route::prefix('pos')->name('pos.')->group(function () {
         Route::get('/', [SaasPosController::class, 'index'])->name('index');
         Route::get('/search-products', [SaasPosController::class, 'searchProducts'])->name('search-products');
+        Route::get('/search-customers', [SaasPosController::class, 'searchCustomers'])->name('search-customers');
         Route::get('/product/{id}', [SaasPosController::class, 'getProduct'])->name('get-product');
         Route::post('/process-sale', [SaasPosController::class, 'processSale'])->name('process-sale');
         Route::get('/receipt/{saleNumber}', [SaasPosController::class, 'printReceipt'])->name('receipt');
@@ -51,7 +52,7 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
         Route::get('/reports', [SaasInHouseSaleController::class, 'report'])->name('reports');
         Route::get('/{sale}', [SaasInHouseSaleController::class, 'show'])->name('show');
         Route::delete('/{sale}', [SaasInHouseSaleController::class, 'destroy'])->name('destroy');
-        Route::patch('/{sale}/payment-status', [SaasInHouseSaleController::class, 'updatePaymentStatus'])->name('update-payment-status');
+
         Route::get('/{sale}/receipt', [SaasInHouseSaleController::class, 'printReceipt'])->name('receipt');
     });
 
@@ -117,6 +118,7 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
         Route::get('/products', [SaasReportController::class, 'productReport'])->name('reports.products');
         Route::get('/customers', [SaasReportController::class, 'customerReport'])->name('reports.customers');
         Route::get('/sellers', [SaasReportController::class, 'sellerReport'])->name('reports.sellers');
+        Route::get('/sellers/{seller}', [SaasReportController::class, 'individualSellerReport'])->name('reports.individual-seller');
     });
 
     // Settings

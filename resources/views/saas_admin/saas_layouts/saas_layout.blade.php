@@ -188,6 +188,11 @@
                                 </div>
                             </div>
                         </li> --}}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('/') }}" target="_blank">
+                                <i style="width: 1.5rem; height: 1.5rem;" class="align-middle" data-feather="home"></i>
+                            </a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#"
                                 data-bs-toggle="dropdown">

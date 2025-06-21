@@ -704,6 +704,74 @@
             width: 100%;
         }
     }
+
+    /* Customer search results styling */
+    #customer_search_results {
+        border: 1px solid #dee2e6;
+        border-radius: 3px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .customer-item {
+        transition: all 0.2s ease;
+    }
+
+    .customer-item:hover {
+        background-color: #f8f9fa;
+        border-color: #28a745;
+    }
+
+    .customer-item:last-child {
+        border-bottom: none !important;
+    }
+
+    .customer-item .fw-bold {
+        font-size: 12px;
+        color: #2d3748;
+    }
+
+    .customer-item .text-muted {
+        font-size: 10px;
+    }
+
+    /* Customer selection styling */
+    .customer-dropdown-section {
+        background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+        border: 1px solid #c3e6cb;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    .customer-search-section {
+        background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);
+        border: 1px solid #a6c8ff;
+        border-radius: 6px;
+        padding: 12px;
+    }
+
+    .section-divider {
+        position: relative;
+        text-align: center;
+        margin: 15px 0;
+    }
+
+    .section-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #dee2e6;
+    }
+
+    .section-divider .badge {
+        background: #6c757d !important;
+        position: relative;
+        z-index: 1;
+        padding: 4px 8px;
+    }
 </style>
 
 <div class="pos-container">
@@ -832,11 +900,78 @@
                             </div>
                         </div>
                         <div class="card-content" id="customer-info-content">
-                            <div class="p-3">
-                                <input type="text" id="customer_name" class="form-control mb-2" placeholder="Customer Name *" required style="font-size: 11px; padding: 4px 6px;">
-                                <input type="text" id="customer_phone" class="form-control mb-2" placeholder="Phone Number" style="font-size: 11px; padding: 4px 6px;">
-                                <input type="email" id="customer_email" class="form-control mb-2" placeholder="Email Address" style="font-size: 11px; padding: 4px 6px;">
-                                <textarea id="customer_address" class="form-control" rows="2" placeholder="Customer Address" style="font-size: 11px; padding: 4px 6px;"></textarea>
+                                                        <div class="p-3">
+                                <!-- Customer Dropdown -->
+                                <div class="customer-dropdown-section">
+                                    <label class="form-label mb-2" style="font-size: 11px; font-weight: 600; color: #28a745;">
+                                        <i class="fas fa-users me-1"></i> Select from Customer List
+                                    </label>
+                                    <div class="input-group">
+                                        <select id="customer_dropdown" class="form-select" style="font-size: 11px;">
+                                            <option value="">Choose a customer...</option>
+                                            @foreach($customers as $customer)
+                                                <option value="{{ $customer->id }}"
+                                                        data-name="{{ $customer->name }}"
+                                                        data-email="{{ $customer->email }}"
+                                                        data-phone="{{ $customer->phone }}">
+                                                    {{ $customer->name }}
+                                                    @if($customer->phone)
+                                                        - {{ $customer->phone }}
+                                                    @endif
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <a href="{{ route('admin.customers.create') }}" class="btn btn-success" title="Add New Customer" target="_blank">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                    </div>
+                                    <small class="text-muted" style="font-size: 10px;">
+                                        <i class="fas fa-info-circle me-1"></i>{{ $customers->count() }} customers available
+                                    </small>
+                                </div>
+
+                                <!-- OR Divider -->
+                                <div class="section-divider">
+                                    <span class="badge">OR</span>
+                                </div>
+
+                                <!-- Customer Search -->
+                                <div class="customer-search-section">
+                                    <label class="form-label mb-2" style="font-size: 11px; font-weight: 600; color: #007bff;">
+                                        <i class="fas fa-search me-1"></i> Search Customer
+                                    </label>
+                                    <div class="position-relative">
+                                        <input type="text" id="customer_search" class="form-control" placeholder="Search by name, email or phone" style="font-size: 11px;">
+                                        <div id="customer_search_loading" class="position-absolute end-0 top-50 translate-middle-y me-2" style="display: none;">
+                                            <div class="spinner-border spinner-border-sm text-primary" role="status" style="width: 1rem; height: 1rem;">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="customer_search_results" class="position-absolute bg-white shadow-sm rounded w-100 mt-1" style="z-index: 1000; max-height: 200px; overflow-y: auto; display: none;"></div>
+                                </div>
+
+                                <div id="customer_form">
+                                    <input type="hidden" id="customer_id">
+                                    <div class="selected-customer-info mb-2 p-2 border rounded" id="selected_customer_info" style="display: none;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0 fw-bold" id="selected_customer_name"></h6>
+                                                <small class="text-muted" id="selected_customer_contact"></small>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" id="clear_customer">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="no-customer-selected" id="no_customer_selected">
+                                        <div class="alert alert-light border text-center py-2" style="font-size: 11px;">
+                                            <i class="fas fa-info-circle me-1"></i> No customer selected
+                                            <br>
+                                            <small class="text-muted">Search for a customer or proceed as walk-in</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -898,10 +1033,6 @@
                                     <div class="summary-row total">
                                         <span><strong>Total:</strong></span>
                                         <span id="total" class="fw-bold text-primary fs-5">Rs 0.00</span>
-                                    </div>
-                                    <div class="summary-row">
-                                        <span>Paid Amount:</span>
-                                        <input type="number" id="paid_amount" class="summary-input" placeholder="0" min="0" step="0.01">
                                     </div>
                                 </div>
                             </div>
@@ -980,13 +1111,19 @@
 
     // Add to cart functionality with animation
     $(document).on('click', '.add-to-cart', function() {
-        const productId = $(this).data('product-id');
-        const productName = $(this).data('product-name');
-        const productPrice = parseFloat($(this).data('product-price'));
-        const productStock = parseInt($(this).data('product-stock'));
+        const $button = $(this);
+        const productId = $button.data('product-id');
+        const productName = $button.data('product-name');
+        const productPrice = parseFloat($button.data('product-price'));
+        const productStock = parseInt($button.data('product-stock'));
 
-        // Add animation
-        $(this).html('<i class="fas fa-spinner fa-spin me-2"></i>Adding...');
+        // Prevent multiple clicks
+        if ($button.hasClass('loading')) {
+            return;
+        }
+
+        // Add loading state
+        $button.addClass('loading').html('<i class="fas fa-spinner fa-spin me-2"></i>Adding...');
 
         setTimeout(() => {
             const existingItem = cart.find(item => item.id === productId);
@@ -1003,6 +1140,7 @@
                         icon: 'warning',
                         confirmButtonColor: '#28a745',
                         confirmButtonText: '<i class="fas fa-check me-1"></i>Got it',
+                        allowHtml: true,
                         timer: 3000,
                         timerProgressBar: true,
                         customClass: {
@@ -1020,10 +1158,11 @@
                 });
                 updateCart();
                 showToast('Product added to cart!', 'success');
-                focusCustomerName();
+                focusCustomerSearch();
             }
 
-            $(this).html('<i class="fas fa-plus me-2"></i>Add to Cart');
+            // Reset button state
+            $button.removeClass('loading').html('<i class="fas fa-plus me-2"></i>Add to Cart');
         }, 300);
     });
 
@@ -1102,10 +1241,7 @@
         $('#subtotal').text('Rs ' + subtotal.toFixed(2));
         $('#total').text('Rs ' + total.toFixed(2));
 
-        // Auto-fill paid amount if empty
-        if (!$('#paid_amount').val()) {
-            $('#paid_amount').val(total.toFixed(2));
-        }
+        // POS sales are always considered paid in full
     }
 
     // Cart item actions
@@ -1246,24 +1382,7 @@
             return;
         }
 
-        const customerName = $('#customer_name').val().trim();
         const paymentMethod = $('#payment_method').val();
-
-        if (!customerName) {
-            Swal.fire({
-                title: 'Customer Name Required!',
-                text: 'Please enter the customer name to proceed.',
-                icon: 'warning',
-                confirmButtonColor: '#28a745',
-                confirmButtonText: '<i class="fas fa-check me-1"></i>Got it',
-                customClass: {
-                    popup: 'swal2-border-radius'
-                }
-            }).then(() => {
-                $('#customer_name').focus();
-            });
-            return;
-        }
 
         if (!paymentMethod) {
             Swal.fire({
@@ -1282,10 +1401,7 @@
         }
 
         const saleData = {
-            customer_name: customerName,
-            customer_phone: $('#customer_phone').val().trim(),
-            customer_email: $('#customer_email').val().trim(),
-            customer_address: $('#customer_address').val().trim(),
+            customer_id: $('#customer_id').val(),
             items: cart.map(item => ({
                 product_id: item.id,
                 quantity: item.quantity,
@@ -1294,7 +1410,6 @@
             payment_method: paymentMethod,
             discount: parseFloat($('#discount').val()) || 0,
             tax: parseFloat($('#tax').val()) || 0,
-            paid_amount: parseFloat($('#paid_amount').val()) || 0,
             notes: $('#notes').val().trim(),
             _token: '{{ csrf_token() }}'
         };
@@ -1309,8 +1424,8 @@
                     // Reset form
                     cart = [];
                     updateCart();
-                    $('#customer_name, #customer_phone, #customer_email, #customer_address, #notes').val('');
-                    $('#discount, #tax, #paid_amount').val('');
+                    $('#notes').val('');
+                    $('#discount, #tax').val('');
                     $('#payment_method').val('');
 
                     // Show success and option to print receipt
@@ -1323,6 +1438,7 @@
                         cancelButtonColor: '#6c757d',
                         confirmButtonText: '<i class="fas fa-receipt me-1"></i>View Receipt',
                         cancelButtonText: '<i class="fas fa-times me-1"></i>Close',
+                        allowHtml: true,
                         customClass: {
                             popup: 'swal2-border-radius'
                         }
@@ -1339,6 +1455,7 @@
                         icon: 'error',
                         confirmButtonColor: '#28a745',
                         confirmButtonText: '<i class="fas fa-check me-1"></i>Got it',
+                        allowHtml: true,
                         customClass: {
                             popup: 'swal2-border-radius'
                         }
@@ -1353,6 +1470,7 @@
                     icon: 'error',
                     confirmButtonColor: '#28a745',
                     confirmButtonText: '<i class="fas fa-check me-1"></i>Got it',
+                    allowHtml: true,
                     customClass: {
                         popup: 'swal2-border-radius'
                     }
@@ -1421,11 +1539,11 @@
         }
     });
 
-    // Auto-focus customer name when cart has items
-    function focusCustomerName() {
-        if (cart.length > 0 && !$('#customer_name').val()) {
+    // Auto-focus customer search when cart has items
+    function focusCustomerSearch() {
+        if (cart.length > 0) {
             setTimeout(() => {
-                $('#customer_name').focus();
+                $('#customer_search').focus();
             }, 500);
         }
     }
@@ -1457,6 +1575,141 @@
 
     // Call initialize function
     initializeCards();
+
+    // Customer search functionality
+    let searchTimeout;
+
+    $('#customer_search').on('input', function() {
+        clearTimeout(searchTimeout);
+        const searchQuery = $(this).val().trim();
+
+        if (searchQuery.length < 2) {
+            $('#customer_search_results').empty().hide();
+            return;
+        }
+
+        searchTimeout = setTimeout(function() {
+            $('#customer_search_loading').show();
+
+            $.ajax({
+                url: "{{ route('admin.pos.search-customers') }}",
+                method: 'GET',
+                data: { search: searchQuery },
+                success: function(response) {
+                    let resultsHtml = '';
+
+                    if (response.customers.length === 0) {
+                        resultsHtml = '<div class="p-2 text-muted">No customers found</div>';
+                    } else {
+                        response.customers.forEach(function(customer) {
+                            resultsHtml += `
+                                <div class="customer-item p-2 border-bottom" style="cursor: pointer;"
+                                    data-id="${customer.id}"
+                                    data-name="${customer.name}"
+                                    data-email="${customer.email || ''}"
+                                    data-phone="${customer.phone || ''}"
+                                    data-address="${customer.shipping_address || customer.billing_address || ''}">
+                                    <div class="fw-bold">${customer.name}</div>
+                                    <div class="small text-muted">${customer.email || ''} ${customer.phone ? ' | ' + customer.phone : ''}</div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    $('#customer_search_results').html(resultsHtml).show();
+                },
+                error: function(xhr) {
+                    console.error('Error searching customers:', xhr);
+                    $('#customer_search_results').html('<div class="p-2 text-danger">Error searching customers</div>').show();
+                },
+                complete: function() {
+                    $('#customer_search_loading').hide();
+                }
+            });
+        }, 300);
+    });
+
+    // Customer dropdown functionality
+    $('#customer_dropdown').on('change', function() {
+        const selectedOption = $(this).find(':selected');
+        const customerId = selectedOption.val();
+
+        if (customerId) {
+            const customerName = selectedOption.data('name');
+            const customerEmail = selectedOption.data('email');
+            const customerPhone = selectedOption.data('phone');
+
+            // Update customer selection
+            updateCustomerSelection(customerId, customerName, customerEmail, customerPhone);
+
+            // Clear search field
+            $('#customer_search').val('');
+            $('#customer_search_results').hide();
+
+            showToast(`Customer "${customerName}" selected from dropdown`, 'success');
+        } else {
+            clearCustomerSelection();
+        }
+    });
+
+    // Customer search click functionality
+    $(document).on('click', '.customer-item', function() {
+        const customerId = $(this).data('id');
+        const customerName = $(this).data('name');
+        const customerEmail = $(this).data('email');
+        const customerPhone = $(this).data('phone');
+
+        // Update customer selection
+        updateCustomerSelection(customerId, customerName, customerEmail, customerPhone);
+
+        // Clear search and dropdown
+        $('#customer_search_results').hide();
+        $('#customer_search').val('');
+        $('#customer_dropdown').val('');
+
+        showToast(`Customer "${customerName}" selected from search`, 'success');
+    });
+
+    // Function to update customer selection
+    function updateCustomerSelection(customerId, customerName, customerEmail, customerPhone) {
+        $('#customer_id').val(customerId);
+
+        // Update the selected customer display
+        $('#selected_customer_name').text(customerName);
+
+        let contactInfo = [];
+        if (customerEmail) contactInfo.push(customerEmail);
+        if (customerPhone) contactInfo.push(customerPhone);
+
+        $('#selected_customer_contact').text(contactInfo.join(' | '));
+
+        // Show the selected customer info and hide the no customer message
+        $('#selected_customer_info').show();
+        $('#no_customer_selected').hide();
+    }
+
+    // Function to clear customer selection
+    function clearCustomerSelection() {
+        $('#customer_id').val('');
+        $('#customer_dropdown').val('');
+        $('#customer_search').val('');
+        $('#customer_search_results').hide();
+        $('#selected_customer_info').hide();
+        $('#no_customer_selected').show();
+    }
+
+    // Clear selected customer
+    $('#clear_customer').on('click', function() {
+        clearCustomerSelection();
+        showToast('Customer cleared', 'info');
+    });
+
+    // Hide search results when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#customer_search, #customer_search_results').length) {
+            $('#customer_search_results').hide();
+        }
+    });
         });
     }
 

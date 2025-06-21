@@ -705,7 +705,7 @@
             <div class="metric-label">Stock Alerts</div>
             <div class="d-flex justify-content-between align-items-center">
                 <small class="text-danger">Out: {{ $outOfStockProducts }} | Low: {{ $lowStockProducts }}</small>
-                <button class="btn btn-sm btn-outline-danger" onclick="alert('Check inventory management')">
+                                            <button class="btn btn-sm btn-outline-danger" onclick="Swal.fire({title: 'Inventory Check', text: 'Check inventory management', icon: 'info', confirmButtonText: 'OK'})">
                     <i data-feather="bell"></i>
                 </button>
             </div>

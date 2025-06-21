@@ -368,7 +368,12 @@
         const resultDiv = document.getElementById('testResult');
 
         if (!email) {
-            alert('Please enter an email address');
+            Swal.fire({
+                title: 'Email Required',
+                text: 'Please enter an email address',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
             return;
         }
 

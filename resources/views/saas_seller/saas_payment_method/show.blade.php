@@ -79,7 +79,9 @@
                             <form action="{{ route('seller.payment-methods.destroy', $paymentMethod) }}" method="POST" style="display: inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this payment method?')">Delete</button>
+                                <button type="button" class="btn btn-sm btn-danger delete-payment-method"
+                                    data-id="{{ $paymentMethod->id }}"
+                                    data-title="{{ $paymentMethod->title }}">Delete</button>
                             </form>
                         </div>
                     </div>
@@ -88,4 +90,46 @@
         </div>
     </div>
 </div>
+<!-- Hidden form for delete -->
+<form id="delete-form" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Delete payment method confirmation with SweetAlert
+    document.querySelectorAll('.delete-payment-method').forEach(button => {
+        button.addEventListener('click', function() {
+            const paymentMethodId = this.getAttribute('data-id');
+            const paymentMethodTitle = this.getAttribute('data-title');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete payment method "${paymentMethodTitle}". This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('delete-form');
+                    form.action = `{{ route('seller.payment-methods.index') }}/${paymentMethodId}`;
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Initialize feather icons
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+});
+</script>
+@endpush

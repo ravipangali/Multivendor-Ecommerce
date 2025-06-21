@@ -101,13 +101,11 @@
                                         <a href="{{ route('seller.products.edit', $product->id) }}" class="btn btn-sm btn-primary">
                                             <i class="align-middle" data-feather="edit"></i>
                                         </a>
-                                        <form action="{{ route('seller.products.destroy', $product->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                <i class="align-middle" data-feather="trash-2"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-danger delete-product"
+                                                data-id="{{ $product->id }}"
+                                                data-name="{{ $product->name }}">
+                                            <i class="align-middle" data-feather="trash-2"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -126,4 +124,46 @@
         </div>
     </div>
 </div>
+<!-- Hidden form for delete -->
+<form id="delete-form" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Delete product confirmation with SweetAlert
+    document.querySelectorAll('.delete-product').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-id');
+            const productName = this.getAttribute('data-name');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete product "${productName}". This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('delete-form');
+                    form.action = `{{ route('seller.products.index') }}/${productId}`;
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Initialize feather icons
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+});
+</script>
+@endpush

@@ -88,7 +88,7 @@
                                 @if($brand->image)
                                     <img src="{{ asset('storage/' . $brand->image) }}"
                                          alt="{{ $brand->name }}"
-                                         class="brand-logo">
+                                         class="brand-logo brand-img">
                                 @else
                                     <div class="brand-logo-placeholder">
                                         <span class="brand-initial">{{ substr($brand->name, 0, 1) }}</span>
@@ -791,6 +791,162 @@ $(document).ready(function() {
 
     .section-title {
         font-size: 1.75rem;
+    }
+}
+
+/* Mobile-Responsive Brand Image Styles */
+.brand-img {
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+    object-fit: contain;
+    object-position: center;
+    padding: 10px;
+}
+
+.brand-logo {
+    transition: transform 0.3s ease;
+}
+
+.brand-card:hover .brand-logo {
+    transform: scale(1.05);
+}
+
+/* Mobile specific brand image optimizations */
+@media (max-width: 768px) {
+    .brand-img {
+        max-height: 120px;
+        padding: 8px;
+    }
+
+    .brand-image-container {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-img {
+        max-height: 100px;
+        padding: 5px;
+    }
+
+    .brand-image-container {
+        padding: 1rem;
+    }
+
+    .brand-logo-placeholder {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+}
+
+/* Mobile-Responsive Typography Styles */
+@media (max-width: 768px) {
+    /* Page titles */
+    .page-title {
+        font-size: 2rem !important;
+        line-height: 1.2;
+    }
+    
+    .page-subtitle {
+        font-size: 1rem !important;
+        line-height: 1.4;
+    }
+    
+    /* Brand card typography */
+    .brand-name {
+        font-size: 1rem !important;
+        line-height: 1.3;
+    }
+    
+    .brand-description {
+        font-size: 0.85rem !important;
+        line-height: 1.4;
+    }
+    
+    .brand-stats {
+        font-size: 0.8rem !important;
+    }
+    
+    .products-count {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Statistics typography */
+    .stat-number {
+        font-size: 1.75rem !important;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Section headers */
+    .section-title {
+        font-size: 1.75rem !important;
+    }
+    
+    .section-subtitle {
+        font-size: 0.95rem !important;
+    }
+    
+    /* Button typography */
+    .btn {
+        font-size: 0.85rem !important;
+        padding: 0.6rem 1rem !important;
+    }
+    
+    .view-products-btn {
+        font-size: 0.8rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens */
+    .page-title {
+        font-size: 1.75rem !important;
+    }
+    
+    .page-subtitle {
+        font-size: 0.9rem !important;
+    }
+    
+    .brand-name {
+        font-size: 0.9rem !important;
+    }
+    
+    .brand-description {
+        font-size: 0.8rem !important;
+    }
+    
+    .brand-stats {
+        font-size: 0.75rem !important;
+    }
+    
+    .products-count {
+        font-size: 0.7rem !important;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem !important;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem !important;
+    }
+    
+    .section-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .btn {
+        font-size: 0.8rem !important;
+        padding: 0.5rem 0.8rem !important;
+    }
+    
+    .view-products-btn {
+        font-size: 0.75rem !important;
     }
 }
 </style>

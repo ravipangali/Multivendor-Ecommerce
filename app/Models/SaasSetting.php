@@ -24,6 +24,7 @@ class SaasSetting extends Model
         'site_instagram',
         'site_linkedin',
         'site_youtube',
+        'site_whatsapp',
 
         // Currency Settings
         'site_currency_symbol',
@@ -74,6 +75,9 @@ class SaasSetting extends Model
         'shipping_local_rate',
         'shipping_regional_rate',
         'shipping_remote_rate',
+
+        // Apply Share Link
+        'apply_share_link',
     ];
 
     /**

@@ -87,7 +87,7 @@
                         <div class="post-featured-image">
                             <img src="{{ $post->featured_image_url }}"
                                  alt="{{ $post->title }}"
-                                 class="img-fluid">
+                                 class="img-fluid blog-detail-img">
                         </div>
                     @endif
 
@@ -180,7 +180,7 @@
                                                 <a href="{{ route('customer.blog.show', $relatedPost->slug) }}">
                                                     <img src="{{ $relatedPost->featured_image_url }}"
                                                          alt="{{ $relatedPost->title }}"
-                                                         class="img-fluid">
+                                                         class="img-fluid blog-related-img">
                                                 </a>
                                             </div>
                                         @endif
@@ -240,7 +240,7 @@
                                                 <a href="{{ route('customer.blog.show', $recentPost->slug) }}">
                                                     <img src="{{ $recentPost->featured_image_url }}"
                                                          alt="{{ $recentPost->title }}"
-                                                         class="img-fluid">
+                                                         class="img-fluid blog-recent-img">
                                                 </a>
                                             </div>
                                         @endif
@@ -797,6 +797,243 @@
 
     .related-posts {
         padding: 1.5rem;
+    }
+}
+
+/* Mobile-Responsive Blog Detail Image Styles */
+.blog-detail-img {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--radius-lg);
+}
+
+.blog-related-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.3s ease;
+}
+
+.blog-recent-img {
+    width: 100%;
+    height: 60px;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Mobile specific blog detail image optimizations */
+@media (max-width: 768px) {
+    .blog-detail-img {
+        max-height: 300px;
+    }
+
+    .blog-related-img {
+        height: 120px;
+    }
+
+    .blog-recent-img {
+        height: 50px;
+    }
+
+    .recent-post-image {
+        width: 70px;
+        height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .blog-detail-img {
+        max-height: 250px;
+    }
+
+    .blog-related-img {
+        height: 100px;
+    }
+
+    .blog-recent-img {
+        height: 45px;
+    }
+
+    .recent-post-image {
+        width: 60px;
+        height: 45px;
+    }
+}
+
+/* Mobile-Responsive Typography Styles */
+@media (max-width: 768px) {
+    /* Post title and meta */
+    .post-title {
+        font-size: 2rem !important;
+        line-height: 1.2;
+    }
+    
+    .post-subtitle {
+        font-size: 1rem !important;
+        line-height: 1.4;
+    }
+    
+    .post-meta {
+        font-size: 0.85rem !important;
+    }
+    
+    .post-date {
+        font-size: 0.8rem !important;
+    }
+    
+    .post-author {
+        font-size: 0.8rem !important;
+    }
+    
+    .post-category {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Post content */
+    .post-content p {
+        font-size: 1rem !important;
+        line-height: 1.6;
+    }
+    
+    .post-content h2 {
+        font-size: 1.5rem !important;
+        line-height: 1.3;
+    }
+    
+    .post-content h3 {
+        font-size: 1.25rem !important;
+        line-height: 1.3;
+    }
+    
+    .post-content h4 {
+        font-size: 1.1rem !important;
+        line-height: 1.3;
+    }
+    
+    /* Tags */
+    .tag-item {
+        font-size: 0.8rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    /* Share buttons */
+    .share-btn {
+        font-size: 0.85rem !important;
+        padding: 0.5rem 1rem !important;
+    }
+    
+    /* Related posts */
+    .related-post-title {
+        font-size: 1rem !important;
+        line-height: 1.3;
+    }
+    
+    .related-post-excerpt {
+        font-size: 0.85rem !important;
+        line-height: 1.4;
+    }
+    
+    /* Comments */
+    .comment-author {
+        font-size: 0.9rem !important;
+    }
+    
+    .comment-date {
+        font-size: 0.75rem !important;
+    }
+    
+    .comment-text {
+        font-size: 0.9rem !important;
+        line-height: 1.5;
+    }
+    
+    /* Sidebar */
+    .widget-title {
+        font-size: 1.1rem !important;
+    }
+    
+    .recent-post-title {
+        font-size: 0.85rem !important;
+        line-height: 1.3;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens */
+    .post-title {
+        font-size: 1.75rem !important;
+    }
+    
+    .post-subtitle {
+        font-size: 0.9rem !important;
+    }
+    
+    .post-meta {
+        font-size: 0.8rem !important;
+    }
+    
+    .post-date,
+    .post-author,
+    .post-category {
+        font-size: 0.75rem !important;
+    }
+    
+    .post-content p {
+        font-size: 0.95rem !important;
+    }
+    
+    .post-content h2 {
+        font-size: 1.3rem !important;
+    }
+    
+    .post-content h3 {
+        font-size: 1.15rem !important;
+    }
+    
+    .post-content h4 {
+        font-size: 1rem !important;
+    }
+    
+    .tag-item {
+        font-size: 0.75rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+    
+    .share-btn {
+        font-size: 0.8rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .related-post-title {
+        font-size: 0.9rem !important;
+    }
+    
+    .related-post-excerpt {
+        font-size: 0.8rem !important;
+    }
+    
+    .comment-author {
+        font-size: 0.85rem !important;
+    }
+    
+    .comment-date {
+        font-size: 0.7rem !important;
+    }
+    
+    .comment-text {
+        font-size: 0.85rem !important;
+    }
+    
+    .widget-title {
+        font-size: 1rem !important;
+    }
+    
+    .recent-post-title {
+        font-size: 0.8rem !important;
     }
 }
 </style>

@@ -30,7 +30,13 @@ class SaasPosController extends Controller
             ->where('is_in_house_product', true)
             ->paginate(20);
 
-        return view('saas_admin.saas_pos.saas_index', compact('categories', 'brands', 'products'));
+        // Load customers for dropdown
+        $customers = User::where('role', 'customer')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'email', 'phone']);
+
+        return view('saas_admin.saas_pos.saas_index', compact('categories', 'brands', 'products', 'customers'));
     }
 
     /**
@@ -72,6 +78,40 @@ class SaasPosController extends Controller
     }
 
     /**
+     * Search customers for POS.
+     */
+    public function searchCustomers(Request $request)
+    {
+        $query = User::where('role', 'customer')
+            ->with('customerProfile')
+            ->where('is_active', true);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%")
+                  ->orWhere('phone', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $customers = $query->limit(10)->get();
+
+        return response()->json([
+            'customers' => $customers->map(function($customer) {
+                return [
+                    'id' => $customer->id,
+                    'name' => $customer->name,
+                    'email' => $customer->email,
+                    'phone' => $customer->phone,
+                    'shipping_address' => $customer->customerProfile->shipping_address ?? '',
+                    'billing_address' => $customer->customerProfile->billing_address ?? ''
+                ];
+            })
+        ]);
+    }
+
+    /**
      * Get product details for POS.
      */
     public function getProduct($id)
@@ -89,10 +129,7 @@ class SaasPosController extends Controller
     public function processSale(Request $request)
     {
         $request->validate([
-            'customer_name' => 'nullable|string|max:255',
-            'customer_phone' => 'nullable|string|max:20',
-            'customer_email' => 'nullable|email|max:255',
-            'customer_address' => 'nullable|string|max:500',
+            'customer_id' => 'nullable|exists:users,id',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:saas_products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -103,7 +140,6 @@ class SaasPosController extends Controller
             'discount_type' => 'nullable|in:flat,percentage',
             'tax_amount' => 'nullable|numeric|min:0',
             'shipping_amount' => 'nullable|numeric|min:0',
-            'paid_amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string|max:1000',
         ]);
 
@@ -138,22 +174,11 @@ class SaasPosController extends Controller
             $taxAmount = $request->tax ?? $request->tax_amount ?? 0;
             $shippingAmount = $request->shipping_amount ?? 0;
             $totalAmount = $subtotal - $discountAmount + $taxAmount + $shippingAmount;
-            $paidAmount = $request->paid_amount;
-            $dueAmount = $totalAmount - $paidAmount;
 
-            // Determine payment status
-            $paymentStatus = 'paid';
-            if ($paidAmount < $totalAmount) {
-                $paymentStatus = $paidAmount > 0 ? 'partial' : 'pending';
-            }
-
-            // Create in-house sale
+            // Create in-house sale - payment is always considered complete for POS
             $sale = new SaasInHouseSale();
             $sale->sale_number = SaasInHouseSale::generateSaleNumber();
-            $sale->customer_name = $request->customer_name;
-            $sale->customer_phone = $request->customer_phone;
-            $sale->customer_email = $request->customer_email;
-            $sale->customer_address = $request->customer_address;
+            $sale->customer_id = $request->customer_id;
             $sale->subtotal = $subtotal;
             $sale->discount_amount = $discountAmount;
             $sale->discount_type = $discountType;
@@ -161,9 +186,7 @@ class SaasPosController extends Controller
             $sale->shipping_amount = $shippingAmount;
             $sale->total_amount = $totalAmount;
             $sale->payment_method = $request->payment_method;
-            $sale->payment_status = $paymentStatus;
-            $sale->paid_amount = $paidAmount;
-            $sale->due_amount = $dueAmount;
+            $sale->payment_status = 'paid'; // POS sales are always paid
             $sale->notes = $request->notes;
             $sale->cashier_id = Auth::id();
             $sale->sale_date = now();

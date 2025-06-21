@@ -55,7 +55,7 @@
                         <tr>
                             <th>Position</th>
                             <td>
-                                <span class="badge bg-info">{{ ucfirst($banner->position) }}</span>
+                                <span class="badge bg-info">{{ $banner->position_display_name }}</span>
                             </td>
                         </tr>
                         <tr>

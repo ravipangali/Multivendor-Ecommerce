@@ -44,7 +44,7 @@
                                     <div class="d-flex justify-content-between">
                                         <div>
                                             <h6 class="card-title text-white">Revenue</h6>
-                                            <h3 class="text-white mb-0">Rs {{ number_format($totalSales, 2) }}</h3>
+                                            <h3 class="text-white mb-0">Rs {{ number_format($totalRevenue, 2) }}</h3>
                                         </div>
                                         <div class="align-self-center">
                                             <i data-feather="dollar-sign" class="icon-lg"></i>
@@ -142,9 +142,16 @@
                                     <td>{{ $sale->created_at->format('M d, Y') }}</td>
                                     <td>
                                         <div>
-                                            <strong>{{ $sale->customer_name ?? 'Walk-in Customer' }}</strong>
-                                            @if($sale->customer_phone)
-                                                <br><small class="text-muted">{{ $sale->customer_phone }}</small>
+                                            @if($sale->customer)
+                                                <a href="{{ route('admin.customers.show', $sale->customer->id) }}" class="text-decoration-none">
+                                                    <strong>{{ $sale->customer->name }}</strong>
+                                                    <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 0.75em;"></i>
+                                                </a>
+                                                @if($sale->customer->phone)
+                                                    <br><small class="text-muted">{{ $sale->customer->phone }}</small>
+                                                @endif
+                                            @else
+                                                <strong>Walk-in Customer</strong>
                                             @endif
                                         </div>
                                     </td>
@@ -172,9 +179,6 @@
                                         <span class="badge {{ $statusClass }}">
                                             {{ ucfirst($sale->payment_status) }}
                                         </span>
-                                        @if($sale->due_amount > 0)
-                                            <br><small class="text-danger">Due: Rs {{ number_format($sale->due_amount, 2) }}</small>
-                                        @endif
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
@@ -184,20 +188,11 @@
                                             <a href="{{ route('admin.in-house-sales.receipt', $sale) }}" class="btn btn-sm btn-outline-success" title="Print Receipt" target="_blank">
                                                 <i data-feather="printer"></i>
                                             </a>
-                                            @if($sale->payment_status !== 'paid')
-                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Update Payment"
-                                                        onclick="updatePayment({{ $sale->id }}, '{{ $sale->sale_number }}', {{ $sale->due_amount }})">
-                                                    <i data-feather="credit-card"></i>
-                                                </button>
-                                            @endif
-                                            <form action="{{ route('admin.in-house-sales.destroy', $sale) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"
-                                                        onclick="return confirm('Are you sure you want to delete this sale?')">
-                                                    <i data-feather="trash-2"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-sale" title="Delete"
+                                                    data-id="{{ $sale->id }}"
+                                                    data-number="{{ $sale->sale_number }}">
+                                                <i data-feather="trash-2"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -230,63 +225,46 @@
     </div>
 </div>
 
-<!-- Payment Update Modal -->
-<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentModalLabel">Update Payment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="paymentForm" method="POST">
-                @csrf
-                @method('PATCH')
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="paid_amount" class="form-label">Payment Amount</label>
-                        <div class="input-group">
-                            <span class="input-group-text">Rs</span>
-                            <input type="number" class="form-control" id="paid_amount" name="paid_amount" step="0.01" min="0" required>
-                        </div>
-                        <small class="text-muted">Due Amount: Rs <span id="due_amount_display"></span></small>
-                    </div>
-                    <div class="mb-3">
-                        <label for="payment_method" class="form-label">Payment Method</label>
-                        <select class="form-select" id="payment_method" name="payment_method" required>
-                            <option value="">Select Payment Method</option>
-                            <option value="cash">Cash</option>
-                            <option value="card">Card</option>
-                            <option value="bank_transfer">Bank Transfer</option>
-                            <option value="mobile_money">Mobile Money</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="payment_note" class="form-label">Note (Optional)</label>
-                        <textarea class="form-control" id="payment_note" name="payment_note" rows="2"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update Payment</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<!-- Hidden form for delete -->
+<form id="delete-form" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
-    function updatePayment(saleId, saleNumber, dueAmount) {
-        document.getElementById('paymentModalLabel').textContent = 'Update Payment for ' + saleNumber;
-                                document.getElementById('paymentForm').action = '{{ route("admin.in-house-sales.index") }}/' + saleId + '/payment-status';
-        document.getElementById('paid_amount').max = dueAmount;
-        document.getElementById('paid_amount').value = dueAmount;
-        document.getElementById('due_amount_display').textContent = dueAmount.toFixed(2);
+    // Delete sale confirmation with SweetAlert
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.delete-sale').forEach(button => {
+            button.addEventListener('click', function() {
+                const saleId = this.getAttribute('data-id');
+                const saleNumber = this.getAttribute('data-number');
 
-        const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
-        modal.show();
-    }
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `You are about to delete sale "${saleNumber}". This action cannot be undone!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('delete-form');
+                        form.action = `{{ route('admin.in-house-sales.index') }}/${saleId}`;
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // Initialize feather icons
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
 </script>
-@endsection
+@endpush

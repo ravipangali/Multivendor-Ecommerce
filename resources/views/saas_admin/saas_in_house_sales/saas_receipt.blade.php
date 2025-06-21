@@ -168,24 +168,33 @@
                 </div>
                 <div class="info-row">
                     <span>Customer:</span>
-                    <span>{{ $sale->customer_name ?? 'Walk-in Customer' }}</span>
+                    <span>
+                        @if($sale->customer)
+                            {{ $sale->customer->name }}
+                            @if(isset($showCustomerId) && $showCustomerId)
+                                (ID: {{ $sale->customer_id }})
+                            @endif
+                        @else
+                            Walk-in Customer
+                        @endif
+                    </span>
                 </div>
-                @if($sale->customer_phone)
+                @if($sale->customer && $sale->customer->phone)
                 <div class="info-row">
                     <span>Phone:</span>
-                    <span>{{ $sale->customer_phone }}</span>
+                    <span>{{ $sale->customer->phone }}</span>
                 </div>
                 @endif
-                @if($sale->customer_email)
+                @if($sale->customer && $sale->customer->email)
                 <div class="info-row">
                     <span>Email:</span>
-                    <span>{{ $sale->customer_email }}</span>
+                    <span>{{ $sale->customer->email }}</span>
                 </div>
                 @endif
-                @if($sale->customer_address)
+                @if($sale->customer && $sale->customer->customerProfile && $sale->customer->customerProfile->address)
                 <div class="info-row">
                     <span>Address:</span>
-                    <span>{{ Str::limit($sale->customer_address, 30) }}</span>
+                    <span>{{ Str::limit($sale->customer->customerProfile->address, 30) }}</span>
                 </div>
                 @endif
                 <div class="info-row">
@@ -255,16 +264,6 @@
                     <span>TOTAL:</span>
                     <span>Rs {{ number_format($sale->total_amount, 2) }}</span>
                 </div>
-                <div class="total-row">
-                    <span>Paid:</span>
-                    <span style="color: #28a745;">Rs {{ number_format($sale->paid_amount, 2) }}</span>
-                </div>
-                @if($sale->due_amount > 0)
-                <div class="total-row">
-                    <span>Due:</span>
-                    <span style="color: #dc3545;">Rs {{ number_format($sale->due_amount, 2) }}</span>
-                </div>
-                @endif
                 <div class="total-row">
                     <span>Status:</span>
                     <span style="color: {{ $sale->payment_status === 'paid' ? '#28a745' : '#ffc107' }};">

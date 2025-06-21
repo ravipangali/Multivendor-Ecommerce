@@ -44,7 +44,7 @@
                                 @if($seller->profile_photo)
                                     <img src="{{ asset('storage/' . $seller->profile_photo) }}"
                                          alt="{{ $seller->name }}"
-                                         class="seller-avatar">
+                                         class="seller-avatar seller-profile-img">
                                 @else
                                     <div class="seller-avatar-placeholder">
                                         <i class="fas fa-user-tie"></i>
@@ -2825,6 +2825,289 @@ document.addEventListener('DOMContentLoaded', function() {
 
     .loading-spinner {
         transform: scale(0.8);
+    }
+}
+
+/* Mobile-Responsive Seller Profile Image Styles */
+.seller-profile-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+    border: 3px solid var(--white);
+    box-shadow: var(--shadow-md);
+}
+
+/* Mobile specific seller profile image optimizations */
+@media (max-width: 768px) {
+    .seller-profile-img {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .seller-avatar-section {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .seller-profile-img {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .avatar-container {
+        margin-bottom: 1rem;
+    }
+    
+    .seller-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        font-size: 1.5rem;
+    }
+}
+
+/* Mobile-Responsive Typography Styles */
+@media (max-width: 768px) {
+    /* Seller profile title */
+    .seller-name {
+        font-size: 1.5rem !important;
+        line-height: 1.2;
+    }
+    
+    .seller-tagline {
+        font-size: 1rem !important;
+        line-height: 1.4;
+    }
+    
+    /* Seller stats */
+    .stat-number {
+        font-size: 1.5rem !important;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Seller description */
+    .seller-description {
+        font-size: 0.9rem !important;
+        line-height: 1.5;
+    }
+    
+    .seller-bio {
+        font-size: 0.9rem !important;
+        line-height: 1.5;
+    }
+    
+    /* Contact information */
+    .contact-info {
+        font-size: 0.85rem !important;
+    }
+    
+    .contact-label {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Business information */
+    .business-info-item {
+        font-size: 0.85rem !important;
+    }
+    
+    .business-info-label {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Product listings */
+    .product-title {
+        font-size: 0.9rem !important;
+        line-height: 1.3;
+    }
+    
+    .product-price {
+        font-size: 0.9rem !important;
+    }
+    
+    .product-brand {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Buttons */
+    .btn {
+        font-size: 0.85rem !important;
+        padding: 0.6rem 1rem !important;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.8rem !important;
+    }
+    
+    /* Section headers */
+    .section-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .section-subtitle {
+        font-size: 0.95rem !important;
+    }
+    
+    /* Rating and reviews */
+    .rating-score {
+        font-size: 1.2rem !important;
+    }
+    
+    .rating-label {
+        font-size: 0.8rem !important;
+    }
+    
+    .review-text {
+        font-size: 0.85rem !important;
+        line-height: 1.5;
+    }
+    
+    .review-author {
+        font-size: 0.8rem !important;
+    }
+    
+    .review-date {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Store information */
+    .store-info-item {
+        font-size: 0.85rem !important;
+    }
+    
+    .store-since {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Filter sidebar typography */
+    .filter-title {
+        font-size: 1rem !important;
+    }
+    
+    .filter-option-label {
+        font-size: 0.85rem !important;
+    }
+    
+    .price-label {
+        font-size: 0.8rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens */
+    .seller-name {
+        font-size: 1.25rem !important;
+    }
+    
+    .seller-tagline {
+        font-size: 0.9rem !important;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem !important;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem !important;
+    }
+    
+    .seller-description {
+        font-size: 0.85rem !important;
+    }
+    
+    .seller-bio {
+        font-size: 0.85rem !important;
+    }
+    
+    .contact-info {
+        font-size: 0.8rem !important;
+    }
+    
+    .contact-label {
+        font-size: 0.75rem !important;
+    }
+    
+    .business-info-item {
+        font-size: 0.8rem !important;
+    }
+    
+    .business-info-label {
+        font-size: 0.75rem !important;
+    }
+    
+    .product-title {
+        font-size: 0.85rem !important;
+    }
+    
+    .product-price {
+        font-size: 0.85rem !important;
+    }
+    
+    .product-brand {
+        font-size: 0.7rem !important;
+    }
+    
+    .btn {
+        font-size: 0.8rem !important;
+        padding: 0.5rem 0.8rem !important;
+    }
+    
+    .btn-sm {
+        font-size: 0.7rem !important;
+        padding: 0.4rem 0.6rem !important;
+    }
+    
+    .section-title {
+        font-size: 1.3rem !important;
+    }
+    
+    .section-subtitle {
+        font-size: 0.9rem !important;
+    }
+    
+    .rating-score {
+        font-size: 1.1rem !important;
+    }
+    
+    .rating-label {
+        font-size: 0.75rem !important;
+    }
+    
+    .review-text {
+        font-size: 0.8rem !important;
+    }
+    
+    .review-author {
+        font-size: 0.75rem !important;
+    }
+    
+    .review-date {
+        font-size: 0.7rem !important;
+    }
+    
+    .store-info-item {
+        font-size: 0.8rem !important;
+    }
+    
+    .store-since {
+        font-size: 0.75rem !important;
+    }
+    
+    .filter-title {
+        font-size: 0.9rem !important;
+    }
+    
+    .filter-option-label {
+        font-size: 0.8rem !important;
+    }
+    
+    .price-label {
+        font-size: 0.75rem !important;
     }
 }
 </style>

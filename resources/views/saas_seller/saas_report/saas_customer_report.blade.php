@@ -976,11 +976,21 @@ function refreshCustomerData() {
 }
 
 function viewCustomerProfile(customerId) {
-    alert('Customer profile view for ID: ' + customerId);
+                                    Swal.fire({
+                                    title: 'Customer Profile',
+                                    text: 'Customer profile view for ID: ' + customerId,
+                                    icon: 'info',
+                                    confirmButtonText: 'OK'
+                                });
 }
 
 function sendPromotion(customerId) {
-    alert('Send promotion to customer ID: ' + customerId);
+                                    Swal.fire({
+                                    title: 'Send Promotion',
+                                    text: 'Send promotion to customer ID: ' + customerId,
+                                    icon: 'info',
+                                    confirmButtonText: 'OK'
+                                });
 }
 
 // Initialize feather icons

@@ -96,13 +96,11 @@
                                         <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-primary">
                                             <i class="align-middle" data-feather="edit"></i>
                                         </a>
-                                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                <i class="align-middle" data-feather="trash-2"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-danger delete-user"
+                                                data-id="{{ $user->id }}"
+                                                data-name="{{ $user->name }}">
+                                            <i class="align-middle" data-feather="trash-2"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -121,4 +119,46 @@
         </div>
     </div>
 </div>
+<!-- Hidden form for delete -->
+<form id="delete-form" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Delete user confirmation with SweetAlert
+    document.querySelectorAll('.delete-user').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.getAttribute('data-id');
+            const userName = this.getAttribute('data-name');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete user "${userName}". This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('delete-form');
+                    form.action = `{{ route('admin.users.index') }}/${userId}`;
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Initialize feather icons
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+});
+</script>
+@endpush

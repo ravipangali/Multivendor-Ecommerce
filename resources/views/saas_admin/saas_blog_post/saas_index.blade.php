@@ -166,13 +166,12 @@
                                                 <i class="align-middle" data-feather="power"></i>
                                             </button>
                                         </form>
-                                        <form action="{{ route('admin.blog-posts.destroy', $post->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger delete-confirm" title="Delete">
-                                                <i class="align-middle" data-feather="trash-2"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-danger delete-blog-post"
+                                                data-id="{{ $post->id }}"
+                                                data-title="{{ $post->title }}"
+                                                title="Delete">
+                                            <i class="align-middle" data-feather="trash-2"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -197,20 +196,46 @@
         </div>
     </div>
 </div>
+<!-- Hidden form for delete -->
+<form id="delete-form" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 @endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Delete confirmation
-    document.querySelectorAll('.delete-confirm').forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Are you sure you want to delete this blog post? This action cannot be undone.')) {
-                this.closest('form').submit();
-            }
+    // Delete blog post confirmation with SweetAlert
+    document.querySelectorAll('.delete-blog-post').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-id');
+            const postTitle = this.getAttribute('data-title');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete blog post "${postTitle}". This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('delete-form');
+                    form.action = `{{ route('admin.blog-posts.index') }}/${postId}`;
+                    form.submit();
+                }
+            });
         });
     });
+
+    // Initialize feather icons
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
 });
 </script>
 @endpush

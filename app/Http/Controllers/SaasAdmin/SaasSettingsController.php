@@ -46,8 +46,10 @@ class SaasSettingsController extends Controller
                 'site_instagram' => 'nullable|url',
                 'site_linkedin' => 'nullable|url',
                 'site_youtube' => 'nullable|url',
+                'site_whatsapp' => 'nullable|url',
                 'site_currency_symbol' => 'required|string|max:10',
                 'site_currency_code' => 'required|string|max:10',
+                'apply_share_link' => 'nullable|url',
             ]);
 
             $settings = SaasSetting::first() ?? new SaasSetting();

@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('site_instagram')->nullable();
             $table->string('site_linkedin')->nullable();
             $table->string('site_youtube')->nullable();
+            $table->string('site_whatsapp')->nullable();
 
             // Currency Settings
             $table->string('site_currency_symbol')->nullable();

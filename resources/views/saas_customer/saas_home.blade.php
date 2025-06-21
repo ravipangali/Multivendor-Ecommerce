@@ -11,14 +11,14 @@
                             <div class="banner-image">
                                 <img src="{{ asset('storage/'.$item->image) ?? asset('saas_frontend/img/slider-1.jpg') }}"
                                      alt="Banner {{ $loop->iteration }}"
-                                     class="img-fluid">
+                                     class="img-fluid banner-img">
                             </div>
                         </a>
                     </div>
                 @empty
                     <div class="banner-slide">
                         <div class="banner-image">
-                            <img src="{{ asset('saas_frontend/img/slider-1.jpg') }}" alt="Default Banner" class="img-fluid">
+                            <img src="{{ asset('saas_frontend/img/slider-1.jpg') }}" alt="Default Banner" class="img-fluid banner-img">
                         </div>
                     </div>
                 @endforelse
@@ -41,7 +41,7 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="action-card vendor-card">
                         <div class="card-icon">
-                            <img src="{{ asset('saas_frontend/img/vendor.png') }}" alt="Become Vendor">
+                            <img src="{{ asset('saas_frontend/img/vendor.png') }}" alt="Become Vendor" class="action-card-img">
                         </div>
                         <div class="card-content">
                             <span class="card-subtitle">Sign Up For Free</span>
@@ -55,7 +55,7 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="action-card shop-card">
                         <div class="card-icon">
-                            <img src="{{ asset('saas_frontend/img/shop.png') }}" alt="Shop Now">
+                            <img src="{{ asset('saas_frontend/img/shop.png') }}" alt="Shop Now" class="action-card-img">
                         </div>
                         <div class="card-content">
                             <span class="card-subtitle">Get Anything You Want</span>
@@ -69,6 +69,8 @@
             </div>
         </div>
     </section>
+
+
 
     <!-- Featured Categories -->
     <section class="featured-categories py-5 bg-light">
@@ -86,7 +88,7 @@
                                 <a href="{{ route('customer.category', $category->slug) }}" class="category-link">
                                     <div class="category-image">
                                         <img src="{{ $category->category_image_url ?? asset('saas_frontend/images/about/12.jpg') }}"
-                                             alt="{{ $category->name }}" class="img-fluid">
+                                             alt="{{ $category->name }}" class="img-fluid category-img">
                                     </div>
                                     <div class="category-content">
                                         <h5 class="category-name">{{ $category->name }}</h5>
@@ -103,7 +105,7 @@
                             <div class="category-card">
                                 <a href="{{ route('customer.products') }}" class="category-link">
                                     <div class="category-image">
-                                        <img src="{{ asset('saas_frontend/images/about/12.jpg') }}" alt="{{ $categoryName }}" class="img-fluid">
+                                        <img src="{{ asset('saas_frontend/images/about/12.jpg') }}" alt="{{ $categoryName }}" class="img-fluid category-img">
                                     </div>
                                     <div class="category-content">
                                         <h5 class="category-name">{{ $categoryName }}</h5>
@@ -139,7 +141,7 @@
                                 <div class="product-image">
                                     <a href="{{ route('customer.product.detail', $product->slug) }}">
                                         <img src="{{ $product->images->first()->image_url ?? asset('saas_frontend/images/shop-items/shop-item27.png') }}"
-                                             alt="{{ $product->name }}" class="img-fluid">
+                                             alt="{{ $product->name }}" class="img-fluid product-img">
                                     </a>
                                     <div class="product-actions">
                                         <button class="action-btn wishlist-btn add-to-wishlist" data-product-id="{{ $product->id }}" title="Add to Wishlist">
@@ -227,7 +229,7 @@
                                     <div class="product-image">
                                         <a href="{{ route('customer.product.detail', $product->slug) }}">
                                             <img src="{{ $product->images->first()->image_url ?? asset('saas_frontend/images/shop-items/shop-item89.png') }}"
-                                                 alt="{{ $product->name }}" class="img-fluid">
+                                                 alt="{{ $product->name }}" class="img-fluid horizontal-product-img">
                                         </a>
                                     </div>
                                     <div class="product-content">
@@ -343,6 +345,125 @@
         </div>
     </section>
 
+        <!-- Category-wise Products -->
+    <section class="category-wise-products py-5">
+        <div class="container-fluid">
+            @if($categoriesWithProducts->count() > 0)
+                @foreach($categoriesWithProducts as $category)
+                    <div class="category-section mb-5">
+                        <!-- Category Header -->
+                        <div class="container">
+                            <div class="category-header d-flex justify-content-between align-items-center mb-4">
+                                <div class="category-title-section">
+                                    <h3 class="category-title text-uppercase">{{ $category->name }}</h3>
+                                    <div class="category-subtitle">
+                                        <small class="text-muted">
+                                            {{ $category->allProducts->count() }} {{ Str::plural('product', $category->allProducts->count()) }}
+                                            @if($category->subcategories->count() > 0)
+                                                from {{ $category->subcategories->count() }} {{ Str::plural('subcategory', $category->subcategories->count()) }}
+                                            @endif
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="view-all-section">
+                                    <a href="{{ route('customer.category', $category->slug) }}" class="view-all-link">
+                                        View All
+                                        <i class="fas fa-chevron-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Products Horizontal Scroll -->
+                        <div class="products-scroll-container">
+                            <div class="products-scroll-wrapper">
+                                @foreach($category->allProducts->take(8) as $product)
+                                    <div class="product-scroll-item">
+                                        <div class="product-card-modern">
+                                            <div class="product-image-wrapper">
+                                                <a href="{{ route('customer.product.detail', $product->slug) }}">
+                                                    <img src="{{ $product->images->first()->image_url ?? asset('saas_frontend/images/shop-items/shop-item27.png') }}"
+                                                         alt="{{ $product->name }}" class="product-image">
+                                                </a>
+
+                                                <!-- Discount Badge -->
+                                                @if($product->discount > 0)
+                                                    <div class="discount-badge">
+                                                        @if($product->discount_type === 'percentage')
+                                                            Rs {{ $product->discount }} OFF
+                                                        @else
+                                                            Rs {{ $product->discount }} OFF
+                                                        @endif
+                                                    </div>
+                                                @endif
+
+                                                <!-- Stock Status -->
+                                                @if($product->stock <= 0)
+                                                    <div class="stock-badge out-of-stock">
+                                                        SOLD OUT
+                                                    </div>
+                                                @elseif($product->stock <= 5)
+                                                    <div class="stock-badge low-stock">
+                                                        ONLY {{ $product->stock }} LEFT
+                                                    </div>
+                                                @endif
+
+                                                <!-- Quick Actions -->
+                                                <div class="quick-actions">
+                                                    <button class="action-btn add-to-wishlist" data-product-id="{{ $product->id }}" title="Add to Wishlist">
+                                                        <i class="far fa-heart"></i>
+                                                    </button>
+                                                    <button class="action-btn add-to-cart" data-product-id="{{ $product->id }}" title="Add to Cart" {{ $product->stock <= 0 ? 'disabled' : '' }}>
+                                                        <i class="fas fa-shopping-cart"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="product-info">
+                                                <h6 class="product-name">
+                                                    <a href="{{ route('customer.product.detail', $product->slug) }}">
+                                                        {{ Str::limit($product->name, 40) }}
+                                                    </a>
+                                                </h6>
+
+                                                <div class="product-rating-small">
+                                                    @php
+                                                        $avgRating = $product->reviews->avg('rating') ?? 0;
+                                                    @endphp
+                                                    <div class="stars-small">
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            <i class="fa{{ $i <= $avgRating ? 's' : 'r' }} fa-star"></i>
+                                                        @endfor
+                                                    </div>
+                                                    <span class="rating-text">({{ $product->reviews->count() }})</span>
+                                                </div>
+
+                                                <div class="product-price-section">
+                                                    <div class="current-price">Rs {{ number_format($product->final_price, 2) }}</div>
+                                                    @if($product->discount > 0)
+                                                        <div class="original-price">Rs {{ number_format($product->price, 2) }}</div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @else
+                <div class="container">
+                    <div class="empty-state text-center py-5">
+                        <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                        <h5>No Categories Available</h5>
+                        <p class="text-muted">Categories with products will appear here</p>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </section>
+
     <!-- Features -->
     <section class="features py-5 bg-light">
         <div class="container">
@@ -387,6 +508,328 @@
         </div>
     </section>
 @endsection
+
+<style>
+/* Category-wise Products */
+.category-wise-products {
+    padding: 4rem 0;
+    background: var(--white);
+}
+
+.category-section {
+    margin-bottom: 4rem;
+}
+
+.category-header {
+    padding: 0 15px;
+    margin-bottom: 2rem;
+}
+
+.category-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.category-subtitle {
+    margin-top: 0.5rem;
+}
+
+.category-subtitle small {
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.view-all-link {
+    color: #ff6b35;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.view-all-link:hover {
+    color: #e55a30;
+    text-decoration: none;
+}
+
+.view-all-link i {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.view-all-link:hover i {
+    transform: translateX(3px);
+}
+
+/* Products Horizontal Scroll */
+.products-scroll-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.products-scroll-wrapper {
+    display: flex;
+    gap: 1rem;
+    padding: 0 15px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.products-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.product-scroll-item {
+    flex: 0 0 280px;
+    min-width: 280px;
+}
+
+/* Modern Product Card */
+.product-card-modern {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+}
+
+.product-card-modern:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+}
+
+.product-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+    background: #f8f9fa;
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card-modern:hover .product-image {
+    transform: scale(1.05);
+}
+
+/* Badges */
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+.stock-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+.stock-badge.out-of-stock {
+    background: linear-gradient(135deg, #636363, #434343);
+    color: white;
+}
+
+.stock-badge.low-stock {
+    background: linear-gradient(135deg, #ffa726, #fb8c00);
+    color: white;
+}
+
+/* Quick Actions */
+.quick-actions {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.product-card-modern:hover .quick-actions {
+    opacity: 1;
+}
+
+.quick-actions .action-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    color: #333;
+    backdrop-filter: blur(10px);
+}
+
+.quick-actions .action-btn:hover {
+    background: #ff6b35;
+    color: white;
+    transform: scale(1.1);
+}
+
+.quick-actions .action-btn:disabled {
+    background: rgba(200, 200, 200, 0.9);
+    color: #666;
+    cursor: not-allowed;
+}
+
+.quick-actions .action-btn:disabled:hover {
+    transform: none;
+    background: rgba(200, 200, 200, 0.9);
+}
+
+/* Product Info */
+.product-info {
+    padding: 1.25rem;
+}
+
+.product-name {
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.product-name a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.product-name a:hover {
+    color: #ff6b35;
+}
+
+.product-rating-small {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stars-small {
+    display: flex;
+    gap: 2px;
+}
+
+.stars-small i {
+    font-size: 0.8rem;
+    color: #ffc107;
+}
+
+.stars-small i.far {
+    color: #ddd;
+}
+
+.rating-text {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.product-price-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.current-price {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #ff6b35;
+}
+
+.original-price {
+    font-size: 0.95rem;
+    color: #666;
+    text-decoration: line-through;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .category-wise-products {
+        padding: 3rem 0;
+    }
+
+    .category-title {
+        font-size: 1.25rem;
+    }
+
+    .product-scroll-item {
+        flex: 0 0 240px;
+        min-width: 240px;
+    }
+
+    .product-image {
+        height: 160px;
+    }
+
+    .product-info {
+        padding: 1rem;
+    }
+
+    .category-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-scroll-item {
+        flex: 0 0 200px;
+        min-width: 200px;
+    }
+
+    .product-image {
+        height: 140px;
+    }
+
+    .discount-badge, .stock-badge {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .quick-actions .action-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
+</style>
 
 @push('styles')
 <style>
@@ -625,6 +1068,113 @@
 
 .product-card:hover .product-image img {
     transform: scale(1.05);
+}
+
+/* Category-wise Products */
+.category-wise-products {
+    padding: 5rem 0;
+    background: var(--white);
+}
+
+.category-tabs-wrapper {
+    margin-bottom: 3rem;
+}
+
+.category-tabs {
+    border-bottom: none;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.category-tabs .nav-link {
+    background: var(--light-bg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-xl);
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 1rem 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.category-tabs .nav-link:hover {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.category-tabs .nav-link.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--white);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.category-tabs .nav-link .category-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+    font-weight: 700;
+}
+
+.category-tabs .nav-link:not(.active) .category-count {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.category-products-content {
+    min-height: 500px;
+}
+
+.category-products-header {
+    padding: 2rem 0;
+    border-bottom: 2px solid var(--border-light);
+    margin-bottom: 2rem;
+}
+
+.category-section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.category-section-subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.category-hierarchy-info {
+    margin-top: 0.5rem;
+}
+
+.category-hierarchy-info small {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+    display: inline-block;
+}
+
+.tab-pane {
+    animation: fadeInUp 0.5s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .product-actions {
@@ -956,6 +1506,54 @@
     .carousel-controls {
         padding: 0 15px;
     }
+
+    /* Category-wise Products Mobile */
+    .category-wise-products {
+        padding: 3rem 0;
+    }
+
+    .category-tabs {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .category-tabs::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .category-tabs::-webkit-scrollbar-track {
+        background: var(--light-bg);
+        border-radius: 2px;
+    }
+
+    .category-tabs::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 2px;
+    }
+
+    .category-tabs .nav-link {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        white-space: nowrap;
+    }
+
+    .category-products-header {
+        padding: 1rem 0;
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .category-section-title {
+        font-size: 1.5rem;
+    }
+
+    .category-hierarchy-info small {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
 }
 
 @media (max-width: 576px) {
@@ -973,6 +1571,220 @@
 
     .featured-categories {
         padding: 3rem 0;
+    }
+}
+
+/* Mobile-Responsive Image Styles */
+.banner-img {
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    max-height: 500px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.action-card-img {
+    width: 100%;
+    max-width: 80px;
+    height: auto;
+    object-fit: contain;
+}
+
+.category-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--radius-md);
+}
+
+.product-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--radius-md);
+    transition: transform 0.3s ease;
+}
+
+.horizontal-product-img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--radius-sm);
+}
+
+/* Mobile specific image optimizations */
+@media (max-width: 768px) {
+    .banner-img {
+        min-height: 150px;
+        max-height: 300px;
+    }
+
+    .action-card-img {
+        max-width: 60px;
+    }
+
+    .category-img {
+        height: 100px;
+    }
+
+    .product-img {
+        height: 160px;
+    }
+
+    .horizontal-product-img {
+        height: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .banner-img {
+        min-height: 120px;
+        max-height: 250px;
+    }
+
+    .action-card-img {
+        max-width: 50px;
+    }
+
+    .category-img {
+        height: 80px;
+    }
+
+    .product-img {
+        height: 140px;
+    }
+
+    .horizontal-product-img {
+        height: 60px;
+    }
+}
+
+/* Mobile-Responsive Typography Styles */
+@media (max-width: 768px) {
+    /* Section titles and headings */
+    .section-title {
+        font-size: 1.75rem !important;
+        line-height: 1.3;
+    }
+    
+    .section-subtitle {
+        font-size: 0.95rem !important;
+        line-height: 1.5;
+    }
+    
+    /* Hero banner text */
+    .banner-content h1 {
+        font-size: 2rem !important;
+    }
+    
+    .banner-content p {
+        font-size: 1rem !important;
+    }
+    
+    /* Action card typography */
+    .card-title {
+        font-size: 1.1rem !important;
+        line-height: 1.3;
+    }
+    
+    .card-subtitle {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Category names */
+    .category-name {
+        font-size: 0.9rem !important;
+        line-height: 1.2;
+    }
+    
+    .category-count {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Product typography */
+    .product-title {
+        font-size: 0.9rem !important;
+        line-height: 1.3;
+    }
+    
+    .product-brand {
+        font-size: 0.7rem !important;
+    }
+    
+    .current-price {
+        font-size: 1rem !important;
+    }
+    
+    .original-price {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Button text */
+    .btn {
+        font-size: 0.85rem !important;
+        padding: 0.6rem 1rem !important;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.8rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens - further font size reduction */
+    .section-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .section-subtitle {
+        font-size: 0.9rem !important;
+    }
+    
+    .banner-content h1 {
+        font-size: 1.75rem !important;
+    }
+    
+    .card-title {
+        font-size: 1rem !important;
+    }
+    
+    .card-subtitle {
+        font-size: 0.75rem !important;
+    }
+    
+    .category-name {
+        font-size: 0.8rem !important;
+    }
+    
+    .category-count {
+        font-size: 0.7rem !important;
+    }
+    
+    .product-title {
+        font-size: 0.85rem !important;
+    }
+    
+    .product-brand {
+        font-size: 0.65rem !important;
+    }
+    
+    .current-price {
+        font-size: 0.95rem !important;
+    }
+    
+    .btn {
+        font-size: 0.8rem !important;
+        padding: 0.5rem 0.8rem !important;
+    }
+    
+    .btn-sm {
+        font-size: 0.7rem !important;
+        padding: 0.4rem 0.6rem !important;
     }
 }
 </style>

@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt - Sale #{{ $sale->sale_number }}</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
         * {
             margin: 0;
@@ -144,6 +148,16 @@
             color: white;
         }
 
+        .btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+            transition: all 0.2s ease;
+        }
+
+        .btn i {
+            margin-right: 4px;
+        }
+
         @media print {
             .no-print {
                 display: none !important;
@@ -168,12 +182,24 @@
                 </div>
                 <div class="info-row">
                     <span>Customer:</span>
-                    <span>{{ $sale->customer_name }}</span>
+                    <span>
+                        @if($sale->customer)
+                            {{ $sale->customer->name }}
+                        @else
+                            Walk-in Customer
+                        @endif
+                    </span>
                 </div>
-                @if($sale->customer_phone)
+                @if($sale->customer && $sale->customer->phone)
                 <div class="info-row">
                     <span>Phone:</span>
-                    <span>{{ $sale->customer_phone }}</span>
+                    <span>{{ $sale->customer->phone }}</span>
+                </div>
+                @endif
+                @if($sale->customer && $sale->customer->email)
+                <div class="info-row">
+                    <span>Email:</span>
+                    <span>{{ $sale->customer->email }}</span>
                 </div>
                 @endif
                 <div class="info-row">
@@ -228,12 +254,7 @@
                     <span>TOTAL:</span>
                     <span>Rs {{ number_format($sale->total_amount, 2) }}</span>
                 </div>
-                @if($sale->paid_amount != $sale->total_amount)
-                <div class="total-row">
-                    <span>Paid:</span>
-                    <span>Rs {{ number_format($sale->paid_amount, 2) }}</span>
-                </div>
-                @endif
+
             </div>
 
             @if($sale->notes)
@@ -248,8 +269,12 @@
             <p style="font-size: 10px; color: #6c757d; margin-bottom: 10px;">{{ config('app.name') }} - POS System</p>
 
             <div class="no-print">
-                <button class="btn btn-print" onclick="window.print()">🖨️ Print Receipt</button>
-                <button class="btn btn-close" onclick="window.close()">✖️ Close</button>
+                <button class="btn btn-print" onclick="window.print()">
+                    <i class="fas fa-print me-1"></i> Print Receipt
+                </button>
+                <button class="btn btn-close" onclick="window.close()">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
             </div>
         </div>
     </div>

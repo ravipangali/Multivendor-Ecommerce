@@ -122,13 +122,12 @@
                                         <a href="{{ route('admin.flash-deal-products.index', ['flash_deal_id' => $flashDeal->id]) }}" class="btn btn-sm btn-success" title="Manage Products">
                                             <i class="align-middle" data-feather="tag"></i>
                                         </a>
-                                        <form action="{{ route('admin.flash-deals.destroy', $flashDeal->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger delete-confirm" title="Delete">
-                                                <i class="align-middle" data-feather="trash-2"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-danger delete-flash-deal"
+                                                data-id="{{ $flashDeal->id }}"
+                                                data-title="{{ $flashDeal->title }}"
+                                                title="Delete">
+                                            <i class="align-middle" data-feather="trash-2"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -153,18 +152,39 @@
         </div>
     </div>
 </div>
+<!-- Hidden form for delete -->
+<form id="delete-form" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 @endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Delete confirmation
-    document.querySelectorAll('.delete-confirm').forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Are you sure you want to delete this flash deal? This action cannot be undone and will also remove all associated products.')) {
-                this.closest('form').submit();
-            }
+    // Delete flash deal confirmation with SweetAlert
+    document.querySelectorAll('.delete-flash-deal').forEach(button => {
+        button.addEventListener('click', function() {
+            const flashDealId = this.getAttribute('data-id');
+            const flashDealTitle = this.getAttribute('data-title');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete flash deal "${flashDealTitle}". This action cannot be undone and will also remove all associated products!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('delete-form');
+                    form.action = `{{ route('admin.flash-deals.index') }}/${flashDealId}`;
+                    form.submit();
+                }
+            });
         });
     });
 

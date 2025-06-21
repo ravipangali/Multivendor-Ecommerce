@@ -688,6 +688,250 @@
             position: static;
         }
     }
+
+    /* Mobile-Responsive Product Image Styles */
+    .product-main-img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        object-position: center;
+        border-radius: var(--radius-md);
+    }
+
+    .product-thumbnail-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        object-position: center;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    /* Mobile specific product image optimizations */
+    @media (max-width: 768px) {
+        .product-main-img {
+            height: 300px;
+        }
+        
+        .product-thumbnail-img {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .thumbnail-container {
+            gap: 0.3rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .product-main-img {
+            height: 250px;
+        }
+        
+        .product-thumbnail-img {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .thumbnail-container {
+            gap: 0.25rem;
+            padding: 0.25rem 0;
+        }
+    }
+
+    /* Mobile-Responsive Typography Styles */
+    @media (max-width: 768px) {
+        /* Product title and meta */
+        .product-title {
+            font-size: 1.5rem !important;
+            line-height: 1.2;
+        }
+        
+        .product-meta .meta-item {
+            font-size: 0.8rem !important;
+        }
+        
+        /* Price typography */
+        .current-price {
+            font-size: 1.5rem !important;
+        }
+        
+        .original-price {
+            font-size: 1rem !important;
+        }
+        
+        .discount-badge {
+            font-size: 0.8rem !important;
+            padding: 0.4rem 0.8rem !important;
+        }
+        
+        /* Stock status */
+        .in-stock,
+        .out-of-stock {
+            font-size: 0.85rem !important;
+        }
+        
+        /* Variations */
+        .variation-label {
+            font-size: 0.9rem !important;
+        }
+        
+        .variation-option label {
+            font-size: 0.8rem !important;
+            padding: 0.6rem 1rem !important;
+        }
+        
+        /* Buttons */
+        .btn {
+            font-size: 0.85rem !important;
+            padding: 0.7rem 1.2rem !important;
+        }
+        
+        .btn-sm {
+            font-size: 0.75rem !important;
+            padding: 0.5rem 0.8rem !important;
+        }
+        
+        /* Tabs */
+        .nav-link {
+            font-size: 0.85rem !important;
+            padding: 0.6rem 1rem !important;
+        }
+        
+        /* Product description */
+        .product-description p {
+            font-size: 0.95rem !important;
+            line-height: 1.6;
+        }
+        
+        .product-description h3 {
+            font-size: 1.25rem !important;
+        }
+        
+        .product-description h4 {
+            font-size: 1.1rem !important;
+        }
+        
+        /* Specifications */
+        .specification-item {
+            font-size: 0.85rem !important;
+        }
+        
+        /* Reviews */
+        .review-author {
+            font-size: 0.9rem !important;
+        }
+        
+        .review-date {
+            font-size: 0.75rem !important;
+        }
+        
+        .review-text {
+            font-size: 0.85rem !important;
+            line-height: 1.5;
+        }
+        
+        /* Related products */
+        .related-product-title {
+            font-size: 0.85rem !important;
+            line-height: 1.3;
+        }
+        
+        .related-product-price {
+            font-size: 0.9rem !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        /* Extra small screens */
+        .product-title {
+            font-size: 1.25rem !important;
+        }
+        
+        .product-meta .meta-item {
+            font-size: 0.75rem !important;
+        }
+        
+        .current-price {
+            font-size: 1.3rem !important;
+        }
+        
+        .original-price {
+            font-size: 0.9rem !important;
+        }
+        
+        .discount-badge {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .in-stock,
+        .out-of-stock {
+            font-size: 0.8rem !important;
+        }
+        
+        .variation-label {
+            font-size: 0.85rem !important;
+        }
+        
+        .variation-option label {
+            font-size: 0.75rem !important;
+            padding: 0.5rem 0.8rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.6rem 1rem !important;
+        }
+        
+        .btn-sm {
+            font-size: 0.7rem !important;
+            padding: 0.4rem 0.6rem !important;
+        }
+        
+        .nav-link {
+            font-size: 0.8rem !important;
+            padding: 0.5rem 0.8rem !important;
+        }
+        
+        .product-description p {
+            font-size: 0.9rem !important;
+        }
+        
+        .product-description h3 {
+            font-size: 1.1rem !important;
+        }
+        
+        .product-description h4 {
+            font-size: 1rem !important;
+        }
+        
+        .specification-item {
+            font-size: 0.8rem !important;
+        }
+        
+        .review-author {
+            font-size: 0.85rem !important;
+        }
+        
+        .review-date {
+            font-size: 0.7rem !important;
+        }
+        
+        .review-text {
+            font-size: 0.8rem !important;
+        }
+        
+        .related-product-title {
+            font-size: 0.8rem !important;
+        }
+        
+        .related-product-price {
+            font-size: 0.85rem !important;
+        }
+    }
 </style>
 @endpush
 
@@ -720,16 +964,16 @@
                     <div class="product-gallery p-3">
                         <div class="main-image-container mb-3">
                             @if($product->images->count() > 0)
-                                <img src="{{ $product->images->first()->image_url }}" alt="{{ $product->name }}" class="main-image" id="mainImage">
+                                <img src="{{ $product->images->first()->image_url }}" alt="{{ $product->name }}" class="main-image product-main-img" id="mainImage">
                             @else
-                                <img src="{{ asset('storage/product_images/default-product.jpg') }}" alt="{{ $product->name }}" class="main-image" id="mainImage">
+                                <img src="{{ asset('storage/product_images/default-product.jpg') }}" alt="{{ $product->name }}" class="main-image product-main-img" id="mainImage">
                             @endif
                         </div>
 
                         @if($product->images->count() > 1)
                             <div class="thumbnail-container">
                                 @foreach($product->images as $index => $image)
-                                    <img src="{{ $image->image_url }}" alt="{{ $product->name }}" class="thumbnail {{ $index === 0 ? 'active' : '' }}" onclick="changeMainImage('{{ $image->image_url }}', this)">
+                                    <img src="{{ $image->image_url }}" alt="{{ $product->name }}" class="thumbnail product-thumbnail-img {{ $index === 0 ? 'active' : '' }}" onclick="changeMainImage('{{ $image->image_url }}', this)">
                                 @endforeach
                             </div>
                         @endif

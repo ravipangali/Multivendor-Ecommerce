@@ -100,7 +100,7 @@
                             @csrf
                             <button type="submit"
                                     class="btn btn-outline-danger"
-                                    onclick="return confirm('Are you sure you want to cancel this withdrawal request?')">
+                                    class="cancel-withdrawal" data-id="{{ $withdrawal->id }}" data-amount="{{ $withdrawal->amount }}">
                                 <i class="align-middle" data-feather="x"></i> Cancel Request
                             </button>
                         </form>
@@ -227,4 +227,41 @@
         </div>
     </div>
 </div>
+<!-- Hidden form for cancel -->
+<form id="cancel-form" action="" method="POST" style="display: none;">
+    @csrf
+</form>
+
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Cancel withdrawal confirmation with SweetAlert
+    document.querySelectorAll('.cancel-withdrawal').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const withdrawalId = this.getAttribute('data-id');
+            const amount = this.getAttribute('data-amount');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to cancel withdrawal request for Rs ${amount}. This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel it!',
+                cancelButtonText: 'Keep Request'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('cancel-form');
+                    form.action = `{{ route('seller.withdrawals.index') }}/${withdrawalId}/cancel`;
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
+@endpush

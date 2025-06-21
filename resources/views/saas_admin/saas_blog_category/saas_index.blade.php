@@ -117,13 +117,12 @@
                                                 <i class="align-middle" data-feather="power"></i>
                                             </button>
                                         </form>
-                                        <form action="{{ route('admin.blog-categories.destroy', $category->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger delete-confirm" title="Delete">
-                                                <i class="align-middle" data-feather="trash-2"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-danger delete-category"
+                                                data-id="{{ $category->id }}"
+                                                data-name="{{ $category->name }}"
+                                                title="Delete">
+                                            <i class="align-middle" data-feather="trash-2"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -148,20 +147,46 @@
         </div>
     </div>
 </div>
+<!-- Hidden form for delete -->
+<form id="delete-form" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 @endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Delete confirmation
-    document.querySelectorAll('.delete-confirm').forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
-                this.closest('form').submit();
-            }
+    // Delete category confirmation with SweetAlert
+    document.querySelectorAll('.delete-category').forEach(button => {
+        button.addEventListener('click', function() {
+            const categoryId = this.getAttribute('data-id');
+            const categoryName = this.getAttribute('data-name');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete blog category "${categoryName}". This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('delete-form');
+                    form.action = `{{ route('admin.blog-categories.index') }}/${categoryId}`;
+                    form.submit();
+                }
+            });
         });
     });
+
+    // Initialize feather icons
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
 });
 </script>
 @endpush

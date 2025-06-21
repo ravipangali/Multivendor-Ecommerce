@@ -51,8 +51,11 @@
 
     <!-- Additional Menu Items -->
     <li class="title my-3 bb1 pl20 fz20 fw500 pb-3">More</li>
-    <li><a href="{{ route('customer.blog.index') }}"><i class="flaticon-blog mr20"></i>Blog</a></li>
-    <li><a href="{{ route('customer.about') }}"><i class="flaticon-info mr20"></i>About Us</a></li>
+    <li><a href="{{ route('customer.blog.index') }}"><i class="fas fa-blog mr20"></i>Blog</a></li>
+    @if($settings->apply_share_link)
+    <li><a href="{{ $settings->apply_share_link }}" target="_blank"><i class="fas fa-money-check-dollar mr20"></i>Apply Share</a></li>
+    @endif
+    <li><a href="{{ route('customer.about') }}"><i class="fas fa-user mr20"></i>About Us</a></li>
     <li><a href="{{ route('customer.contact') }}"><i class="flaticon-phone mr20"></i>Contact Us</a></li>
   </ul>
 </nav>
