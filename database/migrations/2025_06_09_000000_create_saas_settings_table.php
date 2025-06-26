@@ -36,6 +36,7 @@ return new class extends Migration
             // Currency Settings
             $table->string('site_currency_symbol')->nullable();
             $table->string('site_currency_code')->nullable();
+            $table->decimal('seller_commission', 10, 2)->default(0)->nullable();
 
             // Mail Settings
             $table->string('mail_host')->nullable();

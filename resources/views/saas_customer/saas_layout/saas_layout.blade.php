@@ -1781,21 +1781,6 @@
                         }
                     }
 
-                    // Handle bottom nav visibility on scroll
-                    var lastScrollTop = 0;
-                    $(window).scroll(function() {
-                        var currentScroll = $(this).scrollTop();
-
-                        if (currentScroll > lastScrollTop && currentScroll > 100) {
-                            // Scrolling down
-                            $('.mobile-bottom-nav').css('transform', 'translateY(100%)');
-                        } else {
-                            // Scrolling up
-                            $('.mobile-bottom-nav').css('transform', 'translateY(0)');
-                        }
-                        lastScrollTop = currentScroll;
-                    });
-
                     // Set active navigation state
                     function setActiveNav() {
                         var currentPath = window.location.pathname;
@@ -1846,17 +1831,41 @@
                 }
             }
 
+            // Desktop Header Sticky Function
+            function initDesktopHeader() {
+                var header = $('.header-nav.main-menu');
+                if (header.length > 0) {
+                    var sticky = header.offset().top;
+                    $(window).on('scroll', function() {
+                        if ($(window).width() > 991) {
+                            if ($(window).scrollTop() > sticky) {
+                                header.addClass('is-fixed');
+                                $('.body_content_wrapper').css('padding-top', header.outerHeight());
+                            } else {
+                                header.removeClass('is-fixed');
+                                $('.body_content_wrapper').css('padding-top', 0);
+                            }
+                        } else {
+                            header.removeClass('is-fixed');
+                            $('.body_content_wrapper').css('padding-top', 0);
+                        }
+                    });
+                }
+            }
+
             // Initialize mobile navigation
             initMobileBottomNav();
             initMobileHeader();
+            initDesktopHeader();
 
             // Re-initialize on window resize
             $(window).resize(function() {
                 initMobileBottomNav();
                 initMobileHeader();
+                initDesktopHeader();
             });
 
-                                    // Popup Banner Functionality
+            // Popup Banner Functionality
             function showPopupBanners() {
                 console.log('showPopupBanners function called');
                 @if (isset($popupBanners) && $popupBanners->count() > 0)
@@ -2030,6 +2039,25 @@
                     closePopupBanner(parseInt(bannerId));
                 });
             }
+        });
+
+                // Auto-show toast notifications for session messages
+        $(document).ready(function() {
+            @if(session('success'))
+                showNotification({!! json_encode(session('success')) !!}, 'success');
+            @endif
+
+            @if(session('error'))
+                showNotification({!! json_encode(session('error')) !!}, 'error');
+            @endif
+
+            @if(session('warning'))
+                showNotification({!! json_encode(session('warning')) !!}, 'warning');
+            @endif
+
+            @if(session('info'))
+                showNotification({!! json_encode(session('info')) !!}, 'info');
+            @endif
         });
     </script>
 </body>

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('saas_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('seller_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();

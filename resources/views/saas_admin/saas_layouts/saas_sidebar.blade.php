@@ -152,6 +152,40 @@
                 </a>
             </li>
 
+            <li class="sidebar-item {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.transactions.index') }}">
+                    <i class="align-middle" data-feather="activity"></i> <span class="align-middle">Transactions</span>
+                </a>
+            </li>
+
+            <li class="sidebar-header">
+                Financial Management
+            </li>
+
+            <li class="sidebar-item {{ request()->routeIs('admin.refunds.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.refunds.index') }}">
+                    <i class="align-middle" data-feather="rotate-ccw"></i> <span class="align-middle">Customer Refunds</span>
+                    @php
+                        $pendingRefunds = \App\Models\SaasRefund::where('status', 'pending')->count();
+                    @endphp
+                    @if($pendingRefunds > 0)
+                        <span class="badge bg-warning ms-auto">{{ $pendingRefunds }}</span>
+                    @endif
+                </a>
+            </li>
+
+            <li class="sidebar-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('admin.withdrawals.index') }}">
+                    <span class="rs-icon align-middle">Rs</span> <span class="align-middle" style="padding-left: 0.5rem;">Seller Withdrawals</span>
+                    @php
+                        $pendingWithdrawals = \App\Models\SaasWithdrawal::where('status', 'pending')->where('type', 'seller_withdrawal')->count();
+                    @endphp
+                    @if($pendingWithdrawals > 0)
+                        <span class="badge bg-warning ms-auto">{{ $pendingWithdrawals }}</span>
+                    @endif
+                </a>
+            </li>
+
             <li class="sidebar-header">
                 Users
             </li>

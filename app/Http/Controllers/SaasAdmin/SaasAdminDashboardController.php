@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SaasOrder;
 use App\Models\SaasProduct;
 use App\Models\SaasInHouseSale;
+use App\Models\SaasSetting;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -19,6 +20,9 @@ class SaasAdminDashboardController extends Controller
         $today = Carbon::today();
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfWeek = Carbon::now()->endOfWeek();
+
+        // Admin Balance
+        $adminBalance = SaasSetting::get('balance', 0);
 
         // Total Orders (Online)
         $totalOrders = SaasOrder::count();
@@ -156,7 +160,8 @@ class SaasAdminDashboardController extends Controller
             'salesChartOnlineValues',
             'salesChartInHouseValues',
             'salesChartTotalValues',
-            'topProducts'
+            'topProducts',
+            'adminBalance'
         ));
     }
 }

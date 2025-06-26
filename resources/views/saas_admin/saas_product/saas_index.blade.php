@@ -33,6 +33,7 @@
                             <th>Price</th>
                             <th>Stock</th>
                             <th>Status</th>
+                            <th>Approval Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -73,6 +74,15 @@
                                     @endif
                                 </td>
                                 <td>
+                                    @if($product->seller_publish_status === 'request_product')
+                                        <span class="badge bg-warning">Pending Approval</span>
+                                    @elseif($product->seller_publish_status === 'approved_product')
+                                        <span class="badge bg-success">Approved</span>
+                                    @elseif($product->seller_publish_status === 'denied_product')
+                                        <span class="badge bg-danger">Denied</span>
+                                    @endif
+                                </td>
+                                <td>
                                     <div class="btn-group" role="group">
                                         <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-sm btn-primary">
                                             <i class="align-middle" data-feather="eye"></i>
@@ -80,6 +90,47 @@
                                         <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-info">
                                             <i class="align-middle" data-feather="edit"></i>
                                         </a>
+
+                                        @if($product->seller_publish_status === 'request_product')
+                                            <form action="{{ route('admin.products.approve', $product->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                                    <i class="align-middle" data-feather="check"></i>
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('admin.products.deny', $product->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-sm btn-warning" title="Deny">
+                                                    <i class="align-middle" data-feather="x"></i>
+                                                </button>
+                                            </form>
+                                        @elseif($product->seller_publish_status === 'approved_product')
+                                            <form action="{{ route('admin.products.deny', $product->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-sm btn-warning" title="Deny">
+                                                    <i class="align-middle" data-feather="x"></i>
+                                                </button>
+                                            </form>
+                                        @elseif($product->seller_publish_status === 'denied_product')
+                                            <form action="{{ route('admin.products.approve', $product->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                                    <i class="align-middle" data-feather="check"></i>
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('admin.products.reset-status', $product->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-sm btn-secondary" title="Reset to Pending">
+                                                    <i class="align-middle" data-feather="refresh-ccw"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+
                                         <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
@@ -92,7 +143,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">No products found.</td>
+                                <td colspan="10" class="text-center">No products found.</td>
                             </tr>
                         @endforelse
                     </tbody>

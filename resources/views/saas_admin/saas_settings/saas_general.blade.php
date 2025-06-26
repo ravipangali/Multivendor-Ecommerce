@@ -264,6 +264,35 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="seller_commission" class="form-label">Default Seller Commission (%)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="seller_commission" name="seller_commission"
+                                        value="{{ old('seller_commission', $settings->seller_commission ?? 0) }}"
+                                        min="0" max="100" step="0.01" placeholder="0.00">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">Default commission percentage for new sellers (0-100%)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="admin_balance" class="form-label">Admin Balance</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ $settings->site_currency_symbol ?? '$' }}</span>
+                                    <input type="text" class="form-control" id="admin_balance"
+                                        value="{{ number_format($settings->balance ?? 0, 2) }}" readonly>
+                                    <a href="{{ route('admin.transactions.admin-transactions') }}" class="btn btn-outline-primary">
+                                        <i data-feather="activity"></i> View Transactions
+                                    </a>
+                                </div>
+                                <small class="text-muted">Current admin balance from all transactions (read-only)</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Social Media Links -->

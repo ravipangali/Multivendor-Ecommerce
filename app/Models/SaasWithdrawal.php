@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class SaasWithdrawal extends Model
 {
@@ -12,23 +13,31 @@ class SaasWithdrawal extends Model
 
     protected $fillable = [
         'user_id',
-        'wallet_id',
         'payment_method_id',
+        'type',
         'amount',
+        'requested_amount',
         'fee',
+        'gateway_fee',
+        'final_amount',
         'net_amount',
         'currency',
         'status',
         'notes',
         'admin_notes',
+        'admin_attachment',
         'reference_id',
         'processed_at',
         'rejected_reason',
+        'processed_by',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'requested_amount' => 'decimal:2',
         'fee' => 'decimal:2',
+        'gateway_fee' => 'decimal:2',
+        'final_amount' => 'decimal:2',
         'net_amount' => 'decimal:2',
         'processed_at' => 'datetime',
     ];
@@ -53,14 +62,6 @@ class SaasWithdrawal extends Model
     }
 
     /**
-     * Get the wallet this withdrawal is from.
-     */
-    public function wallet()
-    {
-        return $this->belongsTo(SaasWallet::class);
-    }
-
-    /**
      * Get the payment method used for this withdrawal
      */
     public function paymentMethod()
@@ -69,116 +70,105 @@ class SaasWithdrawal extends Model
     }
 
     /**
-     * Request a new withdrawal.
-     *
-     * @param int $userId User ID
-     * @param float $amount Amount to withdraw
-     * @param int $paymentMethodId Payment method ID to use
-     * @param string $notes Notes from the user
-     * @param float $fee Fee amount (if any)
-     * @return \App\Models\SaasWithdrawal
+     * Get the admin who processed the withdrawal.
      */
-    public static function requestWithdrawal($userId, $amount, $paymentMethodId, $notes = null, $fee = 0)
+    public function processedBy()
     {
-        $user = User::findOrFail($userId);
-        $wallet = SaasWallet::where('user_id', $userId)->firstOrFail();
+        return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    /**
+     * Request a new seller withdrawal.
+     */
+    public static function requestSellerWithdrawal($sellerId, $requestedAmount, $paymentMethodId, $notes = null)
+    {
+        $seller = User::findOrFail($sellerId);
+
+        // Verify seller role
+        if (!$seller->isSeller()) {
+            throw new \InvalidArgumentException('Only sellers can request withdrawals');
+        }
+
         $paymentMethod = SaasPaymentMethod::where('id', $paymentMethodId)
-            ->where('user_id', $userId)
+            ->where('user_id', $sellerId)
             ->where('is_active', true)
             ->firstOrFail();
 
-        if ($wallet->balance < $amount) {
+        if ($seller->balance < $requestedAmount) {
             throw new \InvalidArgumentException('Insufficient balance for withdrawal');
         }
 
-        $netAmount = $amount - $fee;
+        // Get gateway transaction fee from settings
+        $settings = SaasSetting::first();
+        $gatewayFee = $settings ? $settings->gateway_transaction_fee : 0;
+
+        // Calculate final amount (requested amount - gateway fee)
+        $finalAmount = $requestedAmount - $gatewayFee;
+
+        if ($finalAmount <= 0) {
+            throw new \InvalidArgumentException('Withdrawal amount too small after gateway fees');
+        }
+
+        return self::create([
+            'user_id' => $sellerId,
+            'payment_method_id' => $paymentMethod->id,
+            'type' => 'seller_withdrawal',
+            'requested_amount' => $requestedAmount,
+            'amount' => $requestedAmount, // Keep for compatibility
+            'gateway_fee' => $gatewayFee,
+            'final_amount' => $finalAmount,
+            'net_amount' => $finalAmount, // Keep for compatibility
+            'currency' => 'NPR',
+            'status' => 'pending',
+            'notes' => $notes,
+        ]);
+    }
+
+    /**
+     * Approve the withdrawal request.
+     */
+    public function approveWithdrawal($adminId, $adminNotes = null, $attachmentFile = null)
+    {
+        if ($this->status !== 'pending') {
+            throw new \InvalidArgumentException('Only pending withdrawals can be approved');
+        }
 
         DB::beginTransaction();
 
         try {
-            // Create the withdrawal request
-            $withdrawal = self::create([
-                'user_id' => $userId,
-                'wallet_id' => $wallet->id,
-                'payment_method_id' => $paymentMethod->id,
-                'amount' => $amount,
-                'fee' => $fee,
-                'net_amount' => $netAmount,
-                'currency' => $wallet->currency,
-                'status' => 'pending',
-                'notes' => $notes,
+            // Handle attachment upload
+            $attachmentPath = null;
+            if ($attachmentFile) {
+                $attachmentPath = $attachmentFile->store('withdrawal_attachments', 'public');
+            }
+
+            // Update withdrawal status
+            $this->update([
+                'status' => 'approved',
+                'admin_notes' => $adminNotes,
+                'admin_attachment' => $attachmentPath,
+                'processed_at' => now(),
+                'processed_by' => $adminId,
             ]);
 
-            // Deduct the amount from wallet (pending withdrawal)
-            $wallet->debit(
-                $amount,
-                'withdrawal',
-                "Withdrawal request #{$withdrawal->id}",
-                ['withdrawal_id' => $withdrawal->id],
-                $fee
+            // Deduct requested amount from seller balance
+            $this->user->updateBalance(
+                $this->requested_amount,
+                SaasTransaction::TYPE_WITHDRAWAL,
+                "Withdrawal approved - Request #{$this->id}",
+                null
             );
 
-            DB::commit();
-            return $withdrawal;
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-    }
-
-    /**
-     * Process a withdrawal request (approve/complete).
-     *
-     * @param string $referenceId External reference ID (transaction ID, etc.)
-     * @param string $adminNotes Notes from admin
-     * @param int $adminId ID of admin who processed the withdrawal
-     * @return bool
-     */
-    public function processWithdrawal($referenceId, $adminNotes = null, $adminId = null)
-    {
-        if ($this->status !== 'pending') {
-            throw new \InvalidArgumentException('Only pending withdrawals can be processed');
-        }
-
-        $this->status = 'completed';
-        $this->reference_id = $referenceId;
-        $this->admin_notes = $adminNotes;
-        $this->processed_at = now();
-        return $this->save();
-    }
-
-    /**
-     * Reject a withdrawal request.
-     *
-     * @param string $reason Reason for rejection
-     * @param string $adminNotes Additional notes from admin
-     * @param int $adminId ID of admin who rejected the withdrawal
-     * @return bool
-     */
-    public function rejectWithdrawal($reason, $adminNotes = null, $adminId = null)
-    {
-        if ($this->status !== 'pending') {
-            throw new \InvalidArgumentException('Only pending withdrawals can be rejected');
-        }
-
-        DB::beginTransaction();
-
-        try {
-            // Update withdrawal status
-            $this->status = 'rejected';
-            $this->rejected_reason = $reason;
-            $this->admin_notes = $adminNotes;
-            $this->processed_at = now();
-            $this->save();
-
-            // Refund the amount to the wallet
-            $wallet = $this->wallet;
-            $wallet->credit(
-                $this->amount,
-                'withdrawal_refund',
-                "Refund for rejected withdrawal #{$this->id}",
-                ['withdrawal_id' => $this->id]
-            );
+            // Deduct final amount from admin balance
+            $settings = SaasSetting::first();
+            if ($settings) {
+                $settings->updateBalance(
+                    $this->final_amount,
+                    SaasTransaction::TYPE_WITHDRAWAL,
+                    "Seller withdrawal processed - Request #{$this->id}",
+                    null
+                );
+            }
 
             DB::commit();
             return true;
@@ -189,9 +179,27 @@ class SaasWithdrawal extends Model
     }
 
     /**
-     * Cancel a withdrawal request (by user).
-     *
-     * @return bool
+     * Reject a withdrawal request.
+     */
+    public function rejectWithdrawal($adminId, $reason, $adminNotes = null)
+    {
+        if ($this->status !== 'pending') {
+            throw new \InvalidArgumentException('Only pending withdrawals can be rejected');
+        }
+
+        $this->update([
+            'status' => 'rejected',
+            'rejected_reason' => $reason,
+            'admin_notes' => $adminNotes,
+            'processed_at' => now(),
+            'processed_by' => $adminId,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Cancel a withdrawal request (by seller).
      */
     public function cancelWithdrawal()
     {
@@ -199,37 +207,68 @@ class SaasWithdrawal extends Model
             throw new \InvalidArgumentException('Only pending withdrawals can be cancelled');
         }
 
-        DB::beginTransaction();
+        $this->update([
+            'status' => 'cancelled',
+            'processed_at' => now(),
+        ]);
 
-        try {
-            // Update withdrawal status
-            $this->status = 'cancelled';
-            $this->save();
-
-            // Refund the amount to the wallet
-            $wallet = $this->wallet;
-            $wallet->credit(
-                $this->amount,
-                'withdrawal_cancelled',
-                "Refund for cancelled withdrawal #{$this->id}",
-                ['withdrawal_id' => $this->id]
-            );
-
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return true;
     }
 
     /**
-     * Get the transaction associated with this withdrawal.
+     * Get admin attachment URL.
+     */
+    public function getAdminAttachmentUrlAttribute()
+    {
+        return $this->admin_attachment ? Storage::url($this->admin_attachment) : null;
+    }
+
+    /**
+     * Scope for pending withdrawals.
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    /**
+     * Scope for approved withdrawals.
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    /**
+     * Scope for seller withdrawals.
+     */
+    public function scopeSellerWithdrawals($query)
+    {
+        return $query->where('type', 'seller_withdrawal');
+    }
+
+    /**
+     * Get status badge class.
+     */
+    public function getStatusBadgeClassAttribute()
+    {
+        return match($this->status) {
+            'pending' => 'warning',
+            'approved' => 'success',
+            'processing' => 'info',
+            'completed' => 'primary',
+            'rejected' => 'danger',
+            'cancelled' => 'secondary',
+            default => 'secondary'
+        };
+    }
+
+    /**
+     * Get the related transaction.
      */
     public function transaction()
     {
-        return SaasWalletTransaction::where('source', 'withdrawal')
-            ->where('meta_data->withdrawal_id', $this->id)
-            ->first();
+        return $this->hasOne(SaasTransaction::class, 'reference_id')
+                    ->where('reference_type', SaasTransaction::REFERENCE_WITHDRAWAL);
     }
 }

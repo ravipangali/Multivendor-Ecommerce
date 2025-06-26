@@ -95,10 +95,10 @@
                                     @if($product->product_type === 'Digital' && $product->file)
                                         <div class="mt-2">
                                             <p>Current File: <strong>{{ basename($product->file) }}</strong></p>
-                                            <a href="{{ route('admin.products.preview-file', $product) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <a href="{{ route('admin.products.file.preview', $product) }}" class="btn btn-sm btn-outline-primary" target="_blank">
                                                 <i class="fas fa-eye"></i> Preview
                                             </a>
-                                            <a href="{{ route('admin.products.download-file', $product) }}" class="btn btn-sm btn-outline-success">
+                                            <a href="{{ route('admin.products.file.download', $product) }}" class="btn btn-sm btn-outline-success">
                                                 <i class="fas fa-download"></i> Download
                                             </a>
                                         </div>

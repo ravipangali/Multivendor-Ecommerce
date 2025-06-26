@@ -13,43 +13,18 @@
 
     <div class="row">
         <!-- Wallet Balance -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="align-middle" data-feather="credit-card"></i>
-                        Wallet Balance
-                    </h5>
-                </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
                 <div class="card-body">
-                    <div class="text-center">
-                        <h2 class="text-success">Rs {{ number_format($walletBalance ?? 0, 2) }}</h2>
-                        <p class="text-muted">Available for withdrawal</p>
-                    </div>
-
-                    @if(($minimumWithdrawal ?? 0) > 0)
-                        <div class="alert alert-info">
-                            <small>
-                                <i class="align-middle" data-feather="info"></i>
-                                Minimum withdrawal amount: Rs {{ number_format($minimumWithdrawal, 2) }}
-                            </small>
-                        </div>
-                    @endif
-
-                    @if(($pendingWithdrawals ?? 0) > 0)
-                        <div class="alert alert-warning">
-                            <small>
-                                <i class="align-middle" data-feather="clock"></i>
-                                Pending withdrawals: Rs {{ number_format($pendingWithdrawals, 2) }}
-                            </small>
-                        </div>
-                    @endif
+                    <h5 class="card-title">Your Balance</h5>
+                    <p class="card-text">This is your current available balance for withdrawal.</p>
+                    <h2 class="text-success">Rs {{ number_format($availableBalance ?? 0, 2) }}</h2>
                 </div>
             </div>
         </div>
 
         <!-- Withdrawal Form -->
-        <div class="col-md-8">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Withdrawal Request Form</h5>
@@ -69,25 +44,25 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="amount" class="form-label">Withdrawal Amount <span class="text-danger">*</span></label>
+                            <label for="requested_amount" class="form-label">Withdrawal Amount <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">Rs</span>
                                 <input type="number"
-                                       class="form-control @error('amount') is-invalid @enderror"
-                                       id="amount"
-                                       name="amount"
-                                       value="{{ old('amount') }}"
+                                       class="form-control @error('requested_amount') is-invalid @enderror"
+                                       id="requested_amount"
+                                       name="requested_amount"
+                                       value="{{ old('requested_amount') }}"
                                        step="0.01"
                                        min="{{ $minimumWithdrawal ?? 0 }}"
-                                       max="{{ $walletBalance ?? 0 }}"
+                                       max="{{ $availableBalance ?? 0 }}"
                                        placeholder="Enter withdrawal amount"
                                        required>
-                                @error('amount')
+                                @error('requested_amount')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="form-text">
-                                Available balance: Rs {{ number_format($walletBalance ?? 0, 2) }}
+                                Available balance: Rs {{ number_format($availableBalance ?? 0, 2) }}
                             </div>
                         </div>
 
@@ -106,7 +81,11 @@
                                         @elseif($paymentMethod->type == 'paypal')
                                             {{ $paymentMethod->paypal_email }}
                                         @else
-                                            {{ $paymentMethod->details }}
+                                            @if(is_array($paymentMethod->details))
+                                                {{ implode(', ', array_filter($paymentMethod->details)) }}
+                                            @else
+                                                {{ $paymentMethod->details }}
+                                            @endif
                                         @endif
                                         @if($paymentMethod->is_default)
                                             <span class="badge bg-success">Default</span>
@@ -152,7 +131,7 @@
                         <div class="mb-3">
                             <button type="submit"
                                     class="btn btn-primary"
-                                    @if(count($paymentMethods ?? []) == 0 || ($walletBalance ?? 0) < ($minimumWithdrawal ?? 0)) disabled @endif>
+                                    @if(count($paymentMethods ?? []) == 0 || ($availableBalance ?? 0) < ($minimumWithdrawal ?? 0)) disabled @endif>
                                 <i class="align-middle" data-feather="send"></i> Submit Withdrawal Request
                             </button>
                             <a href="{{ route('seller.withdrawals.index') }}" class="btn btn-secondary">
@@ -203,9 +182,10 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const amountInput = document.getElementById('amount');
-    const walletBalance = {{ $walletBalance ?? 0 }};
+    const amountInput = document.getElementById('requested_amount');
+    const availableBalance = {{ $availableBalance ?? 0 }};
     const minimumWithdrawal = {{ $minimumWithdrawal ?? 0 }};
+    const gatewayFee = {{ $gatewayFee ?? 0 }};
 
     // Quick amount buttons
     function addQuickAmountButtons() {
@@ -215,10 +195,10 @@ document.addEventListener('DOMContentLoaded', function() {
         quickAmountsDiv.innerHTML = '<small class="text-muted">Quick amounts:</small>';
 
         const amounts = [
-            Math.min(1000, walletBalance),
-            Math.min(5000, walletBalance),
-            Math.min(10000, walletBalance),
-            walletBalance
+            Math.min(1000, availableBalance),
+            Math.min(5000, availableBalance),
+            Math.min(10000, availableBalance),
+            availableBalance
         ].filter((amount, index, arr) => amount >= minimumWithdrawal && arr.indexOf(amount) === index);
 
         amounts.forEach(amount => {
@@ -233,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
         container.appendChild(quickAmountsDiv);
     }
 
-    if (walletBalance >= minimumWithdrawal) {
+    if (availableBalance >= minimumWithdrawal) {
         addQuickAmountButtons();
     }
 
@@ -241,12 +221,16 @@ document.addEventListener('DOMContentLoaded', function() {
     amountInput.addEventListener('input', function() {
         const value = parseFloat(this.value) || 0;
         const submitBtn = document.querySelector('button[type="submit"]');
+        const finalAmount = value - gatewayFee;
 
-        if (value > walletBalance) {
+        if (value > availableBalance) {
             this.setCustomValidity('Amount exceeds available balance');
             submitBtn.disabled = true;
         } else if (value < minimumWithdrawal) {
             this.setCustomValidity('Amount is below minimum withdrawal limit');
+            submitBtn.disabled = true;
+        } else if (finalAmount <= 0) {
+            this.setCustomValidity('Amount too small after gateway fees');
             submitBtn.disabled = true;
         } else {
             this.setCustomValidity('');

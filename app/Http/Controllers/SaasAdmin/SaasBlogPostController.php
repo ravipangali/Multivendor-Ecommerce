@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class SaasBlogPostController extends Controller
 {
@@ -156,7 +157,7 @@ class SaasBlogPostController extends Controller
 
         // Set default author if not provided
         if (!isset($data['author_id']) || !$data['author_id']) {
-            $data['author_id'] = auth()->id();
+            $data['author_id'] = Auth::id();
         }
 
         // Convert tags string to array
@@ -226,7 +227,7 @@ class SaasBlogPostController extends Controller
 
         // Handle featured image upload
         if ($request->hasFile('featured_image')) {
-            // Delete old image
+            // Delete old image if it exists
             if ($blog_post->featured_image) {
                 Storage::disk('public')->delete($blog_post->featured_image);
             }
@@ -235,6 +236,11 @@ class SaasBlogPostController extends Controller
             $filename = 'blog_images/' . uniqid() . '.' . $image->getClientOriginalExtension();
             $image->storeAs('public', $filename);
             $data['featured_image'] = $filename;
+        }
+
+        // Set default author if not provided
+        if (!isset($data['author_id']) || !$data['author_id']) {
+            $data['author_id'] = Auth::id();
         }
 
         // Convert tags string to array

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
@@ -36,6 +37,7 @@ class SaasProduct extends Model
         'is_active',
         'is_featured',
         'has_variations',
+        'seller_publish_status',
         'meta_title',
         'meta_description',
     ];
@@ -51,11 +53,25 @@ class SaasProduct extends Model
     const PRODUCT_TYPE_DIGITAL = 'Digital';
     const PRODUCT_TYPE_PHYSICAL = 'Physical';
 
+    // Seller publish status constants
+    const SELLER_PUBLISH_STATUS_REQUEST = 'request_product';
+    const SELLER_PUBLISH_STATUS_APPROVED = 'approved_product';
+    const SELLER_PUBLISH_STATUS_DENIED = 'denied_product';
+
     public static function getProductTypes()
     {
         return [
             self::PRODUCT_TYPE_DIGITAL => 'Digital Product',
             self::PRODUCT_TYPE_PHYSICAL => 'Physical Product',
+        ];
+    }
+
+    public static function getSellerPublishStatuses()
+    {
+        return [
+            self::SELLER_PUBLISH_STATUS_REQUEST => 'Request Product',
+            self::SELLER_PUBLISH_STATUS_APPROVED => 'Approved Product',
+            self::SELLER_PUBLISH_STATUS_DENIED => 'Denied Product',
         ];
     }
 
@@ -67,6 +83,21 @@ class SaasProduct extends Model
     public function isPhysical()
     {
         return $this->product_type === self::PRODUCT_TYPE_PHYSICAL;
+    }
+
+    public function isRequestProduct()
+    {
+        return $this->seller_publish_status === self::SELLER_PUBLISH_STATUS_REQUEST;
+    }
+
+    public function isApprovedProduct()
+    {
+        return $this->seller_publish_status === self::SELLER_PUBLISH_STATUS_APPROVED;
+    }
+
+    public function isDeniedProduct()
+    {
+        return $this->seller_publish_status === self::SELLER_PUBLISH_STATUS_DENIED;
     }
 
     public function getFileUrlAttribute()

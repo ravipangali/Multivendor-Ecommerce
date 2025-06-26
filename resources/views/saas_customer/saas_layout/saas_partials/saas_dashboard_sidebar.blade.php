@@ -105,6 +105,44 @@
                 </a>
             </li>
 
+            <li class="menu-item-enhanced {{ strpos($currentRoute, 'customer.refunds') !== false ? 'active' : '' }}">
+                <a href="{{ route('customer.refunds.index') }}" class="menu-link-enhanced">
+                    <div class="menu-icon">
+                        <i class="fas fa-undo-alt"></i>
+                    </div>
+                    <div class="menu-content">
+                        <span class="menu-title">Refund Requests</span>
+                        <span class="menu-subtitle">Return & refunds</span>
+                    </div>
+                    @php
+                        $pendingRefunds = DB::table('saas_refunds')->where('customer_id', $user->id)->where('status', 'pending')->count();
+                    @endphp
+                    @if($pendingRefunds > 0)
+                        <span class="badge-notification">{{ $pendingRefunds }}</span>
+                    @endif
+                    <div class="menu-indicator"></div>
+                </a>
+            </li>
+
+            <li class="menu-item-enhanced {{ strpos($currentRoute, 'customer.payment-methods') !== false ? 'active' : '' }}">
+                <a href="{{ route('customer.payment-methods.index') }}" class="menu-link-enhanced">
+                    <div class="menu-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="menu-content">
+                        <span class="menu-title">Payment Methods</span>
+                        <span class="menu-subtitle">Manage payments</span>
+                    </div>
+                    @php
+                        $activePaymentMethods = DB::table('saas_payment_methods')->where('user_id', $user->id)->where('is_active', true)->count();
+                    @endphp
+                    @if($activePaymentMethods > 0)
+                        <span class="badge-notification success-badge">{{ $activePaymentMethods }}</span>
+                    @endif
+                    <div class="menu-indicator"></div>
+                </a>
+            </li>
+
             <li class="menu-item-enhanced {{ $currentRoute == 'customer.profile' ? 'active' : '' }}">
                 <a href="{{ route('customer.profile') }}" class="menu-link-enhanced">
                     <div class="menu-icon">

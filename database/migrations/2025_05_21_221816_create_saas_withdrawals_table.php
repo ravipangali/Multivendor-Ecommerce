@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('saas_withdrawals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('wallet_id')->constrained('saas_wallets')->onDelete('cascade');
             $table->foreignId('payment_method_id')->constrained('saas_payment_methods')->onDelete('restrict');
             $table->decimal('amount', 15, 2);
             $table->decimal('fee', 10, 2)->default(0.00); // Transaction fee if applicable

@@ -143,7 +143,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="text-muted small">Account Holder Name</label>
-                    <p class="fw-bold mb-0">{{ $paymentMethod->account_name }}</p>
+                    <p class="fw-bold mb-0">{{ $paymentMethod->details['account_name'] ?? 'N/A' }}</p>
                 </div>
             </div>
         </div>
@@ -162,15 +162,15 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="text-muted small">Bank Name</label>
-                        <p class="fw-bold mb-0">{{ $paymentMethod->bank_name ?: 'N/A' }}</p>
+                        <p class="fw-bold mb-0">{{ $paymentMethod->details['bank_name'] ?? 'N/A' }}</p>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="text-muted small">Branch Name</label>
-                        <p class="fw-bold mb-0">{{ $paymentMethod->bank_branch ?: 'N/A' }}</p>
+                        <p class="fw-bold mb-0">{{ $paymentMethod->details['bank_branch'] ?? 'N/A' }}</p>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="text-muted small">Account Number</label>
-                        <p class="fw-bold mb-0">{{ $paymentMethod->account_number ?: 'N/A' }}</p>
+                        <p class="fw-bold mb-0">{{ $paymentMethod->details['account_number'] ?? 'N/A' }}</p>
                     </div>
                 </div>
             </div>
@@ -187,7 +187,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="text-muted small">Mobile Number</label>
-                        <p class="fw-bold mb-0">{{ $paymentMethod->mobile_number ?: 'N/A' }}</p>
+                        <p class="fw-bold mb-0">{{ $paymentMethod->details['mobile_number'] ?? 'N/A' }}</p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="text-muted small">Wallet Type</label>

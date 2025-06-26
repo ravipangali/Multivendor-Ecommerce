@@ -30,6 +30,7 @@ use App\Http\Controllers\SaasAdmin\SaasBlogPostController;
 use App\Http\Controllers\SaasAdmin\SaasPosController;
 use App\Http\Controllers\SaasAdmin\SaasInHouseSaleController;
 use App\Http\Controllers\SaasAdmin\SaasInHouseProductController;
+use App\Http\Controllers\SaasAdmin\SaasTransactionController;
 use App\Http\Controllers\SaasAdmin\TinyMCEController;
 
 Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -77,6 +78,10 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
     // Digital Product File Access Routes
     Route::get('/products/{product}/file/preview', [SaasProductController::class, 'previewFile'])->name('products.file.preview');
     Route::get('/products/{product}/file/download', [SaasProductController::class, 'downloadFile'])->name('products.file.download');
+    // Product Approval Routes
+    Route::patch('/products/{product}/approve', [SaasProductController::class, 'approve'])->name('products.approve');
+    Route::patch('/products/{product}/deny', [SaasProductController::class, 'deny'])->name('products.deny');
+    Route::patch('/products/{product}/reset-status', [SaasProductController::class, 'resetStatus'])->name('products.reset-status');
     Route::resource('product-reviews', SaasProductReviewController::class);
     Route::patch('product-reviews/{productReview}/toggle-approval', [SaasProductReviewController::class, 'toggleApproval'])->name('product-reviews.toggle-approval');
     Route::patch('product-reviews/{productReview}/clear-report', [SaasProductReviewController::class, 'clearReport'])->name('product-reviews.clear-report');
@@ -95,6 +100,14 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
     Route::resource('payment-methods', SaasPaymentMethodController::class);
     Route::post('payment-methods/{paymentMethod}/set-default', [SaasPaymentMethodController::class, 'setDefault'])
         ->name('payment-methods.set-default');
+
+    // Transactions
+    Route::prefix('transactions')->name('transactions.')->group(function () {
+        Route::get('/', [SaasTransactionController::class, 'index'])->name('index');
+        Route::get('/admin-transactions', [SaasTransactionController::class, 'adminTransactions'])->name('admin-transactions');
+        Route::get('/export', [SaasTransactionController::class, 'export'])->name('export');
+        Route::get('/{transaction}', [SaasTransactionController::class, 'show'])->name('show');
+    });
 
     // User Management
     Route::resource('users', SaasUserController::class);
@@ -142,4 +155,23 @@ Route::middleware(['auth', 'saasrolemanager:admin'])->prefix('admin')->name('adm
     Route::get('tinymce/test-page', function() {
         return view('saas_admin.tinymce_test');
     })->name('tinymce.test-page');
+
+    // Refund Management
+    Route::prefix('refunds')->name('refunds.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\SaasAdmin\SaasRefundController::class, 'index'])->name('index');
+        Route::get('/{refund}', [\App\Http\Controllers\SaasAdmin\SaasRefundController::class, 'show'])->name('show');
+        Route::get('/{refund}/edit', [\App\Http\Controllers\SaasAdmin\SaasRefundController::class, 'edit'])->name('edit');
+        Route::post('/{refund}/approve', [\App\Http\Controllers\SaasAdmin\SaasRefundController::class, 'approve'])->name('approve');
+        Route::post('/{refund}/reject', [\App\Http\Controllers\SaasAdmin\SaasRefundController::class, 'reject'])->name('reject');
+        Route::get('/{refund}/download-attachment', [\App\Http\Controllers\SaasAdmin\SaasRefundController::class, 'downloadAttachment'])->name('download-attachment');
+    });
+
+    // Withdrawal Management
+    Route::prefix('withdrawals')->name('withdrawals.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\SaasAdmin\SaasWithdrawalController::class, 'index'])->name('index');
+        Route::get('/{withdrawal}', [\App\Http\Controllers\SaasAdmin\SaasWithdrawalController::class, 'show'])->name('show');
+        Route::post('/{withdrawal}/approve', [\App\Http\Controllers\SaasAdmin\SaasWithdrawalController::class, 'approve'])->name('approve');
+        Route::post('/{withdrawal}/reject', [\App\Http\Controllers\SaasAdmin\SaasWithdrawalController::class, 'reject'])->name('reject');
+        Route::get('/{withdrawal}/download-attachment', [\App\Http\Controllers\SaasAdmin\SaasWithdrawalController::class, 'downloadAttachment'])->name('download-attachment');
+    });
 });

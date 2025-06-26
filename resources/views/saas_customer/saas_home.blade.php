@@ -66,6 +66,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="action-card shop-card">
+                        <div class="card-icon">
+                            <img src="{{ asset('saas_frontend/img/request.png') }}" alt="Shop Now" class="action-card-img">
+                        </div>
+                        <div class="card-content">
+                            <span class="card-subtitle">Sign Up For Free</span>
+                            <h3 class="card-title">Make a demand for a product</h3>
+                            <a href="{{ route('register') }}" class="btn btn-primary">
+                                <i class="fas fa-user me-2"></i>Become A Customer
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1670,65 +1684,65 @@
         font-size: 1.75rem !important;
         line-height: 1.3;
     }
-    
+
     .section-subtitle {
         font-size: 0.95rem !important;
         line-height: 1.5;
     }
-    
+
     /* Hero banner text */
     .banner-content h1 {
         font-size: 2rem !important;
     }
-    
+
     .banner-content p {
         font-size: 1rem !important;
     }
-    
+
     /* Action card typography */
     .card-title {
         font-size: 1.1rem !important;
         line-height: 1.3;
     }
-    
+
     .card-subtitle {
         font-size: 0.8rem !important;
     }
-    
+
     /* Category names */
     .category-name {
         font-size: 0.9rem !important;
         line-height: 1.2;
     }
-    
+
     .category-count {
         font-size: 0.75rem !important;
     }
-    
+
     /* Product typography */
     .product-title {
         font-size: 0.9rem !important;
         line-height: 1.3;
     }
-    
+
     .product-brand {
         font-size: 0.7rem !important;
     }
-    
+
     .current-price {
         font-size: 1rem !important;
     }
-    
+
     .original-price {
         font-size: 0.8rem !important;
     }
-    
+
     /* Button text */
     .btn {
         font-size: 0.85rem !important;
         padding: 0.6rem 1rem !important;
     }
-    
+
     .btn-sm {
         font-size: 0.75rem !important;
         padding: 0.5rem 0.8rem !important;
@@ -1740,48 +1754,48 @@
     .section-title {
         font-size: 1.5rem !important;
     }
-    
+
     .section-subtitle {
         font-size: 0.9rem !important;
     }
-    
+
     .banner-content h1 {
         font-size: 1.75rem !important;
     }
-    
+
     .card-title {
         font-size: 1rem !important;
     }
-    
+
     .card-subtitle {
         font-size: 0.75rem !important;
     }
-    
+
     .category-name {
         font-size: 0.8rem !important;
     }
-    
+
     .category-count {
         font-size: 0.7rem !important;
     }
-    
+
     .product-title {
         font-size: 0.85rem !important;
     }
-    
+
     .product-brand {
         font-size: 0.65rem !important;
     }
-    
+
     .current-price {
         font-size: 0.95rem !important;
     }
-    
+
     .btn {
         font-size: 0.8rem !important;
         padding: 0.5rem 0.8rem !important;
     }
-    
+
     .btn-sm {
         font-size: 0.7rem !important;
         padding: 0.4rem 0.6rem !important;

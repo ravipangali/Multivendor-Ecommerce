@@ -155,12 +155,34 @@ class SaasOrderController extends Controller
                 );
 
                 // Send email to seller
-                Mail::to($order->seller->email)->send(
-                    new \App\Mail\SaasOrderStatusChanged($order, $previousOrderStatus, 'seller')
-                );
+                if ($order->seller && $order->seller->email) {
+                    Mail::to($order->seller->email)->send(
+                        new \App\Mail\SaasOrderStatusChanged($order, $previousOrderStatus, 'seller')
+                    );
+                }
+
+                // Send email to admin
+                $adminEmail = config('app.admin_email', 'admin@example.com');
+                if ($adminEmail) {
+                    Mail::to($adminEmail)->send(
+                        new \App\Mail\SaasOrderStatusChanged($order, $previousOrderStatus, 'admin')
+                    );
+                }
+
+                Log::info('Order status change emails sent successfully', [
+                    'order_id' => $order->id,
+                    'customer_email' => $order->customer->email,
+                    'seller_email' => $order->seller->email ?? 'N/A',
+                    'admin_email' => $adminEmail
+                ]);
+
             } catch (\Exception $e) {
                 // Log email error but don't fail the status update
-                Log::error('Failed to send order status change emails: ' . $e->getMessage());
+                Log::error('Failed to send order status change emails', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
             }
 
             // Log the status change

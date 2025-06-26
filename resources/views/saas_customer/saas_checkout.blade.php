@@ -202,6 +202,19 @@
     border-color: var(--primary-color);
   }
 
+  #billing_fields {
+    margin-top: 1rem;
+    padding: 1.5rem;
+    background: rgba(171, 207, 55, 0.05);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(171, 207, 55, 0.2);
+  }
+
+  .billing-field:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(171, 207, 55, 0.1);
+  }
+
   .order-summary-section {
     position: sticky;
     top: 2rem;
@@ -559,6 +572,92 @@
                         </div>
                     </div>
 
+                    <!-- Billing Information -->
+                    <div class="checkout-section">
+                        <h4>
+                            <i class="fa fa-credit-card me-2 text-primary"></i>
+                            Billing Information
+                        </h4>
+
+                                                <!-- Same as shipping checkbox -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       name="same_as_shipping"
+                                       id="same_as_shipping"
+                                       value="1"
+                                       {{ old('same_as_shipping', old('billing_name') || old('billing_email') || old('billing_address') ? '' : '1') == '1' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="same_as_shipping">
+                                    <strong>Billing address is the same as shipping address</strong>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Billing form fields (hidden by default) -->
+                        <div id="billing_fields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           name="billing_name"
+                                           class="form-control billing-field"
+                                           value="{{ old('billing_name', $customer->name) }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email"
+                                           name="billing_email"
+                                           class="form-control billing-field"
+                                           value="{{ old('billing_email', $customer->email) }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                    <input type="tel"
+                                           name="billing_phone"
+                                           class="form-control billing-field"
+                                           value="{{ old('billing_phone', $customer->phone ?? '') }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Country <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           name="billing_country"
+                                           class="form-control billing-field"
+                                           value="{{ old('billing_country', 'Nepal') }}">
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Street Address <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           name="billing_address"
+                                           class="form-control billing-field"
+                                           placeholder="House number and street name"
+                                           value="{{ old('billing_address', $customerProfile->billing_address ?? '') }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           name="billing_city"
+                                           class="form-control billing-field"
+                                           value="{{ old('billing_city') }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">State/Province <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           name="billing_state"
+                                           class="form-control billing-field"
+                                           value="{{ old('billing_state') }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Postal Code <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           name="billing_postal_code"
+                                           class="form-control billing-field"
+                                           value="{{ old('billing_postal_code') }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Payment Methods -->
                     <div class="checkout-section">
                         <h4>
@@ -724,6 +823,46 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get the form element
     const form = document.getElementById('checkoutForm');
     console.log('Checkout form initialized');
+
+    // Handle same as shipping checkbox
+    const sameAsShippingCheckbox = document.getElementById('same_as_shipping');
+    const billingFields = document.getElementById('billing_fields');
+
+    function toggleBillingFields() {
+        if (sameAsShippingCheckbox && billingFields) {
+            if (sameAsShippingCheckbox.checked) {
+                billingFields.style.display = 'none';
+                // Remove required attribute from billing fields when hidden
+                const billingInputs = billingFields.querySelectorAll('.billing-field');
+                billingInputs.forEach(input => {
+                    input.removeAttribute('required');
+                });
+            } else {
+                billingFields.style.display = 'block';
+                // Add required attribute to billing fields when shown
+                const billingInputs = billingFields.querySelectorAll('.billing-field');
+                billingInputs.forEach(input => {
+                    input.setAttribute('required', 'required');
+                });
+            }
+        }
+    }
+
+    // Initialize billing fields visibility
+    toggleBillingFields();
+
+    // Show billing fields if there are validation errors for billing fields
+    @if($errors->hasAny(['billing_name', 'billing_email', 'billing_phone', 'billing_country', 'billing_address', 'billing_city', 'billing_state', 'billing_postal_code']))
+        if (sameAsShippingCheckbox) {
+            sameAsShippingCheckbox.checked = false;
+            toggleBillingFields();
+        }
+    @endif
+
+    // Add event listener for checkbox change
+    if (sameAsShippingCheckbox) {
+        sameAsShippingCheckbox.addEventListener('change', toggleBillingFields);
+    }
 
     // Add a submit event listener
     if (form) {

@@ -47,7 +47,9 @@ class SaasFlashDealProductController extends Controller
             $flashDeals = SaasFlashDeal::all();
         }
 
-        $products = SaasProduct::where('is_active', true)->get();
+        $products = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+            ->get();
         $discountTypes = ['flat', 'percentage'];
 
         return view('saas_admin.saas_flash_deal_product.saas_create', compact(

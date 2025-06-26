@@ -22,6 +22,15 @@ class SaasOrderItem extends Model
     ];
 
     /**
+     * Set the seller_id attribute.
+     * Convert empty string to null for database compatibility.
+     */
+    public function setSellerIdAttribute($value)
+    {
+        $this->attributes['seller_id'] = empty($value) ? null : $value;
+    }
+
+    /**
      * Get the order that owns the item.
      */
     public function order()

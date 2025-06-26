@@ -13,11 +13,7 @@ class SaasPaymentMethod extends Model
         'user_id',
         'type',
         'title',
-        'account_name',
-        'account_number',
-        'bank_name',
-        'bank_branch',
-        'mobile_number',
+        'details',
         'is_default',
         'is_active',
         'notes'
@@ -26,6 +22,7 @@ class SaasPaymentMethod extends Model
     protected $casts = [
         'is_default' => 'boolean',
         'is_active' => 'boolean',
+        'details' => 'array',
     ];
 
     /**
@@ -86,13 +83,13 @@ class SaasPaymentMethod extends Model
 
         switch ($this->type) {
             case 'bank_transfer':
-                return $this->bank_name . ' - ' . $this->account_number;
+                return 'Bank Transfer';
             case 'esewa':
-                return 'eSewa - ' . $this->mobile_number;
+                return 'eSewa';
             case 'khalti':
-                return 'Khalti - ' . $this->mobile_number;
+                return 'Khalti';
             default:
-                return ucfirst($this->type) . ' payment';
+                return ucfirst(str_replace('_', ' ', $this->type));
         }
     }
 }

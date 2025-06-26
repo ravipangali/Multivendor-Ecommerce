@@ -16,6 +16,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class SaasProductController extends Controller
@@ -25,7 +26,7 @@ class SaasProductController extends Controller
      */
     public function index()
     {
-        $products = SaasProduct::with(['category', 'brand'])->latest()->paginate(10);
+        $products = SaasProduct::with(['category', 'brand'])->where('is_in_house_product', '!=', 1)->latest()->paginate(10);
         return view('saas_admin.saas_product.saas_index', compact('products'));
     }
 
@@ -444,5 +445,89 @@ class SaasProductController extends Controller
         $originalName = $product->name . '_' . time() . '.' . pathinfo($product->file, PATHINFO_EXTENSION);
 
         return response()->download($filePath, $originalName);
+    }
+
+    /**
+     * Approve a product
+     */
+    public function approve(SaasProduct $product)
+    {
+        $product->seller_publish_status = SaasProduct::SELLER_PUBLISH_STATUS_APPROVED;
+        $product->save();
+
+        // Send approval email to seller
+        try {
+            $product->load(['seller', 'category', 'brand']);
+            if ($product->seller && $product->seller->email) {
+                Mail::to($product->seller->email)->send(
+                    new \App\Mail\SaasProductApprovalNotification($product, 'approved')
+                );
+
+                Log::info('Product approval email sent successfully', [
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'seller_email' => $product->seller->email,
+                    'seller_name' => $product->seller->name
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send product approval email', [
+                'product_id' => $product->id,
+                'seller_email' => $product->seller->email ?? 'N/A',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+
+        toast('Product approved successfully', 'success');
+        return back();
+    }
+
+    /**
+     * Deny a product
+     */
+    public function deny(SaasProduct $product)
+    {
+        $product->seller_publish_status = SaasProduct::SELLER_PUBLISH_STATUS_DENIED;
+        $product->save();
+
+        // Send denial email to seller
+        try {
+            $product->load(['seller', 'category', 'brand']);
+            if ($product->seller && $product->seller->email) {
+                Mail::to($product->seller->email)->send(
+                    new \App\Mail\SaasProductApprovalNotification($product, 'denied')
+                );
+
+                Log::info('Product denial email sent successfully', [
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'seller_email' => $product->seller->email,
+                    'seller_name' => $product->seller->name
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send product denial email', [
+                'product_id' => $product->id,
+                'seller_email' => $product->seller->email ?? 'N/A',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+
+        toast('Product denied successfully', 'success');
+        return back();
+    }
+
+    /**
+     * Reset product status to request
+     */
+    public function resetStatus(SaasProduct $product)
+    {
+        $product->seller_publish_status = SaasProduct::SELLER_PUBLISH_STATUS_REQUEST;
+        $product->save();
+
+        toast('Product status reset to request', 'success');
+        return back();
     }
 }

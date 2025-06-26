@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Email Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This email address is used for receiving admin notifications,
+    | such as new product approval requests from sellers.
+    |
+    */
+
+    'admin_email' => env('ADMIN_EMAIL', 'admin@example.com'),
+
 ];

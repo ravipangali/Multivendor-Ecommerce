@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('profile_photo')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->decimal('commission', 15, 2)->default(0);
             $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

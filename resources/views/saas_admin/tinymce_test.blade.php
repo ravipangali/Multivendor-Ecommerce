@@ -1,4 +1,4 @@
-@extends('saas_admin.saas_layouts.saas_app')
+@extends('saas_admin.saas_layouts.saas_layout')
 
 @section('title', 'TinyMCE Test')
 

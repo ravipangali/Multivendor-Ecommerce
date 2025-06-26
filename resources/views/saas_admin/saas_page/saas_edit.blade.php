@@ -76,8 +76,7 @@
                                     <textarea class="form-control tinymce-editor @error('content') is-invalid @enderror"
                                               id="content"
                                               name="content"
-                                              rows="15"
-                                              required>{{ old('content', $page->content) }}</textarea>
+                                              rows="15">{{ old('content', $page->content) }}</textarea>
                                     @error('content')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -292,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selector: 'textarea.tinymce-editor',
         height: 400,
         menubar: false,
+        license_key: 'gpl',
         plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',

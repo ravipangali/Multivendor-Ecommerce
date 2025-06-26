@@ -19,12 +19,5 @@ class SaasUserSeeder extends Seeder
             'password' => bcrypt('admin'),
             'role' => 'admin',
         ]);
-
-        User::create([
-            'name' => 'Seller',
-            'email' => 'seller@seller.com',
-            'password' => bcrypt('seller'),
-            'role' => 'seller',
-        ]);
     }
 }

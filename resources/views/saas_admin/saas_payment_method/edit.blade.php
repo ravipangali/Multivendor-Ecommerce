@@ -104,11 +104,11 @@
                         <div class="col-md-6 mb-3">
                             <label for="account_name" class="form-label">Account Holder Name <span
                                     class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('account_name') is-invalid @enderror"
-                                id="account_name" name="account_name"
-                                value="{{ old('account_name', $paymentMethod->account_name) }}"
+                            <input type="text" class="form-control @error('details.account_name') is-invalid @enderror"
+                                id="account_name" name="details[account_name]"
+                                value="{{ old('details.account_name', $paymentMethod->details['account_name'] ?? '') }}"
                                 placeholder="Enter account holder's full name" required>
-                            @error('account_name')
+                            @error('details.account_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <small class="form-text text-muted">Name as it appears on the account</small>
@@ -157,11 +157,11 @@
                         <div class="col-md-6 mb-3">
                             <label for="bank_name" class="form-label">Bank Name <span
                                     class="text-danger bank-required">*</span></label>
-                            <input type="text" class="form-control @error('bank_name') is-invalid @enderror"
-                                id="bank_name" name="bank_name"
-                                value="{{ old('bank_name', $paymentMethod->bank_name) }}"
+                            <input type="text" class="form-control @error('details.bank_name') is-invalid @enderror"
+                                id="bank_name" name="details[bank_name]"
+                                value="{{ old('details.bank_name', $paymentMethod->details['bank_name'] ?? '') }}"
                                 placeholder="e.g., Nepal Investment Bank">
-                            @error('bank_name')
+                            @error('details.bank_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -169,11 +169,11 @@
                         <div class="col-md-6 mb-3">
                             <label for="bank_branch" class="form-label">Branch Name <span
                                     class="text-danger bank-required">*</span></label>
-                            <input type="text" class="form-control @error('bank_branch') is-invalid @enderror"
-                                id="bank_branch" name="bank_branch"
-                                value="{{ old('bank_branch', $paymentMethod->bank_branch) }}"
+                            <input type="text" class="form-control @error('details.bank_branch') is-invalid @enderror"
+                                id="bank_branch" name="details[bank_branch]"
+                                value="{{ old('details.bank_branch', $paymentMethod->details['bank_branch'] ?? '') }}"
                                 placeholder="e.g., Kathmandu Main Branch">
-                            @error('bank_branch')
+                            @error('details.bank_branch')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -181,11 +181,11 @@
                         <div class="col-md-6 mb-3">
                             <label for="account_number" class="form-label">Account Number <span
                                     class="text-danger bank-required">*</span></label>
-                            <input type="text" class="form-control @error('account_number') is-invalid @enderror"
-                                id="account_number" name="account_number"
-                                value="{{ old('account_number', $paymentMethod->account_number) }}"
+                            <input type="text" class="form-control @error('details.account_number') is-invalid @enderror"
+                                id="account_number" name="details[account_number]"
+                                value="{{ old('details.account_number', $paymentMethod->details['account_number'] ?? '') }}"
                                 placeholder="Enter your bank account number">
-                            @error('account_number')
+                            @error('details.account_number')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <small class="form-text text-muted">Keep this information secure</small>
@@ -210,12 +210,12 @@
                                     class="text-danger mobile-required">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">+977</span>
-                                <input type="text" class="form-control @error('mobile_number') is-invalid @enderror"
-                                    id="mobile_number" name="mobile_number"
-                                    value="{{ old('mobile_number', $paymentMethod->mobile_number) }}"
+                                <input type="text" class="form-control @error('details.mobile_number') is-invalid @enderror"
+                                    id="mobile_number" name="details[mobile_number]"
+                                    value="{{ old('details.mobile_number', $paymentMethod->details['mobile_number'] ?? '') }}"
                                     placeholder="9812345678" maxlength="10">
                             </div>
-                            @error('mobile_number')
+                            @error('details.mobile_number')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <small class="form-text text-muted">Enter 10-digit mobile number without country code</small>

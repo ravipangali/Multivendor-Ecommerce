@@ -383,9 +383,9 @@
         </style>
     @endif
 
+    @stack('scripts')
+    @yield('scripts')
     @if(View::exists('saas_admin.saas_layouts.saas_layout'))
-        @yield('scripts')
-        @stack('scripts')
 
         <!-- Add professional functionality enhancements -->
         <script>

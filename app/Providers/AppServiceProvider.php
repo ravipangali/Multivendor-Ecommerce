@@ -50,5 +50,8 @@ class AppServiceProvider extends ServiceProvider
                 'promotionalBanners' => $footerBanners
             ]);
         });
+
+        // Register SaasOrder observer
+        \App\Models\SaasOrder::observe(\App\Observers\SaasOrderObserver::class);
     }
 }

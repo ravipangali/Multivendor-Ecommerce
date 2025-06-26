@@ -50,6 +50,7 @@ class SaasSettingsController extends Controller
                 'site_currency_symbol' => 'required|string|max:10',
                 'site_currency_code' => 'required|string|max:10',
                 'apply_share_link' => 'nullable|url',
+                'seller_commission' => 'nullable|numeric|min:0|max:100',
             ]);
 
             $settings = SaasSetting::first() ?? new SaasSetting();

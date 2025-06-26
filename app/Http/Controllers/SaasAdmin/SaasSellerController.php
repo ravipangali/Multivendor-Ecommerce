@@ -5,8 +5,11 @@ namespace App\Http\Controllers\SaasAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\SaasSellerProfile;
+use App\Models\SaasSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules;
 
@@ -53,7 +56,10 @@ class SaasSellerController extends Controller
      */
     public function create()
     {
-        return view('saas_admin.saas_seller.saas_create');
+        $settings = SaasSetting::first();
+        $defaultCommission = $settings ? $settings->seller_commission : 0;
+
+        return view('saas_admin.saas_seller.saas_create', compact('defaultCommission'));
     }
 
     /**
@@ -68,6 +74,7 @@ class SaasSellerController extends Controller
             'phone' => 'nullable|string|max:20',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'required|boolean',
+            'commission' => 'nullable|numeric|min:0|max:100',
             'store_name' => 'required|string|max:255',
             'store_description' => 'nullable|string',
             'address' => 'nullable|string',
@@ -83,6 +90,15 @@ class SaasSellerController extends Controller
         $seller->role = 'seller';
         $seller->phone = $request->phone;
         $seller->is_active = $request->is_active;
+
+        // Set commission from request or default from settings
+        if ($request->filled('commission')) {
+            $seller->commission = $request->commission;
+        } else {
+            $settings = SaasSetting::first();
+            $seller->commission = $settings ? $settings->seller_commission : 0;
+        }
+
         $seller->save();
 
         if ($request->hasFile('profile_photo')) {
@@ -151,7 +167,10 @@ class SaasSellerController extends Controller
         }
 
         $seller->load('sellerProfile');
-        return view('saas_admin.saas_seller.saas_edit', compact('seller'));
+        $settings = SaasSetting::first();
+        $defaultCommission = $settings ? $settings->seller_commission : 0;
+
+        return view('saas_admin.saas_seller.saas_edit', compact('seller', 'defaultCommission'));
     }
 
     /**
@@ -170,6 +189,7 @@ class SaasSellerController extends Controller
             'phone' => 'nullable|string|max:20',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'required|boolean',
+            'commission' => 'nullable|numeric|min:0|max:100',
             'store_name' => 'required|string|max:255',
             'store_description' => 'nullable|string',
             'address' => 'nullable|string',
@@ -190,6 +210,7 @@ class SaasSellerController extends Controller
         $seller->email = $request->email;
         $seller->phone = $request->phone;
         $seller->is_active = $request->is_active;
+        $seller->commission = $request->commission;
 
         if ($request->hasFile('profile_photo')) {
             // Delete old profile photo if exists
@@ -281,10 +302,38 @@ class SaasSellerController extends Controller
 
         $sellerProfile = $seller->sellerProfile;
         if ($sellerProfile) {
+            $oldStatus = $sellerProfile->is_approved;
             $sellerProfile->is_approved = !$sellerProfile->is_approved;
             $sellerProfile->save();
 
-            $status = $sellerProfile->is_approved ? 'approved' : 'disapproved';
+            $status = $sellerProfile->is_approved ? 'approved' : 'denied';
+
+            // Send email notification to seller
+            try {
+                $seller->load('sellerProfile');
+                if ($seller->email) {
+                    Mail::to($seller->email)->send(
+                        new \App\Mail\SaasSellerApprovalNotification($seller, $status)
+                    );
+
+                    Log::info('Seller approval status email sent successfully', [
+                        'seller_id' => $seller->id,
+                        'seller_name' => $seller->name,
+                        'seller_email' => $seller->email,
+                        'status' => $status,
+                        'previous_status' => $oldStatus ? 'approved' : 'denied'
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to send seller approval email', [
+                    'seller_id' => $seller->id,
+                    'seller_email' => $seller->email,
+                    'status' => $status,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+
             toast("Seller has been {$status} successfully", 'success');
         } else {
             toast('Seller profile not found', 'error');

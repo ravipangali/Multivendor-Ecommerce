@@ -282,7 +282,7 @@ class SaasPaymentMethodController extends Controller
         $rules = [
             'type' => 'required|in:bank_transfer,esewa,khalti,cash,other',
             'title' => 'required|string|max:255',
-            'account_name' => 'required|string|max:255',
+            'details.account_name' => 'required|string|max:255',
             'is_active' => 'nullable|boolean',
             'notes' => 'nullable|string',
         ];
@@ -290,23 +290,24 @@ class SaasPaymentMethodController extends Controller
         // Add specific validation rules based on payment method type
         switch ($request->type) {
             case 'bank_transfer':
-                $rules['bank_name'] = 'required|string|max:255';
-                $rules['bank_branch'] = 'required|string|max:255';
-                $rules['account_number'] = 'required|string|max:50';
+                $rules['details.bank_name'] = 'required|string|max:255';
+                $rules['details.bank_branch'] = 'required|string|max:255';
+                $rules['details.account_number'] = 'required|string|max:50';
                 break;
 
             case 'esewa':
             case 'khalti':
-                $rules['mobile_number'] = 'required|string|regex:/^[0-9]{10}$/';
+                $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10}$/';
                 break;
         }
 
         $messages = [
-            'mobile_number.regex' => 'The mobile number must be a valid 10-digit number.',
-            'bank_name.required' => 'Bank name is required for bank transfer payment methods.',
-            'bank_branch.required' => 'Bank branch is required for bank transfer payment methods.',
-            'account_number.required' => 'Account number is required for bank transfer payment methods.',
-            'mobile_number.required' => 'Mobile number is required for mobile payment methods.',
+            'details.mobile_number.regex' => 'The mobile number must be a valid 10-digit number.',
+            'details.bank_name.required' => 'Bank name is required for bank transfer payment methods.',
+            'details.bank_branch.required' => 'Bank branch is required for bank transfer payment methods.',
+            'details.account_number.required' => 'Account number is required for bank transfer payment methods.',
+            'details.mobile_number.required' => 'Mobile number is required for mobile payment methods.',
+            'details.account_name.required' => 'Account name is required.',
         ];
 
         $request->validate($rules, $messages);
@@ -320,28 +321,31 @@ class SaasPaymentMethodController extends Controller
         // Always set these fields
         $paymentMethod->type = $request->type;
         $paymentMethod->title = $request->title;
-        $paymentMethod->account_name = $request->account_name;
         $paymentMethod->is_active = $request->boolean('is_active', true);
         $paymentMethod->notes = $request->notes;
 
-        // Reset all type-specific fields first to avoid old data persisting
-        $paymentMethod->bank_name = null;
-        $paymentMethod->bank_branch = null;
-        $paymentMethod->account_number = null;
-        $paymentMethod->mobile_number = null;
+        $details = [
+            'account_name' => $request->input('details.account_name'),
+            'bank_name' => null,
+            'bank_branch' => null,
+            'account_number' => null,
+            'mobile_number' => null,
+        ];
 
         // Then set the type-specific fields
         switch ($request->type) {
             case 'bank_transfer':
-                $paymentMethod->bank_name = $request->bank_name;
-                $paymentMethod->bank_branch = $request->bank_branch;
-                $paymentMethod->account_number = $request->account_number;
+                $details['bank_name'] = $request->input('details.bank_name');
+                $details['bank_branch'] = $request->input('details.bank_branch');
+                $details['account_number'] = $request->input('details.account_number');
                 break;
 
             case 'esewa':
             case 'khalti':
-                $paymentMethod->mobile_number = $request->mobile_number;
+                $details['mobile_number'] = $request->input('details.mobile_number');
                 break;
         }
+
+        $paymentMethod->details = $details;
     }
 }

@@ -238,7 +238,10 @@ class SaasCustomerCartController extends Controller
             $skippedCount = 0;
 
             foreach ($request->product_ids as $productId) {
-                $product = SaasProduct::find($productId);
+                $product = SaasProduct::where('id', $productId)
+                    ->where('is_active', true)
+                    ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+                    ->first();
                 if (!$product || $product->stock <= 0) {
                     $skippedCount++;
                     continue;
@@ -297,7 +300,18 @@ class SaasCustomerCartController extends Controller
         }
 
         // Handle single product
-        $product = SaasProduct::findOrFail($request->product_id);
+        $product = SaasProduct::where('id', $request->product_id)
+            ->where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+            ->first();
+
+        if (!$product) {
+            $message = 'Product not found or not available for purchase.';
+            if ($request->expectsJson()) {
+                return response()->json(['error' => $message], 404);
+            }
+            return redirect()->back()->with('error', $message);
+        }
 
         // Determine variations to add
         $variationIds = [];

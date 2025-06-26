@@ -143,5 +143,87 @@ class SaasCartCalculationService
         return $coupon->calculateDiscount($subtotal);
     }
 
+    /**
+     * Get cart totals for a specific user/session
+     */
+    public function getCartTotals($userId = null, $sessionId = null)
+    {
+        $cartItems = $this->getCartItems($userId, $sessionId);
 
+        if ($cartItems->isEmpty()) {
+            return [
+                'subtotal' => 0,
+                'shipping_fee' => 0,
+                'tax' => 0,
+                'discount' => 0,
+                'total' => 0,
+                'coupon_code' => null,
+                'coupon_discount_amount' => 0,
+                'coupon_discount_type' => null,
+            ];
+        }
+
+        // Get applied coupon from session
+        $appliedCoupon = null;
+        if (session('applied_coupon_code')) {
+            $appliedCoupon = SaasCoupon::where('code', session('applied_coupon_code'))->first();
+            if (!$appliedCoupon || !$appliedCoupon->isValid()) {
+                session()->forget('applied_coupon_code');
+                $appliedCoupon = null;
+            }
+        }
+
+        // Calculate using the main calculation method
+        $totals = $this->calculateCartTotals($cartItems, $appliedCoupon);
+
+        // Map to the expected format for backward compatibility
+        return [
+            'subtotal' => $totals['subtotal'],
+            'shipping_fee' => $totals['shipping_cost'],
+            'tax' => $totals['tax_amount'],
+            'discount' => $totals['discount_amount'],
+            'total' => $totals['grand_total'],
+            'coupon_code' => $totals['coupon_code'],
+            'coupon_discount_amount' => $totals['discount_amount'],
+            'coupon_discount_type' => $appliedCoupon ? $appliedCoupon->discount_type : null,
+        ];
+    }
+
+    /**
+     * Get cart items for a specific user/session
+     */
+    public function getCartItems($userId = null, $sessionId = null)
+    {
+        $query = SaasCart::with([
+            'product.images',
+            'product.brand',
+            'productVariation.attribute',
+            'productVariation.attributeValue',
+            'product.variations' // Add this to ensure variations are loaded
+        ]);
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } elseif ($sessionId) {
+            $query->where('session_id', $sessionId);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Clear cart items for a user/session
+     */
+    public function clearCart($userId = null, $sessionId = null)
+    {
+        $query = SaasCart::query();
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } elseif ($sessionId) {
+            $query->where('session_id', $sessionId);
+        }
+
+        return $query->delete();
+    }
 }

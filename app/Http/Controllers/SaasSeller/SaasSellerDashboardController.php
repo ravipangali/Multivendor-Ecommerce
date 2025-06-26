@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\SaasOrder;
 use App\Models\SaasProduct;
 use App\Models\SaasProductReview;
-use App\Models\SaasWallet;
 use App\Models\SaasWithdrawal;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +23,7 @@ class SaasSellerDashboardController extends Controller
         $sellerId = Auth::id();
         $user = Auth::user();
         $sellerProfile = $user->sellerProfile;
+        $seller = User::findOrFail($sellerId);
 
         // Check if seller has a profile
         if (!$sellerProfile) {
@@ -40,12 +41,6 @@ class SaasSellerDashboardController extends Controller
         $thisMonth = Carbon::now()->startOfMonth();
         $lastMonth = Carbon::now()->subMonth()->startOfMonth();
         $lastMonthEnd = Carbon::now()->subMonth()->endOfMonth();
-
-        // Wallet information
-        $wallet = SaasWallet::firstOrCreate(
-            ['user_id' => $sellerId],
-            ['balance' => 0, 'pending_balance' => 0]
-        );
 
         // Total products
         $totalProducts = SaasProduct::where('seller_id', $sellerId)->count();
@@ -194,9 +189,11 @@ class SaasSellerDashboardController extends Controller
             ->pluck('count', 'order_status')
             ->toArray();
 
+        // Seller Balance
+        $balance = $seller->balance;
+
         return view('saas_seller.saas_dashboard', compact(
             'sellerProfile',
-            'wallet',
             'totalProducts',
             'activeProducts',
             'outOfStockProducts',
@@ -218,7 +215,8 @@ class SaasSellerDashboardController extends Controller
             'salesChartLabels',
             'salesChartValues',
             'ordersChartValues',
-            'orderStatusData'
+            'orderStatusData',
+            'balance'
         ));
     }
 }

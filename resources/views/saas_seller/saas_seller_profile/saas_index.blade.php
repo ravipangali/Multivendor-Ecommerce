@@ -46,20 +46,24 @@
                                 <span class="text-muted small">Member since {{ $sellerProfile->created_at->format('M Y') }}</span>
                             </div>
                         </div>
-                        @if($user->wallet)
-                            <div class="wallet-card mt-3 mt-md-0 py-2 px-3 bg-light rounded-3 shadow-sm">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3 p-2 rounded-circle bg-primary bg-opacity-10">
-                                        <i data-feather="credit-card" class="text-primary"></i>
-                                    </div>
-                                    <div>
-                                        <span class="d-block text-muted small">Wallet Balance</span>
-                                        <h5 class="mb-0">Rs {{ number_format($user->wallet->balance, 2) }}</h5>
-                                        <small class="text-muted">Pending: Rs {{ number_format($user->wallet->pending_balance, 2) }}</small>
+                        <div class="ms-auto">
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('seller.profile.edit') }}" class="btn btn-primary">Edit Profile</a>
+                                @if($user->balance)
+                                <div class="wallet-card mt-3 mt-md-0 py-2 px-3 bg-light rounded-3 shadow-sm">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="fas fa-wallet fa-2x text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <span class="d-block text-muted small">Wallet Balance</span>
+                                            <h5 class="mb-0">Rs {{ number_format($user->balance, 2) }}</h5>
+                                        </div>
                                     </div>
                                 </div>
+                                @endif
                             </div>
-                        @endif
+                        </div>
                     </div>
                 </div>
             </div>

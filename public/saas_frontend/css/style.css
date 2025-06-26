@@ -7796,13 +7796,13 @@ span.active_status.active {
 /*== Tag Widget Blog Page ==*/
 .blog_tag_widget {
     margin-bottom: 20px;
-    position: relative 
+    position: relative
 }
 .blog_tag_widget.filter_sidebar {
-    padding: 0 0px 
+    padding: 0 0px
 }
 .blog_tag_widget.filter_sidebar {
-    padding: 0 
+    padding: 0
 }
 .blog_tag_widget .title {
     font-family: Jost;
@@ -7810,7 +7810,7 @@ span.active_status.active {
     font-weight: 500;
     line-height: 26px;
     letter-spacing: 0em;
-    margin-bottom: 20px 
+    margin-bottom: 20px
 }
 .blog_tag_widget .tag_list li a, .bsp_tags li a {
     border: 1px solid #eaeaea;
@@ -9188,7 +9188,7 @@ span.ui-slider-handle.ui-corner-all.ui-state-default, span.ui-slider-handle.ui-c
 }
 /*== CSS Animation Code End ==*/
 section {
-    padding: 100px 0;
+    /* padding: 100px 0; */
     position: relative;
 }
 .main-title {
@@ -13576,15 +13576,15 @@ input.quantity-num[type="number"]::-webkit-inner-spin-button, input.quantity-num
 /* Custom Radio Button Start */
 .radio-custom {
     opacity: 0;
-    position: absolute 
+    position: absolute
 }
 .radio-custom, .radio-custom-label {
     border-radius: 50%;
     cursor: pointer;
-    vertical-align: middle 
+    vertical-align: middle
 }
 .radio-custom-label {
-    position: relative 
+    position: relative
 }
 .radio-custom .radio-custom-label:before {
     content: '';
@@ -13594,41 +13594,41 @@ input.quantity-num[type="number"]::-webkit-inner-spin-button, input.quantity-num
     padding: 2px;
     text-align: center;
     vertical-align: middle;
-    width: 26px 
+    width: 26px
 }
 .radio-custom.dark_bg .radio-custom-label.dark_bg:before {
-    background-color: #041E42 
+    background-color: #041E42
 }
 .radio-custom.violet_bg .radio-custom-label.violet_bg:before {
-    background-color: #443297 
+    background-color: #443297
 }
 .radio-custom.light_blue_bg .radio-custom-label.light_blue_bg:before {
-    background-color: #4A70B1 
+    background-color: #4A70B1
 }
 .radio-custom.yellow_bg .radio-custom-label.yellow_bg:before {
-    background-color: #abcf37 
+    background-color: #abcf37
 }
 .radio-custom.gray_bg .radio-custom-label.gray_bg:before {
-    background-color: #626974 
+    background-color: #626974
 }
 .radio-custom.dark_bg:checked .radio-custom-label.dark_bg:before, .radio-custom.violet_bg:checked .radio-custom-label.violet_bg:before, .radio-custom.light_blue_bg:checked .radio-custom-label.light_blue_bg:before, .radio-custom.gray_bg:checked .radio-custom-label.gray_bg:before {
-    color: #FFF 
+    color: #FFF
 }
 .radio-custom .radio-custom-label:before {
-    border-radius: 50% 
+    border-radius: 50%
 }
 .radio-custom.yellow_bg:checked .radio-custom-label.yellow_bg:before, .radio-custom:checked .radio-custom-label:before {
-    color: #041E42 
+    color: #041E42
 }
 .radio-custom:checked .radio-custom-label:before {
     content: "\f00c";
-    font-family: "Font Awesome 6 Pro" 
+    font-family: "Font Awesome 6 Pro"
 }
 .radio-custom:focus .radio-custom-label {
-    outline: none 
+    outline: none
 }
 .zoomContainer {
-    height: 100px !important 
+    height: 100px !important
 }
 .zmart_testimonial_slider .slidetotal:before{
    content: "/";

@@ -204,7 +204,7 @@
 
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Delete blog post confirmation with SweetAlert
@@ -238,4 +238,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush
+@endsection

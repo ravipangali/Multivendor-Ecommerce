@@ -229,17 +229,17 @@
                                                         @endif
                                                         <div>
                                                             <p class="mb-0 text-muted small">{{ ucfirst(str_replace('_', ' ', $paymentMethod->type)) }}</p>
-                                                            <p class="mb-0 fw-bold">{{ $paymentMethod->account_name }}</p>
+                                                            <p class="mb-0 fw-bold">{{ $paymentMethod->details['account_name'] ?? 'N/A' }}</p>
                                                         </div>
                                                     </div>
 
                                                     <div class="small text-muted mt-2">
                                                         @if($paymentMethod->type == 'bank_transfer')
-                                                            <div class="mb-1"><strong>Bank:</strong> {{ $paymentMethod->bank_name }}</div>
-                                                            <div class="mb-1"><strong>Branch:</strong> {{ $paymentMethod->bank_branch }}</div>
-                                                            <div><strong>Acc #:</strong> {{ $paymentMethod->account_number }}</div>
+                                                            <div class="mb-1"><strong>Bank:</strong> {{ $paymentMethod->details['bank_name'] ?? 'N/A' }}</div>
+                                                            <div class="mb-1"><strong>Branch:</strong> {{ $paymentMethod->details['bank_branch'] ?? 'N/A' }}</div>
+                                                            <div><strong>Acc #:</strong> {{ $paymentMethod->details['account_number'] ?? 'N/A' }}</div>
                                                         @elseif(in_array($paymentMethod->type, ['esewa', 'khalti']))
-                                                            <div><strong>Mobile:</strong> {{ $paymentMethod->mobile_number }}</div>
+                                                            <div><strong>Mobile:</strong> {{ $paymentMethod->details['mobile_number'] ?? 'N/A' }}</div>
                                                         @endif
                                                     </div>
                                                 </div>

@@ -24,6 +24,7 @@ class SaasCustomerSellerController extends Controller
         // Get seller's products with filters
         $query = SaasProduct::where('seller_id', $seller->id)
             ->where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->with(['images', 'brand', 'category', 'reviews']);
 
         // Filter by category
@@ -84,7 +85,10 @@ class SaasCustomerSellerController extends Controller
         $products = $query->paginate(12);
 
         // Get seller statistics
-        $totalProducts = SaasProduct::where('seller_id', $seller->id)->where('is_active', true)->count();
+        $totalProducts = SaasProduct::where('seller_id', $seller->id)
+            ->where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+            ->count();
         $totalReviews = SaasProductReview::where('seller_id', $seller->id)->count();
         $averageRating = SaasProductReview::where('seller_id', $seller->id)->avg('rating') ?? 0;
         $totalSales = DB::table('saas_order_items')
@@ -115,6 +119,7 @@ class SaasCustomerSellerController extends Controller
         // Get price range for this seller's products
         $priceRange = SaasProduct::where('seller_id', $seller->id)
             ->where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->selectRaw('
                 MIN(price - (price * discount / 100)) as min_price,
                 MAX(price - (price * discount / 100)) as max_price
@@ -197,7 +202,10 @@ class SaasCustomerSellerController extends Controller
 
         // Add statistics for each seller
         foreach ($sellers as $seller) {
-            $seller->total_products = SaasProduct::where('seller_id', $seller->id)->where('is_active', true)->count();
+            $seller->total_products = SaasProduct::where('seller_id', $seller->id)
+                ->where('is_active', true)
+                ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+                ->count();
             $seller->total_reviews = SaasProductReview::where('seller_id', $seller->id)->count();
             $seller->average_rating = SaasProductReview::where('seller_id', $seller->id)->avg('rating') ?? 0;
         }

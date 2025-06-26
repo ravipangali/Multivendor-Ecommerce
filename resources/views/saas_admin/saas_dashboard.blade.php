@@ -6,6 +6,29 @@
 <div class="col-12">
     <div class="row">
         <!-- Total Orders -->
+        <div class="col-xl-12 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">Admin Balance</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat text-info">
+                                <i class="align-middle" data-feather="dollar-sign"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class="mt-1 mb-3">${{ number_format($adminBalance, 2) }}</h1>
+                    <div class="mb-0">
+                        <span class="text-info"> <i class="mdi mdi-account-cash"></i> Current Balance </span>
+                        <span class="text-muted">Available funds</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Online Orders Card -->
         <div class="col-xl-3 col-md-6">
             <div class="card">
                 <div class="card-body">

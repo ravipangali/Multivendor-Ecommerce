@@ -11,6 +11,7 @@ use App\Http\Controllers\SaasSeller\SaasReportController;
 use App\Http\Controllers\SaasSeller\SaasSellerDashboardController;
 use App\Http\Controllers\SaasSeller\SaasSellerProfileController;
 use App\Http\Controllers\SaasSeller\SaasWithdrawalController;
+use App\Http\Controllers\SaasSeller\SaasSellerTransactionController;
 
 
 Route::middleware(['auth', 'saasrolemanager:seller'])->prefix('seller')->name('seller.')->group(function () {
@@ -69,7 +70,9 @@ Route::get('/reviews/product/{product}', [SaasProductReviewController::class, 'p
     // Coupons
     Route::resource('coupons', SaasCouponController::class);
 
-
+    // Transactions
+    Route::resource('transactions', SaasSellerTransactionController::class)->only(['index', 'show']);
+    Route::get('transactions/export', [SaasSellerTransactionController::class, 'export'])->name('transactions.export');
 
     // Reports
     Route::get('/reports/sales', [SaasReportController::class, 'salesReport'])->name('reports.sales');

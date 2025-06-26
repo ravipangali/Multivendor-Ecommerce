@@ -34,7 +34,16 @@ class SaasCustomerWishlistController extends Controller
             'product_id' => 'required|exists:saas_products,id'
         ]);
 
-        $product = SaasProduct::findOrFail($request->product_id);
+        $product = SaasProduct::where('id', $request->product_id)
+            ->where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+            ->first();
+
+        if (!$product) {
+            return response()->json([
+                'error' => 'Product not found or is not available'
+            ], 404);
+        }
 
         // Check if product is already in wishlist
         $existingWishlistItem = SaasWishlist::where('customer_id', Auth::id())
@@ -107,6 +116,15 @@ class SaasCustomerWishlistController extends Controller
             $inWishlist = false;
         } else {
             // Add to wishlist
+            $product = SaasProduct::where('id', $request->product_id)
+                ->where('is_active', true)
+                ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+                ->first();
+
+            if (!$product) {
+                return response()->json(['error' => 'Product not found or is not available'], 404);
+            }
+
             SaasWishlist::create([
                 'customer_id' => Auth::id(),
                 'product_id' => $request->product_id

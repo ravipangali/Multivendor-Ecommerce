@@ -157,7 +157,7 @@
 </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-generate slug from name
@@ -181,4 +181,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
+@endsection

@@ -628,19 +628,51 @@ $(document).ready(function() {
                 const originalText = $btn.text();
                 $btn.text('Cancelling...').prop('disabled', true);
 
-                // Here you would make an AJAX call to cancel the order
-                // For now, just show a success message
-                setTimeout(() => {
-                    Swal.fire({
-                        title: 'Order Cancelled!',
-                        text: 'Your order has been cancelled successfully.',
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#abcf37'
-                    }).then(() => {
-                        $btn.text('Cancelled').removeClass('btn-outline-danger').addClass('btn-secondary').prop('disabled', true);
-                    });
-                }, 1000);
+                // Make AJAX call to cancel the order
+                $.ajax({
+                    url: `{{ route('customer.order.cancel.ajax', ':id') }}`.replace(':id', orderId),
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        cancellation_reason: 'Cancelled by customer from dashboard'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Order Cancelled!',
+                                text: 'Your order has been cancelled successfully.',
+                                icon: 'success',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#abcf37'
+                            }).then(() => {
+                                $btn.text('Cancelled').removeClass('btn-outline-danger').addClass('btn-secondary').prop('disabled', true);
+                                // Update the status badge
+                                $btn.closest('.order-card').find('.status-badge').removeClass().addClass('status-badge status-cancelled').text('Cancelled');
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: response.message || 'Failed to cancel order',
+                                icon: 'error',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#f56565'
+                            });
+                            $btn.text(originalText).prop('disabled', false);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error cancelling order:', error);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred while cancelling the order',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#f56565'
+                        });
+                        $btn.text(originalText).prop('disabled', false);
+                    }
+                });
             }
         });
     });

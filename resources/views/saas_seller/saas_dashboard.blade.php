@@ -599,7 +599,7 @@
 
             <div class="quick-stats">
                 <div class="hero-stat">
-                    <div class="hero-stat-value">Rs {{ number_format($wallet->balance, 0) }}</div>
+                    <div class="hero-stat-value">Rs {{ number_format($balance, 2) }}</div>
                     <div class="hero-stat-label">💰 Available Balance</div>
                 </div>
                 <div class="hero-stat">
@@ -625,10 +625,10 @@
             <div class="metric-icon">
                 <i data-feather="credit-card"></i>
             </div>
-            <div class="metric-value">Rs {{ number_format($wallet->balance, 2) }}</div>
+            <div class="metric-value">Rs {{ number_format($balance, 2) }}</div>
             <div class="metric-label">Wallet Balance</div>
             <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted">Pending: Rs {{ number_format($wallet->pending_balance, 2) }}</small>
+                <small class="text-muted">Pending: Rs {{ number_format($pendingWithdrawals, 2) }}</small>
                 <a href="{{ route('seller.withdrawals.index') }}" class="btn btn-sm btn-outline-primary">
                     <i data-feather="arrow-right"></i>
                 </a>

@@ -123,6 +123,7 @@ class SaasCategory extends Model
         // 1. Get products directly from this category
         $directProducts = $this->products()
             ->where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->with(['images', 'brand', 'reviews'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -133,6 +134,7 @@ class SaasCategory extends Model
         foreach ($subcategories as $subcategory) {
             $subcategoryProducts = $subcategory->products()
                 ->where('is_active', true)
+                ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
                 ->with(['images', 'brand', 'reviews'])
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -143,6 +145,7 @@ class SaasCategory extends Model
             foreach ($childCategories as $childCategory) {
                 $childProducts = $childCategory->products()
                     ->where('is_active', true)
+                    ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
                     ->with(['images', 'brand', 'reviews'])
                     ->orderBy('created_at', 'desc')
                     ->get();
@@ -162,7 +165,7 @@ class SaasCategory extends Model
     public function hasAnyProducts()
     {
         // Check direct products
-        if ($this->products()->where('is_active', true)->exists()) {
+        if ($this->products()->where('is_active', true)->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)->exists()) {
             return true;
         }
 

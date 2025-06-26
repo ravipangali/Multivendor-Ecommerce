@@ -19,6 +19,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
+
+use App\Models\SaasProduct;
+use App\Models\SaasSetting;
+use App\Models\SaasTransaction;
+use App\Mail\SaasOrderStatusChanged;
 
 class SaasCustomerCheckoutController extends Controller
 {
@@ -93,278 +99,195 @@ class SaasCustomerCheckoutController extends Controller
             return redirect()->route('login')->with('error', 'Please login to checkout.');
         }
 
+        // Initial validation for shipping and payment
         $request->validate([
             'shipping_name' => 'required|string|max:255',
             'shipping_email' => 'required|email|max:255',
             'shipping_phone' => 'required|string|max:20',
-            'shipping_address' => 'required|string|max:500',
-            'shipping_city' => 'required|string|max:100',
-            'shipping_state' => 'required|string|max:100',
+            'shipping_country' => 'required|string|max:255',
+            'shipping_address' => 'required|string|max:255',
+            'shipping_city' => 'required|string|max:255',
+            'shipping_state' => 'required|string|max:255',
             'shipping_postal_code' => 'required|string|max:20',
-            'shipping_country' => 'required|string|max:100',
-            'payment_method' => 'required|in:cash_on_delivery,bank_transfer,esewa,khalti',
-            'order_notes' => 'nullable|string|max:1000'
+            'payment_method' => 'required|string|in:cash_on_delivery,esewa,khalti,bank_transfer',
         ]);
 
-        $cartItems = SaasCart::where('user_id', Auth::id())
-            ->with(['product', 'productVariation'])
-            ->get();
+        // Billing validation - if same_as_shipping is not checked, validate billing fields
+        if (!$request->has('same_as_shipping') || !$request->boolean('same_as_shipping')) {
+            $request->validate([
+                'billing_name' => 'required|string|max:255',
+                'billing_email' => 'required|email|max:255',
+                'billing_phone' => 'required|string|max:20',
+                'billing_country' => 'required|string|max:255',
+                'billing_address' => 'required|string|max:255',
+                'billing_city' => 'required|string|max:255',
+                'billing_state' => 'required|string|max:255',
+                'billing_postal_code' => 'required|string|max:20',
+            ]);
+        }
+
+        $cartTotals = $this->cartCalculationService->getCartTotals(auth()->id(), session()->getId());
+        $cartItems = $this->cartCalculationService->getCartItems(auth()->id(), session()->getId());
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('customer.cart')->with('error', 'Your cart is empty.');
+            return redirect()->route('saas.customer.cart.index')
+                ->with('warning', 'Your cart is empty!');
         }
 
-        // Validate stock availability
+        // Check for insufficient stock before processing
         foreach ($cartItems as $item) {
-            $availableStock = $item->productVariation ? $item->productVariation->stock : $item->product->stock;
-            if ($item->quantity > $availableStock) {
-                return back()->with('error', "Insufficient stock for {$item->product->name}. Available: {$availableStock}");
+            if ($item->hasInsufficientStock()) {
+                return redirect()->route('saas.customer.cart.index')
+                    ->with('error', 'Not enough stock for ' . $item->product->name . '. Available: ' . $item->getAvailableStock());
             }
         }
 
-        // Calculate totals using services and settings - use final price (includes product discounts)
-        $cartSubtotal = $cartItems->sum(function($item) {
-            $price = $item->productVariation ? $item->productVariation->final_price : $item->product->final_price;
-            return $price * $item->quantity;
-        });
-
-        // Use services for proper tax and shipping calculation based on settings
-        $shippingFee = $this->shippingService->calculateShippingCost($cartItems, $cartSubtotal, $request->all());
-        $tax = $this->taxService->calculateTax($cartItems, $cartSubtotal, $request->all(), $shippingFee);
-
-        // Calculate coupon discount if coupon is applied
-        $couponCode = null;
-        $couponDiscountAmount = 0;
-        $couponDiscountType = null;
-
-        // Check for coupon in request or session
-        $appliedCouponCode = $request->coupon_code ?? session('applied_coupon_code');
-
-        if (!empty($appliedCouponCode)) {
-            $coupon = SaasCoupon::where('code', $appliedCouponCode)->first();
-
-            if ($coupon && $coupon->isValid()) {
-                $couponCode = $coupon->code;
-                $couponDiscountType = $coupon->discount_type;
-
-                if ($coupon->discount_type === 'percentage') {
-                    $couponDiscountAmount = round(($cartSubtotal * $coupon->discount_value) / 100, 2);
-                    // Cap at maximum discount if set
-                    if (isset($coupon->max_discount_amount) && $couponDiscountAmount > $coupon->max_discount_amount) {
-                        $couponDiscountAmount = $coupon->max_discount_amount;
-                    }
-                } else {
-                    $couponDiscountAmount = min($coupon->discount_value, $cartSubtotal);
-                }
-
-                // Apply minimum order amount check
-                if (isset($coupon->min_order_amount) && $cartSubtotal < $coupon->min_order_amount) {
-                    $couponDiscountAmount = 0;
-                    $couponCode = null;
-                    $couponDiscountType = null;
-                }
+        // Handle coupon
+        $coupon = null;
+        if ($request->filled('coupon_code')) {
+            $coupon = SaasCoupon::where('code', $request->coupon_code)->first();
+            if (!$coupon || !$coupon->isValid()) {
+                return back()->withInput()
+                    ->with('error', 'Invalid or expired coupon code!');
             }
         }
 
-        $discount = $couponDiscountAmount;
+        // Determine seller_id for the main order
+        $orderSellerId = $this->determineOrderSellerId($cartItems);
 
-        $grandTotal = $cartSubtotal + $shippingFee + $tax - $discount;
+        // Prepare order data with corrected field names
+        $orderData = [
+            'customer_id' => auth()->id(),
+            'order_number' => SaasOrder::generateOrderNumber(),
+            'subtotal' => $cartTotals['subtotal'] ?? 0,
+            'shipping_fee' => $cartTotals['shipping_fee'] ?? 0,
+            'tax' => $cartTotals['tax'] ?? 0,
+            'discount' => $cartTotals['discount'] ?? 0,
+            'total' => $cartTotals['total'] ?? 0,
+            'payment_method' => $request->payment_method,
+            'payment_status' => 'pending',
+            'order_status' => 'pending',
+            'placed_at' => now(),
+            'order_notes' => $request->order_notes,
 
-        DB::beginTransaction();
+            // Shipping information - use the correct field names
+            'shipping_name' => $request->shipping_name,
+            'shipping_email' => $request->shipping_email,
+            'shipping_phone' => $request->shipping_phone,
+            'shipping_country' => $request->shipping_country,
+            'shipping_street_address' => $request->shipping_address,
+            'shipping_city' => $request->shipping_city,
+            'shipping_state' => $request->shipping_state,
+            'shipping_postal_code' => $request->shipping_postal_code,
+
+            // Billing information - if same_as_shipping is checked, use shipping data, else use provided billing data
+            'billing_name' => $request->boolean('same_as_shipping') ? $request->shipping_name : $request->billing_name,
+            'billing_email' => $request->boolean('same_as_shipping') ? $request->shipping_email : $request->billing_email,
+            'billing_phone' => $request->boolean('same_as_shipping') ? $request->shipping_phone : $request->billing_phone,
+            'billing_country' => $request->boolean('same_as_shipping') ? $request->shipping_country : $request->billing_country,
+            'billing_street_address' => $request->boolean('same_as_shipping') ? $request->shipping_address : $request->billing_address,
+            'billing_city' => $request->boolean('same_as_shipping') ? $request->shipping_city : $request->billing_city,
+            'billing_state' => $request->boolean('same_as_shipping') ? $request->shipping_state : $request->billing_state,
+            'billing_postal_code' => $request->boolean('same_as_shipping') ? $request->shipping_postal_code : $request->billing_postal_code,
+
+            // Coupon information - ensure nulls instead of empty strings
+            'coupon_code' => isset($cartTotals['coupon_code']) && !empty($cartTotals['coupon_code']) ? $cartTotals['coupon_code'] : null,
+            'coupon_discount_amount' => $cartTotals['coupon_discount_amount'] ?? 0,
+            'coupon_discount_type' => isset($cartTotals['coupon_discount_type']) && !empty($cartTotals['coupon_discount_type']) ? $cartTotals['coupon_discount_type'] : null,
+        ];
+
+        // Only add seller_id if it's not null
+        if ($orderSellerId !== null) {
+            $orderData['seller_id'] = $orderSellerId;
+        }
 
         try {
-            // Log general cart information
-            \Illuminate\Support\Facades\Log::info('Starting checkout process', [
-                'customer_id' => Auth::id(),
-                'cart_items_count' => $cartItems->count(),
-                'cart_subtotal' => $cartSubtotal,
-                'shipping_fee' => $shippingFee,
-                'tax' => $tax,
-                'discount' => $discount,
-                'grand_total' => $grandTotal
-            ]);
+            DB::beginTransaction();
+            Log::info('Starting order creation process');
 
-            // Debug the schema
-            $dbColumns = Schema::getColumnListing('saas_orders');
-            \Illuminate\Support\Facades\Log::info('Available columns in saas_orders table:', $dbColumns);
+            $order = SaasOrder::create($orderData);
+            Log::info('Order created successfully', ['order_id' => $order->id]);
 
-            // Group cart items by seller
-            $sellerCartItems = $cartItems->groupBy('product.seller_id');
-            $createdOrders = [];
-            $isFirstSeller = true;
+            // Create order items
+            Log::info('Starting order items creation', ['cart_items_count' => $cartItems->count()]);
+            foreach ($cartItems as $item) {
+                // Deduct stock
+                $product = SaasProduct::find($item->product_id);
 
-            foreach ($sellerCartItems as $sellerId => $sellerItems) {
-                // Log detailed information to help diagnose issues
-                \Illuminate\Support\Facades\Log::info('Processing order for seller: ' . $sellerId);
-                \Illuminate\Support\Facades\Log::info('Items count: ' . count($sellerItems));
-
-                $sellerSubtotal = $sellerItems->sum(function($item) {
-                    $price = $item->productVariation ? $item->productVariation->final_price : $item->product->final_price;
-                    return $price * $item->quantity;
-                });
-
-                // Calculate seller's proportion of total (avoid division by zero)
-                $sellerProportion = $cartSubtotal > 0 ? $sellerSubtotal / $cartSubtotal : 0;
-
-                // Calculate seller's share of shipping, tax, discount
-                $sellerShipping = round($shippingFee * $sellerProportion, 2);
-                $sellerTax = round($tax * $sellerProportion, 2);
-                $sellerDiscount = round($discount * $sellerProportion, 2);
-                $sellerTotal = round($sellerSubtotal + $sellerShipping + $sellerTax - $sellerDiscount, 2);
-
-                \Illuminate\Support\Facades\Log::info('Creating order with values:', [
-                    'customer_id' => Auth::id(),
-                    'seller_id' => $sellerId,
-                    'subtotal' => $sellerSubtotal,
-                    'shipping_fee' => $sellerShipping,
-                    'tax' => $sellerTax,
-                    'discount' => $sellerDiscount,
-                    'total' => $sellerTotal,
-                ]);
-
-                // Format the shipping address to include all shipping details
-                // Create separate order for each seller
-                $order = SaasOrder::create([
-                    'customer_id' => Auth::id(),
-                    'seller_id' => $sellerId,
-                    'order_number' => 'ORD-' . strtoupper(Str::random(8)),
-                    'subtotal' => $sellerSubtotal,
-                    'shipping_fee' => $sellerShipping,
-                    'tax' => $sellerTax,
-                    'discount' => $sellerDiscount,
-                    'total' => $sellerTotal,
-                    'payment_method' => $request->payment_method,
-                    'payment_status' => 'pending',
-                    'order_status' => 'pending',
-                    'placed_at' => now(),
-                    'order_notes' => $request->order_notes,
-                    // Individual shipping address fields
-                    'shipping_name' => $request->shipping_name,
-                    'shipping_email' => $request->shipping_email,
-                    'shipping_phone' => $request->shipping_phone,
-                    'shipping_country' => $request->shipping_country,
-                    'shipping_street_address' => $request->shipping_address,
-                    'shipping_city' => $request->shipping_city,
-                    'shipping_state' => $request->shipping_state,
-                    'shipping_postal_code' => $request->shipping_postal_code,
-                    // Individual billing address fields (same as shipping for now)
-                    'billing_name' => $request->shipping_name,
-                    'billing_email' => $request->shipping_email,
-                    'billing_phone' => $request->shipping_phone,
-                    'billing_country' => $request->shipping_country,
-                    'billing_street_address' => $request->shipping_address,
-                    'billing_city' => $request->shipping_city,
-                    'billing_state' => $request->shipping_state,
-                    'billing_postal_code' => $request->shipping_postal_code,
-                    // Coupon information - only apply to first seller to avoid duplication
-                    'coupon_code' => $isFirstSeller ? $couponCode : null,
-                    'coupon_discount_amount' => $isFirstSeller ? $couponDiscountAmount : 0,
-                    'coupon_discount_type' => $isFirstSeller ? $couponDiscountType : null,
-                ]);
-
-                // Create order items for this seller
-                foreach ($sellerItems as $cartItem) {
-                    $price = $cartItem->productVariation ? $cartItem->productVariation->final_price : $cartItem->product->final_price;
-
-                    // Calculate item-level tax and discount
-                    $itemSubtotal = $price * $cartItem->quantity;
-                    $itemTaxRate = $sellerSubtotal > 0 ? $sellerTax / $sellerSubtotal : 0;
-                    $itemDiscountRate = $sellerSubtotal > 0 ? $sellerDiscount / $sellerSubtotal : 0;
-
-                    $itemTax = round($itemSubtotal * $itemTaxRate, 2);
-                    $itemDiscount = round($itemSubtotal * $itemDiscountRate, 2);
-
-                    // Make sure we get the right variation ID from the cart item
-                    $variationId = null;
-                    if (isset($cartItem->variation_id)) {
-                        $variationId = $cartItem->variation_id;
-                    } elseif (isset($cartItem->product_variation_id)) {
-                        $variationId = $cartItem->product_variation_id;
+                if ($product->has_variations && $item->variation_id) {
+                    $variation = $product->variations()->find($item->variation_id);
+                    if ($variation) {
+                        $variation->decrement('stock', $item->quantity);
                     }
+                } else {
+                    $product->decrement('stock', $item->quantity);
+                }
 
-                    SaasOrderItem::create([
-                        'order_id' => $order->id,
-                        'seller_id' => $sellerId,
-                        'product_id' => $cartItem->product_id,
-                        'variation_id' => $variationId,
-                        'quantity' => $cartItem->quantity,
-                        'price' => $price,
-                        'discount' => $itemDiscount,
-                        'tax' => $itemTax,
-                        'status' => 'pending',
-                    ]);
-
-                    // Update stock
-                    if ($cartItem->productVariation) {
-                        $cartItem->productVariation->decrement('stock', $cartItem->quantity);
+                // Calculate item price - prioritize variation price, then product price, then cart price
+                $itemPrice = $item->price;
+                if (!$itemPrice) {
+                    if ($item->productVariation) {
+                        $itemPrice = $item->productVariation->final_price;
+                    } elseif ($item->product) {
+                        $itemPrice = $item->product->final_price;
                     } else {
-                        $cartItem->product->decrement('stock', $cartItem->quantity);
+                        $itemPrice = 0;
                     }
                 }
 
-                $createdOrders[] = $order;
-                $isFirstSeller = false; // Only first seller gets coupon tracking
+                Log::info('Creating order item', ['product_id' => $item->product_id, 'price' => $itemPrice]);
+                SaasOrderItem::create([
+                    'order_id' => $order->id,
+                    'seller_id' => $item->product->seller_id,
+                    'product_id' => $item->product_id,
+                    'variation_id' => $item->variation_id,
+                    'quantity' => $item->quantity,
+                    'price' => $itemPrice,
+                    'discount' => $item->product->discount ?? 0,
+                    'tax' => $this->taxService->calculateProductTax($itemPrice, $item->quantity),
+                    'status' => 'pending',
+                ]);
+                Log::info('Order item created successfully');
             }
 
-            // Clear cart
-            SaasCart::where('user_id', Auth::id())->delete();
-
-            // Increment coupon usage if coupon was applied
-            if ($couponCode) {
-                $coupon = SaasCoupon::where('code', $couponCode)->first();
-                if ($coupon) {
-                    $coupon->increment('used_count');
-                    \Illuminate\Support\Facades\Log::info('Coupon usage incremented', [
-                        'coupon_code' => $coupon->code,
-                        'new_used_count' => $coupon->used_count
-                    ]);
-                }
-
-                // Clear coupon from session after successful order
-                session()->forget('applied_coupon_code');
+            // If a coupon was used, increment its used count
+            if ($coupon) {
+                Log::info('Incrementing coupon usage', ['coupon_code' => $coupon->code]);
+                $coupon->incrementUsedCount();
+                Log::info('Coupon usage incremented successfully');
             }
+
+            // Clear the cart
+            Log::info('Clearing cart');
+            $this->cartCalculationService->clearCart(auth()->id(), session()->getId());
+            Log::info('Cart cleared successfully');
 
             DB::commit();
+            Log::info('Transaction committed successfully');
 
-            // Send confirmation emails
-            $this->sendOrderConfirmationEmails($createdOrders);
+            // Send order confirmation email after commit (so order is saved even if email fails)
+            // Temporarily commented out to isolate checkout issues
+            // try {
+            //     $this->sendOrderConfirmationEmails($order);
+            // } catch (\Exception $emailException) {
+            //     Log::warning('Order confirmation email failed: ' . $emailException->getMessage());
+            // }
 
-            // Store created orders in session for success page
-            session(['created_orders' => collect($createdOrders)->pluck('id')->toArray()]);
-
-            // Redirect to payment gateway or success page
-            if ($request->payment_method === 'cash_on_delivery') {
-                return redirect()->route('customer.checkout.success')
-                    ->with('success', 'Orders placed successfully! You will pay on delivery.');
-            }
-
-            // For other payment methods, you would redirect to payment gateway
-            // For now, we'll just redirect to success page
             return redirect()->route('customer.checkout.success')
-                ->with('success', 'Orders placed successfully!');
+                ->with('success', 'Your order has been placed successfully!');
 
         } catch (\Exception $e) {
-            DB::rollback();
-            \Illuminate\Support\Facades\Log::error('Checkout Error: ' . $e->getMessage());
-            \Illuminate\Support\Facades\Log::error('Stack trace: ' . $e->getTraceAsString());
-
-            // Log the SQL that might have caused the error
-            if ($e instanceof \Illuminate\Database\QueryException) {
-                \Illuminate\Support\Facades\Log::error('SQL Error: ' . $e->getSql());
-                \Illuminate\Support\Facades\Log::error('SQL Bindings: ' . json_encode($e->getBindings()));
-            }
-
-            // Provide more friendly error message but log the details
-            $errorMsg = 'An error occurred while processing your order.';
-            if (app()->environment('local', 'development', 'staging')) {
-                $errorMsg .= ' Error: ' . $e->getMessage();
-            }
-
-            // Also log form data for debugging (removing sensitive info)
-            $requestData = $request->except(['password', 'card_number', 'cvv']);
-            \Illuminate\Support\Facades\Log::error('Form data: ' . json_encode($requestData));
-
-            return back()->withInput()->with('error', $errorMsg);
+            DB::rollBack();
+            Log::error('Order processing failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'orderData' => $orderData,
+                'cartItems' => $cartItems->toArray()
+            ]);
+            return back()->withInput()
+                ->with('error', 'An error occurred while processing your order. Please try again. Error: ' . $e->getMessage());
         }
     }
 
@@ -386,32 +309,59 @@ class SaasCustomerCheckoutController extends Controller
 
     public function saasCancel()
     {
-        return view('saas_customer.saas_checkout_cancel');
+        return view('saas_customer.saas_checkout_cancel')
+            ->with('error', 'Your order was canceled.');
     }
 
     /**
      * Send order confirmation emails to customers and vendors
      */
-    private function sendOrderConfirmationEmails($orders)
+    private function sendOrderConfirmationEmails($order)
     {
         try {
-            foreach ($orders as $order) {
-                // Load necessary relationships
-                $order->load(['customer', 'seller', 'items.product']);
+            // Load necessary relationships
+            $order->load(['customer', 'seller', 'items.product']);
 
-                // Send confirmation email to customer
-                if ($order->customer && $order->customer->email) {
-                    Mail::to($order->customer->email)->send(new SaasOrderConfirmation($order));
-                }
+            // Send confirmation email to customer
+            if ($order->customer && $order->customer->email) {
+                Mail::to($order->customer->email)->send(new SaasOrderConfirmation($order));
+            }
 
-                // Send notification email to vendor/seller
-                if ($order->seller && $order->seller->email) {
-                    Mail::to($order->seller->email)->send(new SaasVendorOrderNotification($order));
-                }
+            // Send notification email to vendor/seller
+            if ($order->seller && $order->seller->email) {
+                Mail::to($order->seller->email)->send(new SaasOrderStatusChanged($order, $order->seller, 'New Order Placed'));
             }
         } catch (\Exception $e) {
             // Log the error but don't fail the order process
-            \Illuminate\Support\Facades\Log::error('Failed to send order confirmation emails: ' . $e->getMessage());
+            Log::error('Failed to send order confirmation emails: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Determine the seller_id for the main order based on cart items
+     */
+    private function determineOrderSellerId($cartItems)
+    {
+        $sellerIds = [];
+        $hasInHouseProducts = false;
+
+        foreach ($cartItems as $item) {
+            if ($item->product->is_in_house_product || $item->product->seller_id === null) {
+                $hasInHouseProducts = true;
+            } else {
+                $sellerIds[] = $item->product->seller_id;
+            }
+        }
+
+        // Remove duplicates
+        $uniqueSellerIds = array_unique($sellerIds);
+
+        // If there are in-house products or multiple sellers, return null
+        if ($hasInHouseProducts || count($uniqueSellerIds) !== 1) {
+            return null;
+        }
+
+        // If all products are from a single seller, return that seller_id
+        return count($uniqueSellerIds) === 1 ? $uniqueSellerIds[0] : null;
     }
 }

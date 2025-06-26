@@ -32,6 +32,7 @@
                             <th>Price</th>
                             <th>Stock</th>
                             <th>Status</th>
+                            <th>Approval Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -94,13 +95,33 @@
                                     @endif
                                 </td>
                                 <td>
+                                    @if($product->seller_publish_status === 'request_product')
+                                        <span class="badge bg-warning">
+                                            <i class="align-middle" data-feather="clock" style="width: 12px; height: 12px;"></i>
+                                            Pending Approval
+                                        </span>
+                                    @elseif($product->seller_publish_status === 'approved_product')
+                                        <span class="badge bg-success">
+                                            <i class="align-middle" data-feather="check-circle" style="width: 12px; height: 12px;"></i>
+                                            Approved
+                                        </span>
+                                    @elseif($product->seller_publish_status === 'denied_product')
+                                        <span class="badge bg-danger">
+                                            <i class="align-middle" data-feather="x-circle" style="width: 12px; height: 12px;"></i>
+                                            Denied
+                                        </span>
+                                    @endif
+                                </td>
+                                <td>
                                     <div class="btn-group" role="group">
                                         <a href="{{ route('seller.products.show', $product->id) }}" class="btn btn-sm btn-info">
                                             <i class="align-middle" data-feather="eye"></i>
                                         </a>
-                                        <a href="{{ route('seller.products.edit', $product->id) }}" class="btn btn-sm btn-primary">
-                                            <i class="align-middle" data-feather="edit"></i>
-                                        </a>
+                                        @if($product->seller_publish_status !== 'approved_product')
+                                            <a href="{{ route('seller.products.edit', $product->id) }}" class="btn btn-sm btn-primary">
+                                                <i class="align-middle" data-feather="edit"></i>
+                                            </a>
+                                        @endif
                                         <button type="button" class="btn btn-sm btn-danger delete-product"
                                                 data-id="{{ $product->id }}"
                                                 data-name="{{ $product->name }}">
@@ -111,7 +132,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center">No products found</td>
+                                <td colspan="9" class="text-center">No products found</td>
                             </tr>
                         @endforelse
                     </tbody>

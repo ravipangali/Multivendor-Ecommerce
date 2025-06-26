@@ -51,6 +51,10 @@ class SaasBlogCategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $request->merge([
+            'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN),
+        ]);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:saas_blog_categories,slug',
@@ -59,7 +63,7 @@ class SaasBlogCategoryController extends Controller
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'boolean',
+            'status' => 'required|boolean',
             'position' => 'nullable|integer|min:0',
             'parent_id' => 'nullable|exists:saas_blog_categories,id',
         ]);
@@ -111,6 +115,10 @@ class SaasBlogCategoryController extends Controller
      */
     public function update(Request $request, SaasBlogCategory $blogCategory)
     {
+        $request->merge([
+            'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN),
+        ]);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:saas_blog_categories,slug,' . $blogCategory->id,
@@ -119,7 +127,7 @@ class SaasBlogCategoryController extends Controller
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'boolean',
+            'status' => 'required|boolean',
             'position' => 'nullable|integer|min:0',
             'parent_id' => 'nullable|exists:saas_blog_categories,id',
         ]);

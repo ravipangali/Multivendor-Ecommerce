@@ -1,6 +1,5 @@
 @extends('saas_admin.saas_layouts.saas_layout')
 
-@section('title', 'Edit Blog Post')
 
 @section('content')
 <div class="container-fluid p-0">
@@ -76,8 +75,7 @@
                                     <textarea class="form-control tinymce-editor @error('content') is-invalid @enderror"
                                               id="content"
                                               name="content"
-                                              rows="15"
-                                              required>{{ old('content', $post->content) }}</textarea>
+                                              rows="15">{{ old('content', $post->content) }}</textarea>
                                     @error('content')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -197,7 +195,7 @@
 </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script src="{{ asset('tinymce/tinymce.min.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -206,6 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selector: 'textarea.tinymce-editor',
         height: 400,
         menubar: false,
+        license_key: 'gpl',
         plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -408,4 +407,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush
+@endsection

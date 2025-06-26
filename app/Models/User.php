@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\SaasResetPasswordNotification;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -22,6 +23,8 @@ class User extends Authenticatable
         'profile_photo',
         'is_active',
         'last_login_at',
+        'commission',
+        'balance',
     ];
 
     protected $hidden = [
@@ -34,6 +37,8 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_active' => 'boolean',
         'last_login_at' => 'datetime',
+        'commission' => 'decimal:2',
+        'balance' => 'decimal:2',
     ];
 
     /**
@@ -144,22 +149,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the wallet belonging to the user.
-     */
-    public function wallet()
-    {
-        return $this->hasOne(SaasWallet::class);
-    }
-
-    /**
-     * Get all wallets for the user (in different currencies).
-     */
-    public function wallets()
-    {
-        return $this->hasMany(SaasWallet::class);
-    }
-
-    /**
      * Get the withdrawals made by the user.
      */
     public function withdrawals()
@@ -168,18 +157,54 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the wallet transactions for the user.
+     * Get transactions for this user
      */
-    public function walletTransactions()
+    public function transactions()
     {
-        return $this->hasMany(SaasWalletTransaction::class);
+        return $this->hasMany(\App\Models\SaasTransaction::class);
     }
 
     /**
-     * Get the user's primary wallet, creating it if it doesn't exist.
+     * Update user balance and create transaction record
      */
-    public function getWallet($currency = 'NPR')
+    public function updateBalance($amount, $transactionType, $description = null, $orderId = null, $commissionPercentage = null, $commissionAmount = null)
     {
-        return SaasWallet::getOrCreate($this->id, $currency);
+        $balanceBefore = $this->balance;
+
+        if (in_array($transactionType, [\App\Models\SaasTransaction::TYPE_DEPOSIT, \App\Models\SaasTransaction::TYPE_COMMISSION])) {
+            $this->balance += $amount;
+        } else {
+            $this->balance -= $amount;
+        }
+
+        $this->save();
+
+        // Create transaction record
+        return \App\Models\SaasTransaction::createTransaction([
+            'user_id' => $this->id,
+            'transaction_type' => $transactionType,
+            'amount' => $amount,
+            'balance_before' => $balanceBefore,
+            'balance_after' => $this->balance,
+            'order_id' => $orderId,
+            'reference_type' => $orderId ? \App\Models\SaasTransaction::REFERENCE_ORDER : null,
+            'reference_id' => $orderId,
+            'description' => $description,
+            'commission_percentage' => $commissionPercentage,
+            'commission_amount' => $commissionAmount,
+        ]);
+    }
+
+    /**
+     * Get effective commission rate for this seller
+     */
+    public function getEffectiveCommissionRate()
+    {
+        if ($this->commission && $this->commission > 0) {
+            return $this->commission;
+        }
+
+        $settings = \App\Models\SaasSetting::first();
+        return $settings ? $settings->seller_commission : 0;
     }
 }

@@ -47,9 +47,9 @@
                                 <div class="col-md-6">
                                     <label for="account_name" class="form-label">Account Name <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('account_name') is-invalid @enderror"
-                                        id="account_name" name="account_name" value="{{ old('account_name') }}" required>
-                                    @error('account_name')
+                                    <input type="text" class="form-control @error('details.account_name') is-invalid @enderror"
+                                        id="account_name" name="details[account_name]" value="{{ old('details.account_name') }}" required>
+                                    @error('details.account_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -61,9 +61,9 @@
                                     <div class="col-md-6">
                                         <label for="bank_name" class="form-label">Bank Name <span
                                                 class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('bank_name') is-invalid @enderror"
-                                            id="bank_name" name="bank_name" value="{{ old('bank_name') }}">
-                                        @error('bank_name')
+                                        <input type="text" class="form-control @error('details.bank_name') is-invalid @enderror"
+                                            id="bank_name" name="details[bank_name]" value="{{ old('details.bank_name') }}">
+                                        @error('details.bank_name')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -72,9 +72,9 @@
                                         <label for="bank_branch" class="form-label">Bank Branch <span
                                                 class="text-danger">*</span></label>
                                         <input type="text"
-                                            class="form-control @error('bank_branch') is-invalid @enderror" id="bank_branch"
-                                            name="bank_branch" value="{{ old('bank_branch') }}">
-                                        @error('bank_branch')
+                                            class="form-control @error('details.bank_branch') is-invalid @enderror" id="bank_branch"
+                                            name="details[bank_branch]" value="{{ old('details.bank_branch') }}">
+                                        @error('details.bank_branch')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -85,9 +85,9 @@
                                         <label for="account_number" class="form-label">Account Number <span
                                                 class="text-danger">*</span></label>
                                         <input type="text"
-                                            class="form-control @error('account_number') is-invalid @enderror"
-                                            id="account_number" name="account_number" value="{{ old('account_number') }}">
-                                        @error('account_number')
+                                            class="form-control @error('details.account_number') is-invalid @enderror"
+                                            id="account_number" name="details[account_number]" value="{{ old('details.account_number') }}">
+                                        @error('details.account_number')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -101,10 +101,10 @@
                                         <label for="mobile_number" class="form-label">Mobile Number <span
                                                 class="text-danger">*</span></label>
                                         <input type="text"
-                                            class="form-control @error('mobile_number') is-invalid @enderror"
-                                            id="mobile_number" name="mobile_number" value="{{ old('mobile_number') }}"
+                                            class="form-control @error('details.mobile_number') is-invalid @enderror"
+                                            id="mobile_number" name="details[mobile_number]" value="{{ old('details.mobile_number') }}"
                                             placeholder="e.g. 9876543210">
-                                        @error('mobile_number')
+                                        @error('details.mobile_number')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>

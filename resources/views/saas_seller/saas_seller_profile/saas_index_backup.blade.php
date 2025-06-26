@@ -45,11 +45,10 @@
                                 </div>
 
                                 <!-- Wallet Balance -->
-                                @if($user->wallet)
-                                    <div class="mt-4 p-3 bg-light rounded">
+                                @if($user->balance)
+                                    <div class="mt-2">
                                         <h6 class="text-muted mb-2">Wallet Balance</h6>
-                                        <h4 class="text-primary mb-0">Rs {{ number_format($user->wallet->balance, 2) }}</h4>
-                                        <small class="text-muted">Pending: Rs {{ number_format($user->wallet->pending_balance, 2) }}</small>
+                                        <h4 class="text-primary mb-0">Rs {{ number_format($user->balance, 2) }}</h4>
                                     </div>
                                 @endif
                             </div>

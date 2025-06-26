@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class SaasSetting extends Model
 {
@@ -78,6 +79,12 @@ class SaasSetting extends Model
 
         // Apply Share Link
         'apply_share_link',
+
+        // Seller Commission
+        'seller_commission',
+
+        // Balance
+        'balance',
     ];
 
     /**
@@ -88,5 +95,49 @@ class SaasSetting extends Model
     protected $casts = [
         'minimum_withdrawal_amount' => 'decimal:2',
         'gateway_transaction_fee' => 'decimal:2',
+        'seller_commission' => 'decimal:2',
+        'balance' => 'decimal:2',
     ];
+
+    /**
+     * Get a setting value by key.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public static function get($key, $default = null)
+    {
+        $setting = self::first();
+        return $setting ? $setting->{$key} : $default;
+    }
+
+    /**
+     * Update admin balance and create transaction record
+     */
+    public function updateBalance($amount, $transactionType, $description = null, $orderId = null)
+    {
+        $balanceBefore = $this->balance;
+
+        if (in_array($transactionType, [\App\Models\SaasTransaction::TYPE_DEPOSIT])) {
+            $this->balance += $amount;
+        } else {
+            $this->balance -= $amount;
+        }
+
+        $this->save();
+
+        // Create transaction record for admin (user_id = null)
+        return \App\Models\SaasTransaction::createTransaction([
+            'user_id' => null, // Admin transaction
+            'transaction_type' => $transactionType,
+            'amount' => $amount,
+            'balance_before' => $balanceBefore,
+            'balance_after' => $this->balance,
+            'order_id' => $orderId,
+            'reference_type' => $orderId ? \App\Models\SaasTransaction::REFERENCE_ORDER : null,
+            'reference_id' => $orderId,
+            'description' => $description,
+        ]);
+    }
 }

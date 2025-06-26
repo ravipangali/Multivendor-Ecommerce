@@ -1,6 +1,5 @@
-@extends('saas_admin.saas_layouts.saas_app')
+@extends('saas_admin.saas_layouts.saas_layout')
 
-@section('title', 'Create Blog Post')
 
 @section('content')
 <div class="container-fluid p-0">
@@ -59,7 +58,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Content <span class="text-danger">*</span></label>
                                     <textarea class="tinymce-editor @error('content') is-invalid @enderror" name="content" id="content"
-                                              placeholder="Write your blog post content here..." required>{{ old('content') }}</textarea>
+                                              placeholder="Write your blog post content here...">{{ old('content') }}</textarea>
                                     @error('content')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -202,7 +201,7 @@
 </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script src="{{ asset('tinymce/tinymce.min.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -211,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selector: 'textarea.tinymce-editor',
         height: 400,
         menubar: false,
+        license_key: 'gpl',
         plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -412,4 +412,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
+@endsection

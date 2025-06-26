@@ -158,4 +158,32 @@ class SaasTaxService
             'tax_inclusive' => (bool)$settings->tax_inclusive_pricing,
         ];
     }
+
+    /**
+     * Calculate tax for a specific product in an order
+     */
+    public function calculateProductTax($price, $quantity = 1)
+    {
+        $settings = SaasSetting::first();
+
+        if (!$settings || !$settings->tax_enable) {
+            return 0;
+        }
+
+        $taxRate = $settings->tax_rate ?? 13;
+
+        if ($taxRate <= 0) {
+            return 0;
+        }
+
+        $total = $price * $quantity;
+
+        if ($settings->tax_inclusive_pricing) {
+            // Extract tax from inclusive price
+            return round($total * ($taxRate / (100 + $taxRate)), 2);
+        }
+
+        // Add tax on top of exclusive price
+        return round($total * ($taxRate / 100), 2);
+    }
 }

@@ -10,6 +10,8 @@ use App\Http\Controllers\SaasCustomer\SaasCustomerSellerController;
 use App\Http\Controllers\SaasCustomer\SaasPageController;
 use App\Http\Controllers\SaasCustomer\SaasBlogController;
 use App\Http\Controllers\SaasCustomer\SaasDigitalProductController;
+use App\Http\Controllers\SaasCustomer\SaasRefundController;
+use App\Http\Controllers\SaasCustomer\SaasPaymentMethodController;
 use Illuminate\Support\Facades\Route;
 
 // Home page
@@ -99,6 +101,28 @@ Route::middleware(['auth', 'saasrolemanager:customer'])->prefix('customer')->nam
     Route::get('/order/{orderId}/digital-product/{productId}/download', [SaasDigitalProductController::class, 'download'])->name('digital-product.download');
     Route::get('/order/{orderId}/digital-product/{productId}/preview', [SaasDigitalProductController::class, 'preview'])->name('digital-product.preview');
     Route::get('/order/{orderId}/digital-products', [SaasDigitalProductController::class, 'getDownloadableProducts'])->name('digital-products.list');
+
+    // Refund Routes
+    Route::prefix('refunds')->name('refunds.')->group(function () {
+        Route::get('/', [SaasRefundController::class, 'index'])->name('index');
+        Route::get('/create', [SaasRefundController::class, 'create'])->name('create');
+        Route::post('/', [SaasRefundController::class, 'store'])->name('store');
+        Route::get('/{refund}', [SaasRefundController::class, 'show'])->name('show');
+        Route::get('/{refund}/attachment', [SaasRefundController::class, 'downloadAttachment'])->name('attachment.download');
+});
+
+// Payment Method Routes
+Route::prefix('payment-methods')->name('payment-methods.')->group(function () {
+    Route::get('/', [SaasPaymentMethodController::class, 'index'])->name('index');
+    Route::get('/create', [SaasPaymentMethodController::class, 'create'])->name('create');
+    Route::post('/', [SaasPaymentMethodController::class, 'store'])->name('store');
+    Route::get('/{paymentMethod}', [SaasPaymentMethodController::class, 'show'])->name('show');
+    Route::get('/{paymentMethod}/edit', [SaasPaymentMethodController::class, 'edit'])->name('edit');
+    Route::put('/{paymentMethod}', [SaasPaymentMethodController::class, 'update'])->name('update');
+    Route::delete('/{paymentMethod}', [SaasPaymentMethodController::class, 'destroy'])->name('destroy');
+    Route::post('/{paymentMethod}/set-default', [SaasPaymentMethodController::class, 'setDefault'])->name('set-default');
+    Route::post('/{paymentMethod}/toggle-status', [SaasPaymentMethodController::class, 'toggleStatus'])->name('toggle-status');
+    });
 });
 
 // AJAX routes for dynamic functionality

@@ -10,20 +10,19 @@ class SaasOrder extends Model
     use HasFactory;
 
     protected $fillable = [
-        'order_number',
         'customer_id',
         'seller_id',
-        'total',
+        'order_number',
         'subtotal',
-        'discount',
-        'tax',
         'shipping_fee',
+        'tax',
+        'discount',
+        'total',
+        'payment_method',
         'payment_status',
         'order_status',
-        'payment_method',
-        'order_notes',
         'placed_at',
-        // Individual shipping address fields
+        'order_notes',
         'shipping_name',
         'shipping_email',
         'shipping_phone',
@@ -32,7 +31,6 @@ class SaasOrder extends Model
         'shipping_city',
         'shipping_state',
         'shipping_postal_code',
-        // Individual billing address fields
         'billing_name',
         'billing_email',
         'billing_phone',
@@ -41,7 +39,6 @@ class SaasOrder extends Model
         'billing_city',
         'billing_state',
         'billing_postal_code',
-        // Coupon tracking
         'coupon_code',
         'coupon_discount_amount',
         'coupon_discount_type',
@@ -96,6 +93,14 @@ class SaasOrder extends Model
     public function items()
     {
         return $this->hasMany(SaasOrderItem::class, 'order_id');
+    }
+
+    /**
+     * Get the refunds for the order.
+     */
+    public function refunds()
+    {
+        return $this->hasMany(SaasRefund::class, 'order_id');
     }
 
     /**
@@ -415,5 +420,10 @@ class SaasOrder extends Model
         if ($this->billing_country) $address[] = $this->billing_country;
 
         return implode(', ', $address);
+    }
+
+    public function setSellerIdAttribute($value)
+    {
+        $this->attributes['seller_id'] = empty($value) ? null : $value;
     }
 }

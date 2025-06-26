@@ -82,19 +82,19 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <strong>{{ $paymentMethod->account_name }}</strong>
-                                        @if($paymentMethod->account_number)
-                                            <br><small class="text-muted">A/C: {{ $paymentMethod->account_number }}</small>
+                                        <strong>{{ $paymentMethod->details['account_name'] ?? 'N/A' }}</strong>
+                                        @if(isset($paymentMethod->details['account_number']))
+                                            <br><small class="text-muted">A/C: {{ $paymentMethod->details['account_number'] }}</small>
                                         @endif
                                     </td>
                                     <td>
                                         @if($paymentMethod->type == 'bank_transfer')
-                                            <strong>{{ $paymentMethod->bank_name }}</strong>
-                                            @if($paymentMethod->bank_branch)
-                                                <br><small class="text-muted">{{ $paymentMethod->bank_branch }}</small>
+                                            <strong>{{ $paymentMethod->details['bank_name'] ?? 'N/A' }}</strong>
+                                            @if(isset($paymentMethod->details['bank_branch']))
+                                                <br><small class="text-muted">{{ $paymentMethod->details['bank_branch'] }}</small>
                                             @endif
                                         @elseif(in_array($paymentMethod->type, ['esewa', 'khalti']))
-                                            <strong>{{ $paymentMethod->mobile_number }}</strong>
+                                            <strong>{{ $paymentMethod->details['mobile_number'] ?? 'N/A' }}</strong>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif

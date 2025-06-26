@@ -57,7 +57,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Content <span class="text-danger">*</span></label>
                                     <textarea class="form-control tinymce-editor @error('content') is-invalid @enderror" name="content" id="content" rows="15"
-                                              placeholder="Enter page content" required>{{ old('content') }}</textarea>
+                                              placeholder="Enter page content">{{ old('content') }}</textarea>
                                     @error('content')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -215,6 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selector: 'textarea.tinymce-editor',
         height: 400,
         menubar: false,
+        license_key: 'gpl',
         plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',

@@ -4,8 +4,9 @@ namespace App\Http\Controllers\SaasSeller;
 
 use App\Http\Controllers\Controller;
 use App\Models\SaasOrder;
-use App\Models\SaasWallet;
 use App\Models\SaasWithdrawal;
+use App\Models\SaasPaymentMethod;
+use App\Models\SaasSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,19 +18,34 @@ class SaasWithdrawalController extends Controller
      */
     public function index()
     {
-        $sellerId = Auth::id();
+        $seller = Auth::user();
 
-        // Get or create the seller's wallet
-        $wallet = SaasWallet::getOrCreate($sellerId);
+        // Get seller's withdrawals
+        $withdrawalRequests = SaasWithdrawal::where('user_id', $seller->id)
+                                   ->sellerWithdrawals()
+                                   ->with(['paymentMethod', 'processedBy'])
+                                   ->latest()
+                                   ->paginate(10);
 
-        // Get withdrawal requests
-        $withdrawalRequests = SaasWithdrawal::where('user_id', $sellerId)
-            ->latest()
-            ->paginate(10);
+        // Get statistics
+        $totalWithdrawals = SaasWithdrawal::where('user_id', $seller->id)->sellerWithdrawals()->count();
+        $totalWithdrawn = SaasWithdrawal::where('user_id', $seller->id)
+                                       ->sellerWithdrawals()
+                                       ->where('status', 'approved')
+                                       ->sum('requested_amount');
+        $pendingAmount = SaasWithdrawal::where('user_id', $seller->id)
+                                      ->sellerWithdrawals()
+                                      ->where('status', 'pending')
+                                      ->sum('requested_amount');
+
+        $balance = $seller->balance;
 
         return view('saas_seller.saas_withdrawal.saas_index', compact(
-            'wallet',
-            'withdrawalRequests'
+            'withdrawalRequests',
+            'totalWithdrawals',
+            'totalWithdrawn',
+            'pendingAmount',
+            'balance'
         ));
     }
 
@@ -38,37 +54,42 @@ class SaasWithdrawalController extends Controller
      */
     public function create()
     {
-        $sellerId = Auth::id();
-
-        // Get or create the seller's wallet
-        $wallet = SaasWallet::getOrCreate($sellerId);
+        $seller = Auth::user();
 
         // Check if there's a pending withdrawal already
-        $pendingWithdrawal = SaasWithdrawal::where('user_id', $sellerId)
-            ->where('status', 'pending')
-            ->first();
+        $pendingWithdrawal = SaasWithdrawal::where('user_id', $seller->id)
+                                          ->sellerWithdrawals()
+                                          ->where('status', 'pending')
+                                          ->first();
 
         if ($pendingWithdrawal) {
             return redirect()->route('seller.withdrawals.index')
-                ->with('info', 'You already have a pending withdrawal request. Please wait for it to be processed before requesting another withdrawal.');
+                           ->with('info', 'You already have a pending withdrawal request. Please wait for it to be processed before requesting another withdrawal.');
         }
 
-        // Get seller's payment methods if they exist
-        $paymentMethods = \App\Models\SaasPaymentMethod::where('user_id', $sellerId)->get();
+        // Get seller's active payment methods
+        $paymentMethods = SaasPaymentMethod::where('user_id', $seller->id)
+                                          ->where('is_active', true)
+                                          ->get();
 
-        // Calculate available balance and minimum withdrawal
-        $walletBalance = $wallet->available_for_withdrawal ?? 0;
-        $minimumWithdrawal = 100; // Set minimum withdrawal amount
-        $pendingWithdrawals = SaasWithdrawal::where('user_id', $sellerId)
-            ->where('status', 'pending')
-            ->sum('amount');
+        if ($paymentMethods->isEmpty()) {
+            return redirect()->route('seller.payment-methods.create')
+                           ->with('error', 'Please add a payment method before requesting a withdrawal.');
+        }
+
+        // Get settings for minimum withdrawal and gateway fee
+        $settings = SaasSetting::first();
+        $minimumWithdrawal = $settings ? $settings->minimum_withdrawal_amount : 100;
+        $gatewayFee = $settings ? $settings->gateway_transaction_fee : 0;
+
+        // Calculate available balance
+        $availableBalance = $seller->balance ?? 0;
 
         return view('saas_seller.saas_withdrawal.saas_create', compact(
-            'wallet',
             'paymentMethods',
-            'walletBalance',
+            'availableBalance',
             'minimumWithdrawal',
-            'pendingWithdrawals'
+            'gatewayFee'
         ));
     }
 
@@ -77,40 +98,45 @@ class SaasWithdrawalController extends Controller
      */
     public function store(Request $request)
     {
-        $sellerId = Auth::id();
-
         $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'payment_method' => 'required|in:bank_transfer,paypal,stripe',
-            'payment_details' => 'required|string',
-            'notes' => 'nullable|string',
+            'requested_amount' => 'required|numeric|min:1',
+            'payment_method_id' => 'required|exists:saas_payment_methods,id',
+            'notes' => 'nullable|string|max:500',
         ]);
 
-        // Get the seller's wallet
-        $wallet = SaasWallet::getOrCreate($sellerId);
+        $seller = Auth::user();
 
-        if ($request->amount > $wallet->available_for_withdrawal) {
+        // Check minimum withdrawal amount
+        $settings = SaasSetting::first();
+        $minimumAmount = $settings ? $settings->minimum_withdrawal_amount : 100;
+
+        if ($request->requested_amount < $minimumAmount) {
             return redirect()->back()
-                ->withInput()
-                ->with('error', 'Withdrawal amount exceeds available balance');
+                           ->with('error', "Minimum withdrawal amount is Rs. {$minimumAmount}")
+                           ->withInput();
+        }
+
+        // Check if seller has sufficient balance
+        if ($seller->balance < $request->requested_amount) {
+            return redirect()->back()
+                           ->with('error', 'Insufficient balance for withdrawal')
+                           ->withInput();
         }
 
         try {
-            // Create the withdrawal request with transaction
-            $withdrawal = SaasWithdrawal::requestWithdrawal(
-                $sellerId,
-                $request->amount,
-                $request->payment_method,
-                ['details' => $request->payment_details],
+            $withdrawal = SaasWithdrawal::requestSellerWithdrawal(
+                $seller->id,
+                $request->requested_amount,
+                $request->payment_method_id,
                 $request->notes
             );
 
-            return redirect()->route('seller.withdrawals.index')
-                ->with('success', 'Withdrawal request submitted successfully');
+            return redirect()->route('seller.withdrawals.show', $withdrawal)
+                           ->with('success', 'Withdrawal request submitted successfully');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->withInput()
-                ->with('error', 'Error creating withdrawal request: ' . $e->getMessage());
+                           ->with('error', 'Error creating withdrawal request: ' . $e->getMessage())
+                           ->withInput();
         }
     }
 
@@ -119,11 +145,13 @@ class SaasWithdrawalController extends Controller
      */
     public function history()
     {
-        $sellerId = Auth::id();
+        $seller = Auth::user();
 
-        $withdrawals = SaasWithdrawal::where('user_id', $sellerId)
-            ->latest()
-            ->paginate(15);
+        $withdrawals = SaasWithdrawal::where('user_id', $seller->id)
+                                   ->sellerWithdrawals()
+                                   ->with(['paymentMethod', 'processedBy'])
+                                   ->latest()
+                                   ->paginate(15);
 
         return view('saas_seller.saas_withdrawal.saas_history', compact('withdrawals'));
     }
@@ -136,8 +164,10 @@ class SaasWithdrawalController extends Controller
         // Check if the withdrawal belongs to the authenticated seller
         if ($withdrawal->user_id !== Auth::id()) {
             return redirect()->route('seller.withdrawals.index')
-                ->with('error', 'You are not authorized to view this withdrawal.');
+                           ->with('error', 'You are not authorized to view this withdrawal.');
         }
+
+        $withdrawal->load(['paymentMethod', 'processedBy']);
 
         return view('saas_seller.saas_withdrawal.saas_show', compact('withdrawal'));
     }
@@ -150,23 +180,46 @@ class SaasWithdrawalController extends Controller
         // Check if the withdrawal belongs to the authenticated seller
         if ($withdrawal->user_id !== Auth::id()) {
             return redirect()->route('seller.withdrawals.index')
-                ->with('error', 'You are not authorized to cancel this withdrawal.');
+                           ->with('error', 'You are not authorized to cancel this withdrawal.');
         }
 
         // Check if the withdrawal is still pending
         if ($withdrawal->status !== 'pending') {
             return redirect()->route('seller.withdrawals.index')
-                ->with('error', 'Only pending withdrawals can be cancelled.');
+                           ->with('error', 'Only pending withdrawals can be cancelled.');
         }
 
         try {
-            $withdrawal->rejectWithdrawal('Cancelled by seller', 'Seller initiated cancellation');
+            $withdrawal->cancelWithdrawal();
 
             return redirect()->route('seller.withdrawals.index')
-                ->with('success', 'Withdrawal request cancelled successfully');
+                           ->with('success', 'Withdrawal request cancelled successfully');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error cancelling withdrawal: ' . $e->getMessage());
+                           ->with('error', 'Error cancelling withdrawal: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Download admin attachment if available.
+     */
+    public function downloadAttachment(SaasWithdrawal $withdrawal)
+    {
+        // Check if the withdrawal belongs to the authenticated seller
+        if ($withdrawal->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to withdrawal.');
+        }
+
+        if (!$withdrawal->admin_attachment) {
+            abort(404, 'Attachment not found');
+        }
+
+        $filePath = storage_path('app/public/' . $withdrawal->admin_attachment);
+
+        if (!file_exists($filePath)) {
+            abort(404, 'File not found');
+        }
+
+        return response()->download($filePath);
     }
 }

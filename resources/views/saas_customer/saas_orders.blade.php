@@ -344,6 +344,18 @@
     color: var(--white);
   }
 
+  .btn-warning-custom {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: var(--white);
+  }
+
+  .btn-warning-custom:hover {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    color: var(--white);
+  }
+
   .empty-orders {
     text-align: center;
     padding: 4rem 2rem;
@@ -727,6 +739,11 @@
                                                     <i class="fa fa-star"></i> Review
                                                 </a>
                                             @endif
+                                            @if(in_array($order->order_status, ['delivered', 'completed']) && !$order->refunds()->whereIn('status', ['pending', 'approved', 'processed'])->exists())
+                                                <a href="{{ route('customer.refunds.create', ['order_id' => $order->id]) }}" class="btn btn-warning-custom">
+                                                    <i class="fa fa-undo"></i> Request Refund
+                                                </a>
+                                            @endif
                                             @if($order->hasDigitalProducts() && $order->canDownloadDigitalProducts())
                                                 <a href="{{ route('customer.order.detail', $order->id) }}#digital-downloads" class="btn btn-success-custom">
                                                     <i class="fa fa-download"></i> Download
@@ -876,7 +893,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Make the API call to cancel order
-        fetch(`/customer/order/${currentOrderId}/cancel`, {
+        fetch(`{{ route('customer.order.cancel.ajax', ':id') }}`.replace(':id', currentOrderId), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

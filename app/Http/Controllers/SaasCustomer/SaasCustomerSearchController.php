@@ -14,7 +14,9 @@ class SaasCustomerSearchController extends Controller
 {
     public function saasSearch(Request $request)
     {
-        $query = SaasProduct::where('is_active', true)->with(['images', 'brand', 'category', 'reviews']);
+        $query = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+            ->with(['images', 'brand', 'category', 'reviews']);
 
         // Search term
         if ($request->has('q') && $request->q) {
@@ -133,6 +135,7 @@ class SaasCustomerSearchController extends Controller
             ->join('saas_products', 'saas_product_variations.product_id', '=', 'saas_products.id')
             ->where('saas_attributes.name', 'like', '%size%')
             ->where('saas_products.is_active', true)
+            ->where('saas_products.seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->select('saas_attribute_values.value')
             ->distinct()
             ->orderBy('saas_attribute_values.value')
@@ -146,6 +149,7 @@ class SaasCustomerSearchController extends Controller
             ->join('saas_products', 'saas_product_variations.product_id', '=', 'saas_products.id')
             ->where('saas_attributes.name', 'like', '%color%')
             ->where('saas_products.is_active', true)
+            ->where('saas_products.seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->select('saas_attribute_values.value')
             ->distinct()
             ->orderBy('saas_attribute_values.value')
@@ -153,7 +157,10 @@ class SaasCustomerSearchController extends Controller
             ->pluck('value');
 
         // Get price range
-        $priceRange = SaasProduct::where('is_active', true)->selectRaw('MIN(price - (price * discount / 100)) as min_price, MAX(price - (price * discount / 100)) as max_price')->first();
+        $priceRange = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+            ->selectRaw('MIN(price - (price * discount / 100)) as min_price, MAX(price - (price * discount / 100)) as max_price')
+            ->first();
 
         return view('saas_customer.saas_search_results', compact(
             'products',
@@ -193,6 +200,7 @@ class SaasCustomerSearchController extends Controller
 
         // Get price range
         $data['price_range'] = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
             ->first();
 

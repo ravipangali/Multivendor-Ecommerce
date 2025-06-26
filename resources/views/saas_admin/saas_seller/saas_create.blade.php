@@ -72,6 +72,17 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="commission" class="form-label">Commission (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="commission" name="commission"
+                                    value="{{ old('commission', $defaultCommission ?? 0) }}"
+                                    min="0" max="100" step="0.01" placeholder="0.00">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">Commission percentage for this seller (leave empty to use default: {{ $defaultCommission ?? 0 }}%)</small>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="profile_photo" class="form-label">Profile Photo</label>
                             <input type="file" class="form-control" id="profile_photo" name="profile_photo" accept="image/*">
                             <small class="text-muted">Upload profile photo (max 2MB)</small>

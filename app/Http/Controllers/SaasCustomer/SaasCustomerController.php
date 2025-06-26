@@ -46,18 +46,21 @@ class SaasCustomerController extends Controller
         // Get featured products
         $featuredProducts = SaasProduct::where('is_featured', true)
             ->where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->with(['images', 'brand', 'reviews'])
             ->orderBy('created_at', 'desc')
             ->take(8)->get();
 
         // Get new arrivals
         $newArrivals = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->with(['images', 'brand', 'reviews'])
             ->orderBy('created_at', 'desc')
             ->take(16)->get();
 
         // Get top selling products (based on order items count)
         $topSellingProducts = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->withCount('orderItems')
             ->with(['images', 'brand', 'reviews'])
             ->orderBy('order_items_count', 'desc')
@@ -71,6 +74,7 @@ class SaasCustomerController extends Controller
 
         // Get demand products (products in wishlists)
         $demandProducts = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->withCount('wishlists')
             ->with(['images', 'brand', 'reviews'])
             ->having('wishlists_count', '>', 0)
@@ -111,7 +115,9 @@ class SaasCustomerController extends Controller
 
     public function saasProductListing(Request $request)
     {
-        $query = SaasProduct::where('is_active', true)->with(['images', 'brand', 'category', 'reviews']);
+        $query = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
+            ->with(['images', 'brand', 'category', 'reviews']);
 
         // Filter by category
         if ($request->has('category') && $request->category) {
@@ -265,6 +271,7 @@ class SaasCustomerController extends Controller
         $category = SaasCategory::where('slug', $slug)->where('status', true)->firstOrFail();
 
         $query = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->where('category_id', $category->id)
             ->with(['images', 'brand', 'category', 'subcategory', 'reviews']);
 
@@ -403,6 +410,7 @@ class SaasCustomerController extends Controller
         $brand = SaasBrand::where('slug', $slug)->firstOrFail();
 
         $query = SaasProduct::where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->where('brand_id', $brand->id)
             ->with(['images', 'brand', 'category', 'subcategory', 'reviews']);
 
@@ -532,6 +540,7 @@ class SaasCustomerController extends Controller
     {
         $product = SaasProduct::where('slug', $slug)
             ->where('is_active', true)
+            ->where('seller_publish_status', SaasProduct::SELLER_PUBLISH_STATUS_APPROVED)
             ->with([
                 'images',
                 'brand',

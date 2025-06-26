@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SaasPage;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
@@ -109,6 +110,12 @@ class SaasPageController extends Controller
      */
     public function store(Request $request)
     {
+        $request->merge([
+            'status' => $request->has('status'),
+            'in_footer' => $request->has('in_footer'),
+            'in_header' => $request->has('in_header'),
+        ]);
+
         $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:saas_pages,slug',
@@ -119,9 +126,9 @@ class SaasPageController extends Controller
             'meta_keywords' => 'nullable|string|max:255',
             'template' => 'nullable|string|max:100',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'boolean',
-            'in_footer' => 'boolean',
-            'in_header' => 'boolean',
+            'status' => 'required|boolean',
+            'in_footer' => 'required|boolean',
+            'in_header' => 'required|boolean',
             'position' => 'nullable|integer|min:0',
             'author_id' => 'nullable|exists:users,id',
             'published_at' => 'nullable|date',
@@ -149,7 +156,7 @@ class SaasPageController extends Controller
 
         // Set default author if not provided
         if (!isset($data['author_id']) || !$data['author_id']) {
-            $data['author_id'] = auth()->id();
+            $data['author_id'] = Auth::id();
         }
 
         $page = SaasPage::create($data);
@@ -181,6 +188,12 @@ class SaasPageController extends Controller
      */
     public function update(Request $request, SaasPage $page)
     {
+        $request->merge([
+            'status' => $request->has('status'),
+            'in_footer' => $request->has('in_footer'),
+            'in_header' => $request->has('in_header'),
+        ]);
+
         $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:saas_pages,slug,' . $page->getKey(),
@@ -191,9 +204,9 @@ class SaasPageController extends Controller
             'meta_keywords' => 'nullable|string|max:255',
             'template' => 'nullable|string|max:100',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'boolean',
-            'in_footer' => 'boolean',
-            'in_header' => 'boolean',
+            'status' => 'required|boolean',
+            'in_footer' => 'required|boolean',
+            'in_header' => 'required|boolean',
             'position' => 'nullable|integer|min:0',
             'author_id' => 'nullable|exists:users,id',
             'published_at' => 'nullable|date',
@@ -222,6 +235,11 @@ class SaasPageController extends Controller
             $filename = 'page_images/' . uniqid() . '.' . $image->getClientOriginalExtension();
             $image->storeAs('public', $filename);
             $data['featured_image'] = $filename;
+        }
+
+        // Set default author if not provided
+        if (!isset($data['author_id']) || !$data['author_id']) {
+            $data['author_id'] = Auth::id();
         }
 
         $page->update($data);

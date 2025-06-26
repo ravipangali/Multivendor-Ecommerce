@@ -11,10 +11,12 @@ use App\Models\SaasBrand;
 use App\Models\SaasUnit;
 use App\Models\SaasAttribute;
 use App\Models\SaasProductVariation;
+use App\Mail\SaasProductRequestNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class SaasProductController extends Controller
@@ -123,8 +125,58 @@ class SaasProductController extends Controller
 
         $product->is_featured = $request->has('is_featured') ? (bool) $request->is_featured : false;
         $product->is_active = $request->has('is_active') ? (bool) $request->is_active : false;
+        $product->seller_publish_status = SaasProduct::SELLER_PUBLISH_STATUS_REQUEST;
 
         $product->save();
+
+                // Send email notification to admin about new product request
+        try {
+            $adminEmail = config('app.admin_email');
+
+            if (empty($adminEmail)) {
+                Log::warning('Admin email not configured, skipping product request notification', [
+                    'product_id' => $product->id,
+                    'seller_id' => $sellerId
+                ]);
+            } else {
+                // Load relationships before sending email
+                $productWithRelations = $product->load(['seller', 'category', 'brand', 'images']);
+
+                // Verify seller exists
+                if (!$productWithRelations->seller) {
+                    Log::error('Product has no seller relationship', [
+                        'product_id' => $product->id,
+                        'seller_id' => $sellerId
+                    ]);
+                } else {
+                    // Send the email
+                    Mail::to($adminEmail)->send(new SaasProductRequestNotification($productWithRelations));
+
+                    Log::info('Product request notification sent successfully', [
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'seller_id' => $sellerId,
+                        'seller_name' => $productWithRelations->seller->name,
+                        'admin_email' => $adminEmail,
+                        'mail_driver' => config('mail.default')
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send product request notification', [
+                'product_id' => $product->id,
+                'seller_id' => $sellerId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'mail_config' => [
+                    'driver' => config('mail.default'),
+                    'admin_email' => config('app.admin_email'),
+                    'from_address' => config('mail.from.address')
+                ]
+            ]);
+
+            // Still continue with success message since product was created
+        }
 
         // Handle digital product file upload
         if ($product->product_type === 'Digital' && $request->hasFile('file')) {
@@ -184,7 +236,7 @@ class SaasProductController extends Controller
             $product->save();
         }
 
-        return redirect()->route('seller.products.index')->with('success', 'Product created successfully');
+        return redirect()->route('seller.products.index')->with('success', 'Product created successfully and sent for approval');
     }
 
     /**

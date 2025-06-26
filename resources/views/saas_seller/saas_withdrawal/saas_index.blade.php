@@ -20,54 +20,60 @@
 
     <!-- Wallet Summary -->
     <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card">
+        <div class="col-md-3 col-sm-6">
+            <div class="card mini-stats-wid">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col mt-0">
-                            <h5 class="card-title">Total Balance</h5>
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Current Balance</p>
+                            <h1 class="mt-1 mb-3">Rs {{ number_format($balance, 2) }}</h1>
                         </div>
-                        <div class="col-auto">
-                            <div class="stat text-primary">
-                                <span class="rs-icon align-middle">Rs</span>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                <span class="avatar-title">
+                                    <i class="bx bx-wallet font-size-24"></i>
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <h1 class="mt-1 mb-3">Rs {{ number_format($wallet->balance, 2) }}</h1>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card">
+        <div class="col-md-3 col-sm-6">
+            <div class="card mini-stats-wid">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col mt-0">
-                            <h5 class="card-title">Pending Balance</h5>
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Pending Withdrawals</p>
+                            <h1 class="mt-1 mb-3">Rs {{ number_format($pendingAmount, 2) }}</h1>
                         </div>
-                        <div class="col-auto">
-                            <div class="stat text-warning">
-                                <i class="align-middle" data-feather="clock"></i>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-warning">
+                                <span class="avatar-title">
+                                    <i class="bx bx-time-five font-size-24"></i>
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <h1 class="mt-1 mb-3">Rs {{ number_format($wallet->pending_balance, 2) }}</h1>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card">
+        <div class="col-md-3 col-sm-6">
+            <div class="card mini-stats-wid">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col mt-0">
-                            <h5 class="card-title">Available</h5>
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Available for Withdrawal</p>
+                            <h1 class="mt-1 mb-3">Rs {{ number_format($balance, 2) }}</h1>
                         </div>
-                        <div class="col-auto">
-                            <div class="stat text-success">
-                                <i class="align-middle" data-feather="check-circle"></i>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-success">
+                                <span class="avatar-title">
+                                    <i class="bx bx-money font-size-24"></i>
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <h1 class="mt-1 mb-3">Rs {{ number_format($wallet->available_for_withdrawal, 2) }}</h1>
                 </div>
             </div>
         </div>
@@ -91,12 +97,55 @@
     </div>
 
     <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Withdrawal Summary</h4>
+                    <div class="row text-center">
+                        <div class="col-md-4 col-sm-6 mb-3 mb-md-0">
+                            <div class="p-3 bg-light rounded shadow-sm">
+                                <p class="text-muted mb-1">Current Balance</p>
+                                <h1 class="mt-1 mb-3">Rs {{ number_format($balance, 2) }}</h1>
+                                <a href="{{ route('seller.withdrawals.create') }}" class="btn btn-primary btn-sm">Request Withdrawal</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-6 mb-3 mb-md-0">
+                            <div class="p-3 bg-light rounded shadow-sm">
+                                <p class="text-muted mb-1">Pending Withdrawals</p>
+                                <h1 class="mt-1 mb-3">Rs {{ number_format($pendingAmount, 2) }}</h1>
+                                <a href="#pending-requests" class="btn btn-secondary btn-sm">View Pending</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-6">
+                            <div class="p-3 bg-light rounded shadow-sm">
+                                <p class="text-muted mb-1">Total Withdrawn</p>
+                                <h1 class="mt-1 mb-3">Rs {{ number_format($totalWithdrawn, 2) }}</h1>
+                                <a href="{{ route('seller.transactions.index') }}" class="btn btn-info btn-sm">View History</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Recent Withdrawal Requests</h5>
-                </div>
                 <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title" id="pending-requests">Withdrawal History</h4>
+                        <div class="my-3">
+                            @if($balance > 0)
+                                <a href="{{ route('seller.withdrawals.create') }}" class="btn btn-success"><i class="mdi mdi-plus me-1"></i> Request New Withdrawal</a>
+                            @else
+                                <p class="text-warning">You do not have enough balance to make a withdrawal request.</p>
+                            @endif
+                        </div>
+                    </div>
+
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible" role="alert">
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -205,7 +254,7 @@
                                         <div class="text-muted">
                                             <i class="align-middle" data-feather="download" style="width: 48px; height: 48px;"></i>
                                             <p class="mt-2">No withdrawal requests found.</p>
-                                            @if($wallet->available_for_withdrawal > 0)
+                                            @if($balance > 0)
                                                 <a href="{{ route('seller.withdrawals.create') }}" class="btn btn-primary">
                                                     Request Your First Withdrawal
                                                 </a>

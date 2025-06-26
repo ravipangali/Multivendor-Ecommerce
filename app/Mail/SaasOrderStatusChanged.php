@@ -34,9 +34,16 @@ class SaasOrderStatusChanged extends Mailable
         $subject = 'Order Status Update - #' . $this->order->order_number;
 
         // Choose email template based on recipient
-        $template = $this->recipient === 'seller'
-            ? 'emails.saas_seller.saas_order_status_changed'
-            : 'emails.saas_customer.saas_order_status_changed';
+        switch ($this->recipient) {
+            case 'seller':
+                $template = 'emails.saas_seller.saas_order_status_changed';
+                break;
+            case 'admin':
+                $template = 'emails.saas_admin.saas_order_status_changed';
+                break;
+            default:
+                $template = 'emails.saas_customer.saas_order_status_changed';
+        }
 
         return $this->subject($subject)
                    ->view($template)

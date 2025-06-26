@@ -40,16 +40,16 @@
                                     <span class="badge bg-secondary">{{ ucfirst($paymentMethod->type) }}</span>
                                 @endif
                             </p>
-                            <p><strong>Account Name:</strong> {{ $paymentMethod->account_name }}</p>
+                            <p><strong>Account Name:</strong> {{ $paymentMethod->details['account_name'] ?? 'N/A' }}</p>
 
                             @if($paymentMethod->type == 'bank_transfer')
-                                <p><strong>Bank Name:</strong> {{ $paymentMethod->bank_name }}</p>
-                                <p><strong>Bank Branch:</strong> {{ $paymentMethod->bank_branch }}</p>
-                                <p><strong>Account Number:</strong> {{ $paymentMethod->account_number }}</p>
+                                <p><strong>Bank Name:</strong> {{ $paymentMethod->details['bank_name'] ?? 'N/A' }}</p>
+                                <p><strong>Bank Branch:</strong> {{ $paymentMethod->details['bank_branch'] ?? 'N/A' }}</p>
+                                <p><strong>Account Number:</strong> {{ $paymentMethod->details['account_number'] ?? 'N/A' }}</p>
                             @endif
 
                             @if($paymentMethod->type == 'esewa' || $paymentMethod->type == 'khalti')
-                                <p><strong>Mobile Number:</strong> {{ $paymentMethod->mobile_number }}</p>
+                                <p><strong>Mobile Number:</strong> {{ $paymentMethod->details['mobile_number'] ?? 'N/A' }}</p>
                             @endif
                         </div>
                         <div class="col-md-6">

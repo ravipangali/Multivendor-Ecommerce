@@ -970,7 +970,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.disabled = true;
 
                     // Make the API call to cancel order
-                    fetch(`/customer/order/${orderId}/cancel`, {
+                    fetch(`{{ route('customer.order.cancel.ajax', ':id') }}`.replace(':id', orderId), {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

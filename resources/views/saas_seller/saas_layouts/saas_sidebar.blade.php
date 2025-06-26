@@ -92,8 +92,6 @@
                 </a>
             </li>
 
-
-
             <li class="sidebar-header">
                 Financial
             </li>
@@ -137,6 +135,16 @@
                     <i class="align-middle" data-feather="users"></i> <span class="align-middle">Customer Report</span>
                 </a>
             </li>
+
+            <div class="sb-sidenav-menu-heading">Earnings</div>
+            <a class="nav-link {{ request()->routeIs('seller.transactions.*') ? 'active' : '' }}" href="{{ route('seller.transactions.index') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-exchange-alt"></i></div>
+                Transactions
+            </a>
+            <a class="nav-link {{ request()->routeIs('seller.withdrawals.*') ? 'active' : '' }}" href="{{ route('seller.withdrawals.index') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-money-bill-wave"></i></div>
+                Withdrawals
+            </a>
         </ul>
     </div>
 </nav>
